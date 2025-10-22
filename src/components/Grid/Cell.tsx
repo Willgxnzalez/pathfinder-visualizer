@@ -9,9 +9,9 @@ interface CellProps { // Only use data that causes a re-render
     isEnd: boolean;
     isVisited: boolean;
     isPath: boolean;
-    onMouseDown: (row: number, col: number) => void;
-    onMouseEnter: (row: number, col: number) => void;
-    onMouseUp: () => void;
+    onMouseDownHandler: (row: number, col: number) => void;
+    onMouseEnterHandler: (row: number, col: number) => void;
+    onMouseUpHandler: () => void;
 }
 
 function Cell({
@@ -22,14 +22,13 @@ function Cell({
     isEnd,
     isVisited,
     isPath,
-    onMouseDown,
-    onMouseEnter,
-    onMouseUp,
+    onMouseDownHandler,
+    onMouseEnterHandler,
+    onMouseUpHandler,
 }: CellProps) {
 
     const BASE_CELL_CLASS = `
         w-6 h-6 border border-gray-800
-        transition-colors duration-200 ease-in-out
         cursor-pointer
     `;
 
@@ -40,24 +39,16 @@ function Cell({
         if (isVisited) return CELL_COLORS.visited;
         if (isWall) return CELL_COLORS.wall;
         return CELL_COLORS.default;
-    };
+    }
 
     return (
         <div 
             className={`${BASE_CELL_CLASS} ${getCellType()}`}
-            onMouseDown={() => onMouseDown(row, col)}
-            onMouseEnter={() => onMouseEnter(row, col)}
-            onMouseUp={onMouseUp}
+            onMouseDown={() => onMouseDownHandler(row, col)}
+            onMouseEnter={() => onMouseEnterHandler(row, col)}
+            onMouseUp={onMouseUpHandler}
         />
     );
 }
 
-export default memo(Cell, (prev, next) => { // Trigger re-renders only for visual props
-    return (
-        prev.isWall === next.isWall &&
-        prev.isStart === next.isStart &&
-        prev.isEnd === next.isEnd &&
-        prev.isVisited === next.isVisited &&
-        prev.isPath === next.isPath
-    );
-});
+export default memo(Cell) ;
