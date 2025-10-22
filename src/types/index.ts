@@ -1,4 +1,4 @@
-export interface Cell {
+export interface Cell { // The data used for pathfinding algorithms
     row: number;
     col: number;
     isWall: boolean;
