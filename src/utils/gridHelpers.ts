@@ -18,13 +18,13 @@ export function createGrid(): Cell[][] {
                 isPath: false,
                 distance: Infinity,
                 prevCell: null
-            })
+            });
         }
 
         grid.push(currentRow);
     }
 
-    return  grid; 
+    return grid;
 }
 
 export function toggleWall(grid: Cell[][], row: number, col: number): Cell[][] {
@@ -32,6 +32,7 @@ export function toggleWall(grid: Cell[][], row: number, col: number): Cell[][] {
         if (rowIdx !== row) return rowCells;
         return rowCells.map((cell, colIdx) => {
             if (colIdx === col && !cell.isStart && !cell.isEnd) {
+                console.log(`Toggling Cell(${rowIdx}, ${colIdx})`);
                 return { ...cell, isWall: !cell.isWall };
             }
             return cell;

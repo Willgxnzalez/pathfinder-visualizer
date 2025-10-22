@@ -1,19 +1,26 @@
-import React, { useState } from 'react';
+// src/App.tsx
 import './App.css';
+import Grid from './components/Grid/Grid';
+import { createGrid } from './utils/gridHelpers';
+import { Cell } from './types';
+import React, { useState, useCallback } from 'react';
 
 function App() {
-  const [count, setCount] = useState(0)
+    const [grid, setGrid] = useState<Cell[][]>(createGrid());
+    const [isRunning, setIsRunning] = useState(false);
+    
+    // Allow both direct and functional updates
 
-  return (
-    <>
-      <h1 className="text-red-500">Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-      </div>
-    </>
-  )
+    return (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 p-6">
+          <h1 className="text-3xl font-bold text-cyan-500 mb-4">Pathfinding Visualizer</h1>
+          <Grid 
+            grid={grid} 
+            onGridChange={setGrid} 
+            isRunning={isRunning} 
+          />
+        </div>
+    );
 }
 
-export default App
+export default App;
