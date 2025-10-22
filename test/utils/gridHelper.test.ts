@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { createGrid } from '../../src/utils/gridHelpers'
+import { createGrid, toggleWall } from '../../src/utils/gridHelpers'
 import { GRID_ROWS, GRID_COLS } from '../../src/utils/constants';
 
 test('Creates Grid', () => {
@@ -40,4 +40,50 @@ test('Creates Grid', () => {
       expect(cell.prevCell).toBe(null);
     });
   });
+});
+
+test('toggleWall toggles the wall state correctly', () => {
+    const grid = createGrid();
+
+    expect(grid[5][5].isWall).toBe(false);
+
+    const gridAfterToggle = toggleWall(grid, 5, 5);
+    expect(gridAfterToggle[5][5].isWall).toBe(true);
+
+    const gridAfterToggleBack = toggleWall(gridAfterToggle, 5, 5);
+    expect(gridAfterToggleBack[5][5].isWall).toBe(false);
+});
+
+test('toggleWall doesn\'t affect start and end cells', () => {
+    const grid = createGrid();
+
+    // Try toggling start position
+    const toggledStart = toggleWall(grid, 10, 10);
+    expect(toggledStart[10][10].isWall).toBe(false);
+
+    // Try toggling end position
+    const toggledEnd = toggleWall(grid, 10, 40);
+    expect(toggledEnd[10][40].isWall).toBe(false);
+
+    // Should not mutate original grid
+    expect(grid[5][5].isWall).toBe(false);
+});
+
+test('toggleWall only mutates the specified cell for the given row', () => {
+    const grid = createGrid();
+    const newGrid = toggleWall(grid, 0, 0);
+
+    // The toggled cell should have changed
+    expect(grid[0][0].isWall).toBe(false);
+    expect(newGrid[0][0].isWall).toBe(true);
+
+    // Other cells in the same row stay the same
+    for(let col = 1; col < GRID_COLS; col++) {
+        expect(newGrid[0][col]).toEqual(grid[0][col]);
+    }
+
+    // Other rows reference equality
+    for(let row = 1; row < GRID_ROWS; row++) {
+        expect(newGrid[row]).toBe(grid[row]);
+    }
 });

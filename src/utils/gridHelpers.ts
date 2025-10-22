@@ -27,3 +27,14 @@ export function createGrid(): Cell[][] {
     return  grid; 
 }
 
+export function toggleWall(grid: Cell[][], row: number, col: number): Cell[][] {
+    return grid.map((rowCells, rowIdx) => {
+        if (rowIdx !== row) return rowCells;
+        return rowCells.map((cell, colIdx) => {
+            if (colIdx === col && !cell.isStart && !cell.isEnd) {
+                return { ...cell, isWall: !cell.isWall };
+            }
+            return cell;
+        });
+    });
+}
