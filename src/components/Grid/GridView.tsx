@@ -1,7 +1,5 @@
 import React, { useEffect, useCallback, useRef } from 'react';
-import { GridCell } from '../../types';
 import { GridManager } from './GridManager';
-import { GRID_COLS } from '../../utils/constants';
 import { GridGraph } from './GridGraph';
 
 interface GridViewProps {

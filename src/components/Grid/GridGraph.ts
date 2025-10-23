@@ -1,146 +1,109 @@
-import { createCell } from './Cell';
-import { GridCell, INode } from '../../types';
+import { GridNode } from '../../geometry/Node';
+import { INode } from '../../types';
 
 export class GridGraph {
-    private cells: GridCell[][];
-    private cellMap: Map<number, GridCell>;
+    private nodes: GridNode[][];
+    private nodeMap: Map<number, GridNode>;
     private rows: number;
     private cols: number;
 
-    private startCell: GridCell;
-    private endCell: GridCell;
-    
+    private startNode!: GridNode;
+    private endNode!: GridNode;
+
     constructor(rows: number, cols: number) {
-        this.cells = [];
-        this.cellMap = new Map();
         this.rows = rows;
         this.cols = cols;
+        this.nodeMap = new Map();
         this.initialize();
     }
 
     private initialize(): void {
-        this.cells = Array.from({ length: this.rows }, (_, row) =>
+        this.nodes = Array.from({ length: this.rows }, (_, row) =>
             Array.from({ length: this.cols }, (_, col) => {
                 const id = row * this.cols + col;
-                const cell = createCell(row, col, id);
-                this.cellMap.set(id, cell);
-                return cell;
+                const node = new GridNode(id, row, col);
+                this.nodeMap.set(id, node);
+                return node;
             })
         );
     }
 
     setStart(row: number, col: number): void {
-        if (this.startCell) {
-            this.startCell.isStart = false;
-        }
+        if (this.startNode) this.startNode.isStart = false;
 
-        const cell = this.getCell(row, col);
-        if (cell) {
-            cell.isStart = true;
-            cell.isWall = false;
-            this.startCell = cell;
+        const node = this.getNodeAt(row, col);
+        if (node) {
+            node.isStart = true;
+            node.walkable = true;
+            this.startNode = node;
         }
     }
 
     setEnd(row: number, col: number): void {
-        if (this.endCell) {
-            this.endCell.isEnd = false;
-        }
+        if (this.endNode) this.endNode.isEnd = false;
 
-        const cell = this.getCell(row, col);
-        if (cell) {
-            cell.isEnd = true;
-            cell.isWall = false;
-            this.endCell = cell;
+        const node = this.getNodeAt(row, col);
+        if (node) {
+            node.isEnd = true;
+            node.walkable = true;
+            this.endNode = node;
         }
     }
 
-    getDimensions(): { rows: number, cols: number } {
+    getDimensions() {
         return { rows: this.rows, cols: this.cols };
     }
 
-    getCell(row: number, col: number): GridCell | undefined {
-        if (row < 0 || row >= this.rows || col < 0 || col >= this.cols) {
-            return undefined;
-        }
-        return this.cells[row][col];
+    getNodeAt(row: number, col: number): GridNode | undefined {
+        if (row < 0 || row >= this.rows || col < 0 || col >= this.cols) return undefined;
+        return this.nodes[row][col];
     }
 
-    getAllCells(): GridCell[][] {
-        return this.cells;
+    getAllNodes(): GridNode[][] {
+        return this.nodes;
     }
 
-    setWalkable(row: number, col: number, wasWall: boolean): void{
-        const cell = this.getCell(row, col);
-        if (cell && !cell.isStart && !cell.isEnd) {
-            cell.isWall = !wasWall;
+    setWalkable(row: number, col: number, walkable: boolean): void {
+        const node = this.getNodeAt(row, col);
+        if (node && !node.isStart && !node.isEnd) {
+            node.walkable = walkable;
         }
     }
 
-    isWalkable(cell: GridCell): boolean {
-        return !cell.isWall;
+    isWalkable(node: GridNode): boolean {
+        return node.walkable;
     }
 
-    // ========== IGraph Adapter methods ==========
-    private cellToNodeId(row: number, col: number): number {
-        return row * this.cols + col;
-    }
-    
-    private nodeIdToCoords(id: number): { row: number, col: number } {
-        return { row: Math.floor(id / this.cols), col: id % this.cols };
+    // ===== IGraph-compatible methods =====
+    getNode(id: number): GridNode | undefined {
+        return this.nodeMap.get(id);
     }
 
-    private cellToNode(cell: GridCell): INode {
-        return {
-          id: this.cellToNodeId(cell.row, cell.col),
-          walkable: !cell.isWall,
-          gCost: cell.gCost,
-          hCost: cell.hCost,
-          parent: cell.parent ? this.cellToNode(cell) : null,
-          isStart: cell.isStart,
-          isEnd: cell.isEnd,
-          isVisited: cell.isVisited,
-          isPath: cell.isPath
+    getNeighbors(id: number): GridNode[] {
+        const node = this.nodeMap.get(id);
+        if (!node) return [];
+
+        const { row, col } = node;
+        const neighbors: GridNode[] = [];
+
+        const addIfWalkable = (r: number, c: number) => {
+            const n = this.getNodeAt(r, c);
+            if (n && n.walkable) neighbors.push(n);
         };
-      }
 
-    getNode(id: number): INode | undefined {
-        const cell = this.cellMap.get(id); // O(1) lookup
-        return cell ? this.cellToNode(cell) : undefined;
-    }
+        if (row > 0) addIfWalkable(row - 1, col);
+        if (row < this.rows - 1) addIfWalkable(row + 1, col);
+        if (col > 0) addIfWalkable(row, col - 1);
+        if (col < this.cols - 1) addIfWalkable(row, col + 1);
 
-    getNeighbors(nodeId: number): INode[] {
-        const cell = this.cellMap.get(nodeId);
-        if (!cell) return [];
-
-        const row = cell.row;
-        const col = cell.col;
-        const neighbors: INode[] = [];
-
-        if (row > 0) {
-            const c = this.cells[row - 1][col];
-            if (this.isWalkable(c)) neighbors.push(this.cellToNode(c));
-        }
-        if (row < this.rows - 1) {
-            const c = this.cells[row + 1][col];
-            if (this.isWalkable(c)) neighbors.push(this.cellToNode(c));
-        }
-        if (col > 0) {
-            const c = this.cells[row][col - 1];
-            if (this.isWalkable(c)) neighbors.push(this.cellToNode(c));
-        }
-        if (col < this.cols - 1) {
-            const c = this.cells[row][col + 1];
-            if (this.isWalkable(c)) neighbors.push(this.cellToNode(c));
-        }
         return neighbors;
     }
 
     getStartNodeId(): number {
-        return this.startCell.id;
+        return this.startNode.id;
     }
 
     getEndNodeId(): number {
-        return this.endCell.id;
+        return this.endNode.id;
     }
 }

@@ -1,17 +1,39 @@
 import { INode } from "../types";
 
-export class Node implements INode {
+export class GridNode implements INode {
+    id: number;
+    row: number;
+    col: number;
+
+    gCost: number = Infinity;
+    hCost: number = 0;
+    fCost: number = 0;
+    parent: GridNode | null = null;
+
+    walkable: boolean = true;
+    isStart: boolean = false;
+    isEnd: boolean = false;
+    isVisited: boolean = false;
+    isPath: boolean = false;
+
+    constructor(id: number, row: number, col: number) {
+        this.id = id;
+        this.row = row;
+        this.col = col;
+    }
+}
+
+export class MapNode implements INode {
     id: number;
     walkable: boolean;
 
-    // Map-specific
     lat: number;
     lng: number;
 
     gCost: number = Infinity;
     hCost: number = 0;
     fCost: number = 0;
-    parent: INode | null = null;
+    parent: MapNode | null = null;
 
     isStart: boolean = false;
     isEnd: boolean = false;
