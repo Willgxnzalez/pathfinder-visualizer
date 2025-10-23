@@ -1,18 +1,18 @@
 import { INode, IEdge } from '../types';
 
 export interface IGraph {
-    getNode(id: String): INode | null;
-    getNeighbors(nodeId: string): INode[];
-    getDistance(fromId: string, toId: string): number;
-    getHeuristic(fromId: string, toId: string): number;
+    getNode(id: number): INode | null;
+    getNeighbors(nodeId: number): INode[];
+    getDistance(fromId: number, toId: number): number;
+    getHeuristic(fromId: number, toId: number): number;
 
-    getStartNodeId(): string | null;
-    getEndNodeId(): string | null;
+    getStartNodeId(): number | null;
+    getEndNodeId(): number | null;
 
     resetPathFinding(): void;
 
-    markVisited(nodeId: string): void;
-    markPath(nodeId: string): void;
+    markVisited(nodeId: number): void;
+    markPath(nodeId: number): void;
 }
 
 
