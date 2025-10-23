@@ -7,10 +7,8 @@ export class GridGraph {
     private rows: number;
     private cols: number;
 
-    private startRow: number;
-    private startCol: number;
-    private endRow: number;
-    private endCol: number;
+    private startCell: GridCell;
+    private endCell: GridCell;
     
     constructor(rows: number, cols: number) {
         this.cells = [];
@@ -32,30 +30,28 @@ export class GridGraph {
     }
 
     setStart(row: number, col: number): void {
-        if (this.startRow != null && this.startRow >= 0) {
-            this.cells[this.startRow][this.startCol].isStart = false;
+        if (this.startCell) {
+            this.startCell.isStart = false;
         }
 
         const cell = this.getCell(row, col);
         if (cell) {
             cell.isStart = true;
             cell.isWall = false;
-            this.startRow = row;
-            this.startCol = col;
+            this.startCell = cell;
         }
     }
 
     setEnd(row: number, col: number): void {
-        if (this.endRow != null && this.endRow >= 0) {
-            this.cells[this.endRow][this.endCol].isEnd = false;
+        if (this.endCell) {
+            this.endCell.isEnd = false;
         }
 
         const cell = this.getCell(row, col);
         if (cell) {
             cell.isEnd = true;
             cell.isWall = false;
-            this.endRow = row;
-            this.endCol = col;
+            this.endCell = cell;
         }
     }
 
@@ -100,7 +96,6 @@ export class GridGraph {
           walkable: !cell.isWall,
           gCost: cell.gCost,
           hCost: cell.hCost,
-          fCost: cell.gCost + cell.hCost,
           parent: cell.parent ? this.cellToNode(cell) : null,
           isStart: cell.isStart,
           isEnd: cell.isEnd,
@@ -139,5 +134,13 @@ export class GridGraph {
             if (this.isWalkable(c)) neighbors.push(this.cellToNode(c));
         }
         return neighbors;
+    }
+
+    getStartNodeId(): number {
+        return this.startCell.id;
+    }
+
+    getEndNodeId(): number {
+        return this.endCell.id;
     }
 }

@@ -81,24 +81,27 @@ test('GridGraph start/end setters', () => {
     graph.setStart(1, 1);
     let cell = graph.getCell(1, 1)!;
     expect(cell.isStart).toBe(true);
+
+    // getStartNodeId matches assigned
+    expect(graph.getStartNodeId()).toBe(1 * 3 + 1);
+
     // Set a new start
     graph.setStart(2, 2);
     expect(cell.isStart).toBe(false);
     expect(graph.getCell(2, 2)!.isStart).toBe(true);
+    // Check id
+    expect(graph.getStartNodeId()).toBe(2 * 3 + 2);
 
     // Do similarly for end
     graph.setEnd(0, 2);
     let endCell = graph.getCell(0, 2)!;
     expect(endCell.isEnd).toBe(true);
+    expect(graph.getEndNodeId()).toBe(0 * 3 + 2);
+
     graph.setEnd(2, 0);
     expect(endCell.isEnd).toBe(false);
     expect(graph.getCell(2, 0)!.isEnd).toBe(true);
-
-    // Access private fields directly for testing purposes
-    expect((graph as any).startRow).toBe(2);
-    expect((graph as any).startCol).toBe(2);
-    expect((graph as any).endRow).toBe(2);
-    expect((graph as any).endCol).toBe(0);
+    expect(graph.getEndNodeId()).toBe(2 * 3 + 0);
 });
 
 test('GridGraph does not set wall on start or end', () => {
