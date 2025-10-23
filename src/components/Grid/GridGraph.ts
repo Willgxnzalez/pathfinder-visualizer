@@ -28,13 +28,41 @@ export class GridGraph {
         }
     }
 
+    setStart(row: number, col: number): void {
+        if (this.startRow != null && this.startRow >= 0) {
+            this.cells[this.startRow][this.startCol].isStart = false;
+        }
+
+        const cell = this.getCell(row, col);
+        if (cell) {
+            cell.isStart = true;
+            cell.isWall = false;
+            this.startRow = row;
+            this.startCol = col;
+        }
+    }
+
+    setEnd(row: number, col: number): void {
+        if (this.endRow != null && this.endRow >= 0) {
+            this.cells[this.endRow][this.endCol].isEnd = false;
+        }
+
+        const cell = this.getCell(row, col);
+        if (cell) {
+            cell.isEnd = true;
+            cell.isWall = false;
+            this.endRow = row;
+            this.endCol = col;
+        }
+    }
+
     getDimensions(): { rows: number, cols: number } {
         return { rows: this.rows, cols: this.cols };
     }
 
-    getCell(row: number, col: number): GridCell | undefined {
+    getCell(row: number, col: number): GridCell | null {
         if (row < 0 || row >= this.rows || col < 0 || col >= this.cols) {
-            return undefined;
+            return null;
         }
         return this.cells[row][col];
     }
