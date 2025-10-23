@@ -15,7 +15,7 @@ export interface GridCell { // The data used for pathfinding algorithms
 }
 
 export interface INode {
-    id: string;
+    id: number;
     walkable: boolean;
 
     gCost: number;

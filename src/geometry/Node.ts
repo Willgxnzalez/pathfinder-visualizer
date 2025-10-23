@@ -1,7 +1,7 @@
 import { INode } from "../types";
 
 export class Node implements INode {
-    id: string;
+    id: number;
     walkable: boolean;
 
     // Map-specific
@@ -18,7 +18,7 @@ export class Node implements INode {
     isVisited: boolean = false;
     isPath: boolean = false;
 
-    constructor(id: string, lat: number, lng: number, walkable: boolean) {
+    constructor(id: number, lat: number, lng: number, walkable: boolean) {
         this.id = id;
         this.lat = lat;
         this.lng = lng;
