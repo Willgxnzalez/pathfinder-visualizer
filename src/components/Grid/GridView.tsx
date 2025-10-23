@@ -34,6 +34,16 @@ export default function Grid({ graph, manager, cellSize, onManagerReady }: GridV
         managerRef.current.handleMouseDown(e.clientX, e.clientY);
     }, []);
 
+    const handleMouseMove = useCallback((e: React.MouseEvent) => {
+        if (!managerRef.current) return;
+        managerRef.current.handleMouseMove(e.clientX, e.clientY);
+    }, []);
+
+    const handleMouseUp = useCallback((e: React.MouseEvent) => {
+        if (!managerRef.current) return;
+        managerRef.current.handleMouseUp();
+    } , []);
+
     return (
         <div className="border-2 border-gray-700 rounded-lg p-2 bg-gray-950 select-none">
             <div
@@ -41,6 +51,9 @@ export default function Grid({ graph, manager, cellSize, onManagerReady }: GridV
                 className="cursor-crosshair"
                 style={{ touchAction: 'none' }}
                 onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseUp}
             />
         </div>
     );

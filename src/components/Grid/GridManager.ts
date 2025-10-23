@@ -7,8 +7,8 @@ export class GridManager {
     private graph: GridGraph;
     private cellSize: number;
     private cellElements: Map<string, HTMLElement>;
-
     private drawMode: 'wall' | 'erase' = 'wall';
+    private isDrawing: boolean = false;
 
     constructor(container: HTMLElement, graph: GridGraph, cellSize: number) {
         this.container = container;
@@ -83,9 +83,28 @@ export class GridManager {
         const cell = this.graph.getCell(coords.row, coords.col);
         if (!cell || cell.isStart || cell.isEnd) return;
 
+        this.isDrawing = true;
         this.drawMode = cell.isWall ? 'erase' : 'wall';
         this.graph.setWalkable(coords.row, coords.col, cell.isWall);
         this.updateCell(coords.row, coords.col);
+    }
+
+    handleMouseMove(x: number, y: number): void {
+        const coords = this.getCoordsFromPoint(x, y);
+        if (!coords || !this.isDrawing) return;
+    
+        const cell = this.graph.getCell(coords.row, coords.col);
+        if (!cell || cell.isStart || cell.isEnd) return;
+    
+        const shouldBeWalkable = this.drawMode === 'erase';
+        if (!cell.isWall === shouldBeWalkable) return;
+    
+        this.graph.setWalkable(coords.row, coords.col, shouldBeWalkable);
+        this.updateCell(coords.row, coords.col);
+    }
+
+    handleMouseUp(): void {
+        this.isDrawing = false;
     }
 
     updateCell(row: number, col: number): void {
