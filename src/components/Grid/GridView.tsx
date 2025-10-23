@@ -15,19 +15,24 @@ export default function Grid({ graph, manager, cellSize, onManagerReady }: GridV
     const containerRef = useRef<HTMLDivElement>(null);
     const managerRef = useRef<GridManager | null>(null);
 
-    useEffect(() => {
+    useEffect(() => { // runs after component is mounted
         if (containerRef.current && !managerRef.current) {
-          managerRef.current = new GridManager(containerRef.current, graph, cellSize);
-          onManagerReady(managerRef.current);
+            managerRef.current = new GridManager(containerRef.current, graph, cellSize);
+            onManagerReady(managerRef.current);
         }
     
         return () => {
           if (managerRef.current) {
-            managerRef.current.destroy();
-            managerRef.current = null;
+                managerRef.current.destroy();
+                managerRef.current = null;
           }
         };
-      }, [graph, cellSize, onManagerReady]);
+    }, [graph, cellSize, onManagerReady]);
+
+    const handleMouseDown = useCallback((e: React.MouseEvent) => {
+        if (!managerRef.current) return;
+        managerRef.current.handleMouseDown(e.clientX, e.clientY);
+    }, []);
 
     return (
         <div className="border-2 border-gray-700 rounded-lg p-2 bg-gray-950 select-none">
@@ -35,6 +40,7 @@ export default function Grid({ graph, manager, cellSize, onManagerReady }: GridV
                 ref={containerRef}
                 className="cursor-crosshair"
                 style={{ touchAction: 'none' }}
+                onMouseDown={handleMouseDown}
             />
         </div>
     );

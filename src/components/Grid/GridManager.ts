@@ -6,6 +6,7 @@ export class GridManager {
     private container: HTMLElement;
     private graph: GridGraph;
     private cellSize: number;
+    private cellElements: Map<string, HTMLElement>;
 
     private drawMode: 'wall' | 'erase' = 'wall';
 
@@ -13,6 +14,7 @@ export class GridManager {
         this.container = container;
         this.graph = graph;
         this.cellSize = cellSize;
+        this.cellElements = new Map();
         this.render();
     }
 
@@ -30,6 +32,7 @@ export class GridManager {
                 const cell = cells[row][col];
                 const cellElement = this.createCellElement(cell);
                 this.container.appendChild(cellElement);
+                this.cellElements.set(`${row}-${col}`, cellElement);
             }
         }
     }
@@ -55,6 +58,42 @@ export class GridManager {
         else if (cell.isWall) bg = CELL_COLORS.wall;
     
         return `${base} ${bg}`;
+    }
+
+    private getCoordsFromPoint(x: number, y: number): { row: number, col: number } | null {
+        const rect = this.container.getBoundingClientRect();
+        const relx = x - rect.left;
+        const rely = y - rect.top;
+        
+        const row = Math.floor(rely / this.cellSize);
+        const col = Math.floor(relx / this.cellSize);
+
+        const { rows, cols } = this.graph.getDimensions();
+
+        if (row >= 0 && row < rows && col >= 0 && col < cols) {
+            return { row, col };
+        }
+        return null;
+    }
+
+    handleMouseDown(x: number, y: number): void {
+        const coords = this.getCoordsFromPoint(x, y);
+        if (!coords) return;
+
+        const cell = this.graph.getCell(coords.row, coords.col);
+        if (!cell || cell.isStart || cell.isEnd) return;
+
+        this.drawMode = cell.isWall ? 'erase' : 'wall';
+        this.graph.setWalkable(coords.row, coords.col, cell.isWall);
+        this.updateCell(coords.row, coords.col);
+    }
+
+    updateCell(row: number, col: number): void {
+        const cell = this.graph.getCell(row, col);
+        const cellElement = this.cellElements.get(`${row}-${col}`);
+        if (cell && cellElement) {
+            cellElement.className = this.getCellClasses(cell);
+        }
     }
 
     destroy(): void {
