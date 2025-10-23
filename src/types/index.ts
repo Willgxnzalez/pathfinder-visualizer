@@ -1,4 +1,5 @@
 export interface GridCell { // The data used for pathfinding algorithms
+    id: number;
     row: number;
     col: number;
     isWall: boolean;

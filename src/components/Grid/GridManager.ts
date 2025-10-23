@@ -6,7 +6,7 @@ export class GridManager {
     private container: HTMLElement;
     private graph: GridGraph;
     private cellSize: number;
-    private cellElements: Map<string, HTMLElement>;
+    private cellElements: Map<number, HTMLElement>;
     private drawMode: 'wall' | 'erase' = 'wall';
     private isDrawing: boolean = false;
 
@@ -26,13 +26,14 @@ export class GridManager {
         this.container.style.gridTemplateRows = `repeat(${rows}, ${this.cellSize}px)`;
         this.container.style.gridTemplateColumns = `repeat(${cols}, ${this.cellSize}px)`;
 
-        const cells = this.graph.getAllCells();
         for (let row = 0; row < rows; ++row) {
             for (let col = 0; col < cols; ++col) {
-                const cell = cells[row][col];
-                const cellElement = this.createCellElement(cell);
-                this.container.appendChild(cellElement);
-                this.cellElements.set(`${row}-${col}`, cellElement);
+                const cell = this.graph.getCell(row, col);
+                if (cell) {
+                    const cellElement = this.createCellElement(cell);
+                    this.container.appendChild(cellElement);
+                    this.cellElements.set(cell.id, cellElement);
+                }
             }
         }
     }
@@ -109,7 +110,8 @@ export class GridManager {
 
     updateCell(row: number, col: number): void {
         const cell = this.graph.getCell(row, col);
-        const cellElement = this.cellElements.get(`${row}-${col}`);
+        if (!cell) return;
+        const cellElement = this.cellElements.get(cell.id);
         if (cell && cellElement) {
             cellElement.className = this.getCellClasses(cell);
         }

@@ -2,6 +2,7 @@ import { createCell } from './Cell';
 import { GridCell } from '../../types';
 export class GridGraph {
     private cells: GridCell[][];
+    private cellMap: Map<number, GridCell>;
     private rows: number;
     private cols: number;
 
@@ -12,20 +13,21 @@ export class GridGraph {
     
     constructor(rows: number, cols: number) {
         this.cells = [];
+        this.cellMap = new Map();
         this.rows = rows;
         this.cols = cols;
         this.initialize();
     }
 
     private initialize(): void {
-        for (let row = 0; row < this.rows; ++row) {
-            const currentRow: GridCell[] = new Array(this.cols);
-            for (let col = 0; col < this.cols; ++col) {
-                const cell = createCell(row, col);
-                currentRow[col] = cell;
-            }
-            this.cells.push(currentRow);
-        }
+        this.cells = Array.from({ length: this.rows }, (_, row) =>
+            Array.from({ length: this.cols }, (_, col) => {
+                const id = row * this.cols + col;
+                const cell = createCell(row, col, id);
+                this.cellMap.set(id, cell);
+                return cell;
+            })
+        );
     }
 
     setStart(row: number, col: number): void {

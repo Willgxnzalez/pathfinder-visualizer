@@ -1,7 +1,8 @@
 import { GridCell } from '../../types/index';
 
-export function createCell(row: number, col: number): GridCell {
+export function createCell(row: number, col: number, id: number): GridCell {
     return {
+        id,
         row,
         col,
         isWall: false,
