@@ -27,4 +27,12 @@ export class GridGraph {
             this.cells.push(currentRow);
         }
     }
+
+    getDimensions(): { rows: number, cols: number } {
+        return { rows: this.rows, cols: this.cols };
+    }
+
+    getAllCells(): GridCell[][] {
+        return this.cells;
+    }
 }
