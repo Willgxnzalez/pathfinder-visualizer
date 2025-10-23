@@ -1,18 +1,16 @@
-export interface Cell { // The data used for pathfinding algorithms
+export interface GridCell { // The data used for pathfinding algorithms
     row: number;
     col: number;
     isWall: boolean;
     isStart: boolean;
     isEnd: boolean;
+
+    // Pathfinding state
     isVisited: boolean;
     isPath: boolean;
-    distance: number;
-    prevCell: Cell | null;
+    gCost: number;
+    hCost: number;
+    parent: GridCell | null;
 }
 
 export type Algorithm = 'bfs' | 'dfs' | 'astar' | 'dijkstra';
-
-export interface GridPosition {
-    row: number;
-    col: number;
-}
