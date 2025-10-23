@@ -37,10 +37,10 @@ test('GridGraph getCell returns correct cell', () => {
     expect(cell!.col).toBe(3);
 
     // Out of bounds should return undefined
-    expect(graph.getCell(-1, 2)).toBeNull();
-    expect(graph.getCell(2, -1)).toBeNull();
-    expect(graph.getCell(99, 0)).toBeNull();
-    expect(graph.getCell(0, 99)).toBeNull();
+    expect(graph.getCell(-1, 2)).toBeUndefined();
+    expect(graph.getCell(2, -1)).toBeUndefined();
+    expect(graph.getCell(99, 0)).toBeUndefined();
+    expect(graph.getCell(0, 99)).toBeUndefined();
 });
 
 test('GridGraph setWalkable toggles wall correctly', () => {
@@ -115,4 +115,62 @@ test('GridGraph does not set wall on start or end', () => {
     // should allow walls on non start/end
     graph.setWalkable(0, 0, false);
     expect(graph.getCell(0, 0)!.isWall).toBe(true);
+});
+
+test('GridGraph.getNode returns INode for a cell by id', () => {
+    const graph = new GridGraph(2, 3);
+    const id = 1 * 3 + 2;
+    // No cell should be wall by default
+    const node = graph.getNode(id);
+    expect(node).toBeDefined();
+    expect(node!.id).toBe(id);
+    expect(node!.walkable).toBe(true);
+    expect(node!.isStart).toBe(false);
+    expect(node!.isEnd).toBe(false);
+    expect(node!.isVisited).toBe(false);
+    expect(node!.isPath).toBe(false);
+});
+
+test('GridGraph.getNeighbors returns walkable neighbors only', () => {
+    const graph = new GridGraph(3, 3);
+    // mark (1,1) as a wall, should not be returned as neighbor
+    graph.setWalkable(1, 1, false);
+
+    // (1,0) neighbors: (0,0), (2,0), (1,1)
+    // (1,1) is wall, so should not show up in neighbors
+    const cellId = 1 * 3 + 0;
+    const neighbors = graph.getNeighbors(cellId);
+    // (0,0) and (2,0) are walkable
+    const neighborIds = neighbors.map(n => n.id);
+    expect(neighborIds).toContain(0 * 3 + 0); // (0,0)
+    expect(neighborIds).toContain(2 * 3 + 0); // (2,0)
+    // There should be no (1,1)
+    expect(neighborIds).not.toContain(1 * 3 + 1);
+
+    // Make (1,0) a wall, check (1,1)'s neighbors returns only walkables
+    graph.setWalkable(1, 0, false);
+    // Now get neighbors for (1,1)
+    const neighbors2 = graph.getNeighbors(1 * 3 + 1);
+    // (0,1), (2,1), (1,0),(1,2) - but (1,0) is wall, so not included
+    const neighborIds2 = neighbors2.map(n => n.id);
+    expect(neighborIds2).toContain(0 * 3 + 1); // (0,1)
+    expect(neighborIds2).toContain(2 * 3 + 1); // (2,1)
+    expect(neighborIds2).toContain(1 * 3 + 2); // (1,2)
+    expect(neighborIds2).not.toContain(1 * 3 + 0);
+});
+
+test('GridGraph.getNode returns undefined for out-of-bounds id', () => {
+    const graph = new GridGraph(2, 2);
+    // Out of range: 2*2 = 4, should be undefined
+    expect(graph.getNode(4)).toBeUndefined();
+    expect(graph.getNode(-1)).toBeUndefined();
+});
+
+test('GridGraph.getCell(row, col) returns undefined out of bounds', () => {
+    const graph = new GridGraph(2, 2);
+    expect(graph.getCell(-1, 0)).toBeUndefined();
+    expect(graph.getCell(0, -1)).toBeUndefined();
+    expect(graph.getCell(2, 0)).toBeUndefined();
+    expect(graph.getCell(0, 2)).toBeUndefined();
+    expect(graph.getCell(1,1)).toBeDefined();
 });
