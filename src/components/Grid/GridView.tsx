@@ -45,7 +45,7 @@ export default function Grid({ graph, manager, cellSize, onManagerReady }: GridV
     } , []);
 
     return (
-        <div className="border-2 border-gray-700 rounded-lg p-2 bg-gray-950 select-none">
+        <div className="border-2 border-gray-700 rounded-lg p-2 bg-black select-none">
             <div
                 ref={containerRef}
                 style={{ touchAction: 'none' }}

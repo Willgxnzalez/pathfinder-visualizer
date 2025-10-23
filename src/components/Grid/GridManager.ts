@@ -22,7 +22,7 @@ export class GridManager {
         const { rows, cols } = this.graph.getDimensions();
 
         this.container.innerHTML = '';
-        this.container.className = 'grid border-2 border-gray-700 rounded-lg bg-gray-950 cursor-crosshair';
+        this.container.className = 'grid border-2 border-gray-700 cursor-crosshair relative touch-none grid pt-px pl-px';
         this.container.style.gridTemplateRows = `repeat(${rows}, ${this.cellSize}px)`;
         this.container.style.gridTemplateColumns = `repeat(${cols}, ${this.cellSize}px)`;
 
@@ -48,7 +48,7 @@ export class GridManager {
     }
     
     private getCellClasses(cell: GridCell): string {
-        const base = 'border border-gray-800 transition-colors duration-150';
+        const base = 'border border-med-gray transition-colors duration-150 -mt-px -ml-px box-border';
     
         let bg: string = CELL_COLORS.default;
         if (cell.isStart) bg = CELL_COLORS.start;
