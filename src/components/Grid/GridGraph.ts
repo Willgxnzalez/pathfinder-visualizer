@@ -32,7 +32,21 @@ export class GridGraph {
         return { rows: this.rows, cols: this.cols };
     }
 
+    getCell(row: number, col: number): GridCell | undefined {
+        if (row < 0 || row >= this.rows || col < 0 || col >= this.cols) {
+            return undefined;
+        }
+        return this.cells[row][col];
+    }
+
     getAllCells(): GridCell[][] {
         return this.cells;
+    }
+
+    setWalkable(row: number, col: number, wasWall: boolean): void{
+        const cell = this.getCell(row, col);
+        if (cell && !cell.isStart && !cell.isEnd) {
+            cell.isWall = !wasWall;
+        }
     }
 }
