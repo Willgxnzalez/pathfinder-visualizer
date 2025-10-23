@@ -22,7 +22,7 @@ export class GridManager {
         const { rows, cols } = this.graph.getDimensions();
 
         this.container.innerHTML = '';
-        this.container.className = 'grid border-2 border-gray-700 cursor-crosshair relative touch-none grid pt-px pl-px';
+        this.container.className = 'grid border-2 border-gray-700 cursor-crosshair relative touch-none pt-px pl-px';
         this.container.style.gridTemplateRows = `repeat(${rows}, ${this.cellSize}px)`;
         this.container.style.gridTemplateColumns = `repeat(${cols}, ${this.cellSize}px)`;
 
