@@ -1,4 +1,3 @@
-import { esbuildVersion } from "vite";
 import { IGraph } from "../../geometry/IGraph";
 import { AnimationStep, PathfindingResult } from "../../types";
 
@@ -16,13 +15,13 @@ export default function* bfs(graph: IGraph): Generator<AnimationStep, Pathfindin
 
     while (queue.length !== 0) {
         const currId = queue.shift()!;
-        
-        if (visited.has(currId)) {
-            ("visited before")
-            continue;
-        }
+
+        if (visited.has(currId)) continue;
+
         visited.add(currId);
+
         ++nodesVisited;
+
         yield { type: 'visit', nodeIds: [currId] };
 
         if (currId === endId ) {
