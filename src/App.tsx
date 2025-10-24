@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import bfs from './algorithms/pathfinding/bfs';
 import dfs from './algorithms/pathfinding/dfs';
-import { GridManager } from './components/grid/GridManager';
-import { GridGraph } from './components/grid/GridGraph';
-import GridView from './components/grid/GridView';
+import GridManager from './components/grid/GridManager';
+import GridGraph from './components/grid/GridGraph';
+import Grid from './components/grid/GridView';
 import { AnimationState, AnimationStep, PathfindingResult, Algorithm } from './types';
 import { GRID_ROWS, GRID_COLS, CELL_SIZE, START_NODE_POS, END_NODE_POS } from './utils/constants';
 import { IGraph } from './geometry/IGraph';
@@ -221,7 +221,7 @@ export default function App() {
             </div>
 
             <div className="mb-8">
-                <GridView
+                <Grid
                     graph={graphRef.current}
                     manager={manager}
                     cellSize={CELL_SIZE}
