@@ -48,7 +48,10 @@ export default function App() {
     };
 
 	const getAlgorithm = (algorithm: Algorithm): ((graph: IGraph) => Generator<AnimationStep, PathfindingResult, unknown>) => {
-		const algoMap = { BFS, DFS };
+		const algoMap = { 
+            bfs: BFS, 
+            dfs: DFS
+        };
 		return algoMap[algorithm] ?? BFS;
 	}
 
@@ -80,7 +83,7 @@ export default function App() {
 			for (const node of step.nodes) {
 				node.isPath = true;
 				manager.updateNode(node);
-				await new Promise(r => setTimeout(r, delay));
+				await new Promise(r => setTimeout(r, 10));
 			}
 		}
 	}
