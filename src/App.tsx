@@ -5,11 +5,12 @@ import { GridManager } from './components/Grid/GridManager';
 import GridView from './components/Grid/GridView';
 import { GRID_ROWS, GRID_COLS, CELL_SIZE, START_NODE_POS, END_NODE_POS } from './utils/constants';
 import bfs from './algorithms/pathfinding/bfs'
+import dfs from './algorithms/pathfinding/dfs';
 
 export default function App() {
 	const graphRef = useRef<GridGraph>(new GridGraph(GRID_ROWS, GRID_COLS));
 	const [manager, setManager] = useState<GridManager | null>(null);
-	const [selectedAlgorithm, setSelectedAlgorithm] = useState<'bfs' | 'dijkstra' | 'astar'>('bfs');
+	const [selectedAlgorithm, setSelectedAlgorithm] = useState<'bfs' | 'dfs' | 'dijkstra' | 'astar'>('bfs');
 	const [speed, setSpeed] = useState<'slow' | 'medium' | 'fast'>('medium');
 	const [isRunning, setIsRunning] = useState(false);
 	const [result, setResult] = useState<string>('');
@@ -32,6 +33,7 @@ export default function App() {
 	
 		const algorithms = {
 			bfs,
+			dfs,
 			//dijkstra,
 			//astar: aStar
 		};
@@ -62,8 +64,10 @@ export default function App() {
 				disabled={isRunning}
 			>
 				<option value="bfs">Breadth-First Search</option>
+				<option value="dfs">Depth-First Search</option>
 				<option value="dijkstra">Dijkstra's Algorithm</option>
 				<option value="astar">A* Search</option>
+				
 			</select>
 
 			{/* Speed selector */}
