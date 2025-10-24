@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import bfs from './algorithms/pathfinding/bfs';
-import dfs from './algorithms/pathfinding/dfs';
+import BFS from './algorithms/pathfinding/BFS';
+import DFS from './algorithms/pathfinding/DFS';
 import GridManager from './components/grid/GridManager';
 import GridGraph from './components/grid/GridGraph';
 import Grid from './components/grid/GridView';
@@ -48,8 +48,8 @@ export default function App() {
     };
 
 	const getAlgorithm = (algorithm: Algorithm): ((graph: IGraph) => Generator<AnimationStep, PathfindingResult, unknown>) => {
-		const algoMap = { bfs, dfs };
-		return algoMap[algorithm] ?? bfs;
+		const algoMap = { BFS, DFS };
+		return algoMap[algorithm] ?? BFS;
 	}
 
     const waitForNextStep = async (delay: number): Promise<boolean> => {

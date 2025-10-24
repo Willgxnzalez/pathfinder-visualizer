@@ -1,7 +1,7 @@
 import { IGraph } from "../../models/IGraph";
 import { INode, AnimationStep, PathfindingResult } from "../../types";
 
-export default function* dfs(graph: IGraph): Generator<AnimationStep, PathfindingResult, unknown> {
+export default function* DFS(graph: IGraph): Generator<AnimationStep, PathfindingResult, unknown> {
     const start = graph.getStartNode();
     const end = graph.getEndNode();
 
