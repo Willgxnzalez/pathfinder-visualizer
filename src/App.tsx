@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import bfs from './algorithms/pathfinding/bfs';
+import dfs from './algorithms/pathfinding/dfs';
 import { GridManager } from './components/grid/GridManager';
 import { GridGraph } from './components/grid/GridGraph';
 import GridView from './components/grid/GridView';
@@ -42,9 +43,13 @@ export default function App() {
     }, []);
 
     const getDelay = (s: 'slow' | 'medium' | 'fast') => {
-        const speedMap = { slow: 100, medium: 20, fast: 5 };
+        const speedMap = { slow: 75, medium: 40, fast: 0 };
         return speedMap[s];
     };
+
+	const getAlgorithm = (algorithm: Algorithm): ((graph: IGraph) => Generator<AnimationStep, PathfindingResult, unknown>) => {
+		return { bfs, dfs }[algorithm];
+	}
 
     const waitForNextStep = async (delay: number): Promise<boolean> => {
         const state = animationStateRef.current;
@@ -90,7 +95,7 @@ export default function App() {
         setResult('');
         setAnimationState('running');
 
-        const algorithm = bfs; // You’ll switch this later using selectedAlgorithm
+		const algorithm = getAlgorithm(selectedAlgorithm);
         generatorRef.current = algorithm(graph);
 
         let delay = getDelay(speedRef.current);
@@ -122,7 +127,7 @@ export default function App() {
             setResult(`Path found! Length: ${finalResult.pathLength}, Nodes visited: ${finalResult.nodesVisited}`);
         else
             setResult(`No path found. Nodes visited: ${finalResult.nodesVisited}`);
-    }, [manager]);
+    }, [manager, selectedAlgorithm]);
 
     const handlePause = useCallback(() => {
         if (animationStateRef.current === 'running') setAnimationState('paused');
