@@ -1,5 +1,5 @@
 import { GridNode } from '../../geometry/Node';
-import { IEdge, INode } from '../../types';
+import { IEdge } from '../../types';
 
 export class GridGraph {
     private nodes: GridNode[][];
@@ -13,6 +13,7 @@ export class GridGraph {
     constructor(rows: number, cols: number) {
         this.rows = rows;
         this.cols = cols;
+        this.nodes = [];
         this.nodeMap = new Map();
         this.initialize();
     }
@@ -50,22 +51,26 @@ export class GridGraph {
         }
     }
 
-    clearGrid(): void {
-        this.nodeMap.clear();
-    
-        this.nodes = this.nodes.map(row =>
-            row.map(node => {
-                const newNode = new GridNode(node.id, node.row, node.col);
-    
-                newNode.isStart = node.isStart;
-                newNode.isEnd = node.isEnd;
-    
-                this.nodeMap.set(newNode.id, newNode);
-                return newNode;
-            })
-        );
+    /**
+     * Clear pathfinding visualization
+     * @param keepWalls - if true, keeps wall state (for reset before new run)
+     */
+    clearGrid(keepWalls: boolean = false): void {
+        for (let row = 0; row < this.rows; row++) {
+            for (let col = 0; col < this.cols; col++) {
+                const node = this.nodes[row][col];
+                node.isVisited = false;
+                node.isPath = false;
+                node.parent = null;
+                node.gCost = Infinity;
+                node.hCost = 0;
+                
+                if (!keepWalls && !node.isStart && !node.isEnd) {
+                    node.walkable = true;
+                }
+            }
+        }
     }
-    
 
     getDimensions() {
         return { rows: this.rows, cols: this.cols };
@@ -87,15 +92,7 @@ export class GridGraph {
         }
     }
 
-    isWalkable(node: GridNode): boolean {
-        return node.walkable;
-    }
-
     // ===== IGraph-compatible methods =====
-
-    nodeToCoords(id: number): { row: number, col: number } {
-        return { row: Math.floor(id / this.cols), col: id % this.cols };
-    }
 
     getNode(id: number): GridNode | undefined {
         return this.nodeMap.get(id);
@@ -126,7 +123,10 @@ export class GridGraph {
     }
 
     getDistance(fromId: number, toId: number): number {
-        return 0;
+        const from = this.nodeMap.get(fromId);
+        const to = this.nodeMap.get(toId);
+        if (!from || !to) return Infinity;
+        return Math.abs(from.row - to.row) + Math.abs(from.col - to.col);
     }
 
     getHeuristic(fromId: number, toId: number): number {
@@ -141,20 +141,13 @@ export class GridGraph {
         return this.endNode.id;
     }
 
-    resetPathFinding() {
-
+    markVisited(nodeId: number): void {
+        const node = this.getNode(nodeId);
+        if (node) node.isVisited = true;
     }
 
-    markVisited(nodeId: number) {
+    markPath(nodeId: number): void {
         const node = this.getNode(nodeId);
-        if (node) {
-            node.isVisited = true;
-        }
-    }
-    markPath(nodeId: number) {
-        const node = this.getNode(nodeId);
-        if (node) {
-            node.isPath = true;
-        }
+        if (node) node.isPath = true;
     }
 }

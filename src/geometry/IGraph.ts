@@ -10,8 +10,6 @@ export interface IGraph {
     getStartNodeId(): number | undefined;
     getEndNodeId(): number | undefined;
 
-    resetPathFinding(): void;
-
     markVisited(nodeId: number): void;
     markPath(nodeId: number): void;
 }
