@@ -1,13 +1,12 @@
 import { INode, IEdge } from '../types';
 
 export interface IGraph {
-    getNode(id: number): INode | undefined;
-    getNeighbors(nodeId: number): INode[];
-    getEdges(nodeId: number): IEdge[];
-    getDistance(fromId: number, toId: number): number;
-    getHeuristic(fromId: number, toId: number): number;
+    getNeighbors(node: INode): INode[];
+    getDistance(from: INode, to: INode): number;
+    getHeuristic(from: INode, to: INode): number;
     getStartNode(): INode | undefined;
     getEndNode(): INode | undefined;
 }
+
 
 

@@ -36,7 +36,7 @@ export default function* DFS(graph: IGraph): Generator<AnimationStep, Pathfindin
             return { found: true, pathLength: path.length, nodesVisited, path: path };
         }
 
-        for (const neighbor of graph.getNeighbors(curr.id)) {
+        for (const neighbor of graph.getNeighbors(curr)) {
             if (!visited.has(neighbor)) {
                 stack.push(neighbor);
                 parent.set(neighbor, curr);

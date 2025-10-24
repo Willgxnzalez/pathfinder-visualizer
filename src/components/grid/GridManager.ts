@@ -85,7 +85,7 @@ export default class GridManager {
 
         this.isDrawing = true;
         this.drawMode = node.walkable ? 'wall' : 'erase';
-        this.graph.setWalkable(coords.row, coords.col, this.drawMode === 'erase');
+        this.graph.setWalkable(node, this.drawMode === 'erase');
         this.updateNode(node);
     }
 
@@ -99,7 +99,7 @@ export default class GridManager {
         const shouldBeWalkable = this.drawMode === 'erase';
         if (node.walkable === shouldBeWalkable) return;
 
-        this.graph.setWalkable(coords.row, coords.col, shouldBeWalkable);
+        this.graph.setWalkable(node, shouldBeWalkable);
         this.updateNode(node);
     }
 
@@ -115,11 +115,11 @@ export default class GridManager {
     }
 
     updateAllNodes(): void {
-        const nodes = this.graph.getAllNodes();
         const { rows, cols } = this.graph.getDimensions();
         for (let row = 0; row < rows; ++row) {
             for (let col = 0; col < cols; ++col) {
-                this.updateNode(nodes[row][col]);
+                const node = this.graph.getNodeAt(row, col)
+                if (node) this.updateNode(node);
             }
         }
     }
