@@ -1,46 +1,47 @@
 import { IGraph } from "../../geometry/IGraph";
-import { AnimationStep, PathfindingResult } from "../../types";
+import { INode, AnimationStep, PathfindingResult } from "../../types";
 
 export default function* dfs(graph: IGraph): Generator<AnimationStep, PathfindingResult, unknown> {
-    const startId = graph.getStartNodeId();
-    const endId = graph.getEndNodeId();
+    const start = graph.getStartNode();
+    const end = graph.getEndNode();
 
-    if (startId === undefined || endId === undefined)
-        return { found: false, pathLength: 0, nodesVisited: 0, path: [] };
-
-    const stack: number[] = [startId];
-    const visited = new Set<number>();
-    const parent = new Map<number, number>();
+    if (start === undefined || end === undefined) 
+        return { found: false, pathLength: 0, nodesVisited: 0, path: [] }
+    
+    const stack: INode[] = [start];
+    const visited = new Set<INode>();
+    const parent = new Map<INode, INode>();
     let nodesVisited = 0;
 
     while (stack.length !== 0) {
-        const currId = stack.pop()!;
+        const curr = stack.pop()!;
 
-        if (visited.has(currId)) continue;
+        if (visited.has(curr)) continue;
 
-        visited.add(currId);
+        visited.add(curr);
+
         ++nodesVisited;
 
-        yield { type: 'visit', nodeIds: [currId] };
+        yield { type: 'visit', nodes: [curr] };
 
-        if (currId === endId) {
-            const path: number[] = [];
-            let current: number | undefined = endId;
-            while (current !== undefined) {
+        if (curr.id === end.id ) {
+            const path: INode[] = [];
+            let current: INode | undefined = end;
+
+            while (current) {
                 path.unshift(current);
                 current = parent.get(current);
             }
-            yield { type: 'path', nodeIds: path };
-            return { found: true, pathLength: path.length, nodesVisited, path };
+            yield { type: 'path', nodes: path };
+            return { found: true, pathLength: path.length, nodesVisited, path: path };
         }
 
-        // Push unvisited neighbors to the stack.
-        for (const neighbor of graph.getNeighbors(currId)) {
-            if (!visited.has(neighbor.id)) {
-                stack.push(neighbor.id);
-                parent.set(neighbor.id, currId);
+        for (const neighbor of graph.getNeighbors(curr.id)) {
+            if (!visited.has(neighbor)) {
+                stack.push(neighbor);
+                parent.set(neighbor, curr);
             }
         }
     }
-    return { found: false, pathLength: 0, nodesVisited, path: [] };
+    return { found: false, pathLength: 0, nodesVisited, path: [] }
 }

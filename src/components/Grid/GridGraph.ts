@@ -1,5 +1,5 @@
 import { GridNode } from '../../geometry/Node';
-import { IEdge } from '../../types';
+import { INode, IEdge } from '../../types';
 
 export class GridGraph {
     private nodes: GridNode[][];
@@ -133,21 +133,11 @@ export class GridGraph {
         return this.getDistance(fromId, toId);
     }
     
-    getStartNodeId(): number {
-        return this.startNode.id;
+    getStartNode(): INode {
+        return this.startNode;
     }
 
-    getEndNodeId(): number {
-        return this.endNode.id;
-    }
-
-    markVisited(nodeId: number): void {
-        const node = this.getNode(nodeId);
-        if (node) node.isVisited = true;
-    }
-
-    markPath(nodeId: number): void {
-        const node = this.getNode(nodeId);
-        if (node) node.isPath = true;
+    getEndNode(): INode {
+        return this.endNode;
     }
 }

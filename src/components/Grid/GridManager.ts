@@ -1,6 +1,7 @@
 import { GridNode } from "../../geometry/Node";
 import { GridGraph } from "./GridGraph";
 import { CELL_COLORS } from "../../utils/constants";
+import { INode } from "../../types";
 
 export class GridManager {
     private container: HTMLElement;
@@ -47,7 +48,7 @@ export class GridManager {
         return element;
     }
 
-    private getNodeClasses(node: GridNode): string {
+    private getNodeClasses(node: INode): string {
         const base = 'border border-gray-700 transition-colors duration-150 -mt-px -ml-px box-border';
 
         let bg: string = CELL_COLORS.default;
@@ -106,7 +107,7 @@ export class GridManager {
         this.isDrawing = false;
     }
 
-    updateNode(node: GridNode): void {
+    updateNode(node: INode): void {
         const element = this.cellElements.get(node.id);
         if (element) {
             element.className = this.getNodeClasses(node);

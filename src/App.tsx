@@ -63,19 +63,17 @@ export default function App() {
         return animationStateRef.current !== 'idle';
     };
 
-	const renderStep = async (step: AnimationStep, graph: GridGraph, manager: GridManager, delay: number): Promise<void> => {
+	const renderStep = async (step: AnimationStep, manager: GridManager, delay: number): Promise<void> => {
 		if (step.type === 'visit') {
-			for (const nodeId of step.nodeIds) {
-				graph.markVisited(nodeId);
-				const node = graph.getNode(nodeId);
-				if (node) manager.updateNode(node);
+			for (const node of step.nodes) {
+				node.isVisited = true;
+				manager.updateNode(node);
 			}
 		} else if (step.type === 'path') {
 			await new Promise(r => setTimeout(r, delay * 10));
-			for (const nodeId of step.nodeIds) {
-				graph.markPath(nodeId);
-				const node = graph.getNode(nodeId);
-				if (node) manager.updateNode(node);
+			for (const node of step.nodes) {
+				node.isPath = true;
+				manager.updateNode(node);
 				await new Promise(r => setTimeout(r, delay));
 			}
 		}
@@ -101,7 +99,7 @@ export default function App() {
         while (!result.done) {
             const step = result.value;
 
-            renderStep(step, graph, manager, delay);
+            renderStep(step, manager, delay);
 
             const shouldContinue = await waitForNextStep(delay);
             if (!shouldContinue) {

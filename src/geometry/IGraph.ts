@@ -6,12 +6,8 @@ export interface IGraph {
     getEdges(nodeId: number): IEdge[];
     getDistance(fromId: number, toId: number): number;
     getHeuristic(fromId: number, toId: number): number;
-
-    getStartNodeId(): number | undefined;
-    getEndNodeId(): number | undefined;
-
-    markVisited(nodeId: number): void;
-    markPath(nodeId: number): void;
+    getStartNode(): INode | undefined;
+    getEndNode(): INode | undefined;
 }
 
 

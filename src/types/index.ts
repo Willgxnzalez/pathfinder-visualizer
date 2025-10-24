@@ -24,12 +24,12 @@ export type AnimationState = 'idle' | 'running' | 'paused' | 'stepping';
 
 export interface AnimationStep {
     type: 'visit' | 'path' | 'complete';
-    nodeIds: number[];
+    nodes: INode[];
 }
 
 export interface PathfindingResult {
     found: boolean;
     pathLength: number;
     nodesVisited: number;
-    path: number[];
+    path: INode[];
 }

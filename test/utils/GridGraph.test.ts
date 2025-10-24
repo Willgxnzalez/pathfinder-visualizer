@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { GridGraph } from '../../src/components/Grid/GridGraph';
+import { GridGraph } from '../../src/components/grid/GridGraph';
 
 test('GridGraph creates grid and nodes correctly', () => {
     const rows = 5;
@@ -77,26 +77,26 @@ test('GridGraph start/end setters', () => {
     let node = graph.getNodeAt(1, 1)!;
     expect(node.isStart).toBe(true);
 
-    // getStartNodeId matches assigned
-    expect(graph.getStartNodeId()).toBe(1 * 3 + 1);
+    // getStartNode matches assigned
+    expect(graph.getStartNode()).toBe(node);
 
     // Set a new start
     graph.setStart(2, 2);
     expect(node.isStart).toBe(false);
     expect(graph.getNodeAt(2, 2)!.isStart).toBe(true);
     // Check id
-    expect(graph.getStartNodeId()).toBe(2 * 3 + 2);
+    expect(graph.getStartNode()!.id).toBe(2 * 3 + 2);
 
     // Do similarly for end
     graph.setEnd(0, 2);
     let endNode = graph.getNodeAt(0, 2)!;
     expect(endNode.isEnd).toBe(true);
-    expect(graph.getEndNodeId()).toBe(0 * 3 + 2);
+    expect(graph.getEndNode()!.id).toBe(0 * 3 + 2);
 
     graph.setEnd(2, 0);
     expect(endNode.isEnd).toBe(false);
     expect(graph.getNodeAt(2, 0)!.isEnd).toBe(true);
-    expect(graph.getEndNodeId()).toBe(2 * 3 + 0);
+    expect(graph.getEndNode()!.id).toBe(2 * 3 + 0);
 });
 
 test('GridGraph does not set wall on start or end', () => {
