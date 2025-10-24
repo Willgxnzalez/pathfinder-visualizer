@@ -1,4 +1,4 @@
-import { IGraph } from "../../geometry/IGraph";
+import { IGraph } from "../../models/IGraph";
 import { INode, AnimationStep, PathfindingResult } from "../../types";
 
 export default function* dfs(graph: IGraph): Generator<AnimationStep, PathfindingResult, unknown> {

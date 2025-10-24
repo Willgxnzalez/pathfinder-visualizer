@@ -1,4 +1,4 @@
-import { GridNode } from '../../geometry/Node';
+import { GridNode } from '../../models/Node';
 import { INode, IEdge } from '../../types';
 
 export default class GridGraph {

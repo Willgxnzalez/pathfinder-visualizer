@@ -1,4 +1,4 @@
-import { GridNode } from "../../geometry/Node";
+import { GridNode } from "../../models/Node";
 import GridGraph  from "./GridGraph";
 import { CELL_COLORS } from "../../utils/constants";
 import { INode } from "../../types";
