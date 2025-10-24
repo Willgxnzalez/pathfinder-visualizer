@@ -20,6 +20,8 @@ export interface IEdge {
 
 export type Algorithm = 'bfs' | 'dfs' | 'astar' | 'dijkstra';
 
+export type AnimationState = 'idle' | 'running' | 'paused' | 'stepping';
+
 export interface AnimationStep {
     type: 'visit' | 'path' | 'complete';
     nodeIds: number[];
