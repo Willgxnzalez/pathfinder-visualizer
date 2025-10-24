@@ -1,5 +1,5 @@
 import { GridNode } from '../../geometry/Node';
-import { INode } from '../../types';
+import { IEdge, INode } from '../../types';
 
 export class GridGraph {
     private nodes: GridNode[][];
@@ -50,6 +50,23 @@ export class GridGraph {
         }
     }
 
+    clearGrid(): void {
+        this.nodeMap.clear();
+    
+        this.nodes = this.nodes.map(row =>
+            row.map(node => {
+                const newNode = new GridNode(node.id, node.row, node.col);
+    
+                newNode.isStart = node.isStart;
+                newNode.isEnd = node.isEnd;
+    
+                this.nodeMap.set(newNode.id, newNode);
+                return newNode;
+            })
+        );
+    }
+    
+
     getDimensions() {
         return { rows: this.rows, cols: this.cols };
     }
@@ -75,6 +92,11 @@ export class GridGraph {
     }
 
     // ===== IGraph-compatible methods =====
+
+    nodeToCoords(id: number): { row: number, col: number } {
+        return { row: Math.floor(id / this.cols), col: id % this.cols };
+    }
+
     getNode(id: number): GridNode | undefined {
         return this.nodeMap.get(id);
     }
@@ -99,11 +121,40 @@ export class GridGraph {
         return neighbors;
     }
 
+    getEdges(id: number): IEdge[] {
+        return [];
+    }
+
+    getDistance(fromId: number, toId: number): number {
+        return 0;
+    }
+
+    getHeuristic(fromId: number, toId: number): number {
+        return this.getDistance(fromId, toId);
+    }
+    
     getStartNodeId(): number {
         return this.startNode.id;
     }
 
     getEndNodeId(): number {
         return this.endNode.id;
+    }
+
+    resetPathFinding() {
+
+    }
+
+    markVisited(nodeId: number) {
+        const node = this.getNode(nodeId);
+        if (node) {
+            node.isVisited = true;
+        }
+    }
+    markPath(nodeId: number) {
+        const node = this.getNode(nodeId);
+        if (node) {
+            node.isPath = true;
+        }
     }
 }

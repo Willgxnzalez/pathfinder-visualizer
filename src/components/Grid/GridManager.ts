@@ -1,6 +1,8 @@
 import { GridNode } from "../../geometry/Node";
 import { GridGraph } from "./GridGraph";
 import { CELL_COLORS } from "../../utils/constants";
+import { IGraph } from "../../geometry/IGraph";
+import { AnimationStep, PathfindingResult } from "../../types";
 
 export class GridManager {
     private container: HTMLElement;
@@ -53,9 +55,9 @@ export class GridManager {
         let bg: string = CELL_COLORS.default;
         if (node.isStart) bg = CELL_COLORS.start;
         else if (node.isEnd) bg = CELL_COLORS.end;
+        else if (!node.walkable) bg = CELL_COLORS.wall;
         else if (node.isPath) bg = CELL_COLORS.path;
         else if (node.isVisited) bg = CELL_COLORS.visited;
-        else if (!node.walkable) bg = CELL_COLORS.wall;
 
         return `${base} ${bg}`;
     }
@@ -85,7 +87,7 @@ export class GridManager {
         this.isDrawing = true;
         this.drawMode = node.walkable ? 'wall' : 'erase';
         this.graph.setWalkable(coords.row, coords.col, this.drawMode === 'erase');
-        this.updateNode(coords.row, coords.col);
+        this.updateNode(node);
     }
 
     handleMouseMove(x: number, y: number): void {
@@ -99,24 +101,89 @@ export class GridManager {
         if (node.walkable === shouldBeWalkable) return;
 
         this.graph.setWalkable(coords.row, coords.col, shouldBeWalkable);
-        this.updateNode(coords.row, coords.col);
+        this.updateNode(node);
     }
 
     handleMouseUp(): void {
         this.isDrawing = false;
     }
 
-    updateNode(row: number, col: number): void {
-        const node = this.graph.getNodeAt(row, col);
-        if (!node) return;
-
+    updateNode(node: GridNode): void {
         const element = this.cellElements.get(node.id);
         if (element) {
             element.className = this.getNodeClasses(node);
         }
     }
 
+    updateAll(): void  {
+        const nodes = this.graph.getAllNodes();
+        const { rows, cols } = this.graph.getDimensions();
+        for (let row = 0; row < rows; ++row) {
+            for (let col = 0; col < cols; ++col) {
+                this.updateNode(nodes[row][col]);
+            }
+        }
+    }
+
     destroy(): void {
         this.container.innerHTML = '';
     }
+
+    resetGrid(): void {
+        this.graph.clearGrid();
+        this.updateAll();
+    }
+
+    async runAlgorithm(
+        algorithm: (graph: IGraph) => Generator<AnimationStep, PathfindingResult, unknown>,
+        speed: 'slow' | 'medium' | 'fast' = 'medium'
+    ): Promise<PathfindingResult> {
+
+        // Speed settings (ms between frames)
+        const speeds = {
+        slow: 100,
+        medium: 20,
+        fast: 5
+        };
+        const delay = speeds[speed];
+
+        const gen = algorithm(this.graph);
+        let result = gen.next();
+
+        // Consume generator step-by-step
+        while (!result.done) {
+            const step = result.value;
+
+            if (step.type === 'visit') {
+                for (const nodeId of step.nodeIds) {
+                    this.graph.markVisited(nodeId);
+                    const node = this.graph.getNode(nodeId);
+                    if (node) {
+                        this.updateNode(node!);
+                    }
+                }
+            } else if (step.type === 'path') {
+                await new Promise(resolve => setTimeout(resolve, delay * 2));
+                
+                for (const nodeId of step.nodeIds) {
+                    this.graph.markPath(nodeId);
+                    const node = this.graph.getNode(nodeId);
+                    if (node) {
+                        this.updateNode(node);
+                    }
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+
+            // Wait before next step
+            await new Promise(resolve => setTimeout(resolve, delay));
+            
+            // Get next step
+            result = gen.next();
+        }
+
+        // Return final result
+        return result.value;
+    }
+
 }

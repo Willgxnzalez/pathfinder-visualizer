@@ -7,7 +7,6 @@ export class GridNode implements INode {
 
     gCost: number = Infinity;
     hCost: number = 0;
-    fCost: number = 0;
     parent: GridNode | null = null;
 
     walkable: boolean = true;
