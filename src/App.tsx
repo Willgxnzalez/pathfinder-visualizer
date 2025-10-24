@@ -5,6 +5,7 @@ import { GridGraph } from './components/grid/GridGraph';
 import GridView from './components/grid/GridView';
 import { AnimationState, AnimationStep, PathfindingResult, Algorithm } from './types';
 import { GRID_ROWS, GRID_COLS, CELL_SIZE, START_NODE_POS, END_NODE_POS } from './utils/constants';
+import { IGraph } from './geometry/IGraph';
 
 export default function App() {
     const graphRef = useRef(new GridGraph(GRID_ROWS, GRID_COLS));
@@ -62,10 +63,29 @@ export default function App() {
         return animationStateRef.current !== 'idle';
     };
 
+	const renderStep = async (step: AnimationStep, graph: GridGraph, manager: GridManager, delay: number): Promise<void> => {
+		if (step.type === 'visit') {
+			for (const nodeId of step.nodeIds) {
+				graph.markVisited(nodeId);
+				const node = graph.getNode(nodeId);
+				if (node) manager.updateNode(node);
+			}
+		} else if (step.type === 'path') {
+			await new Promise(r => setTimeout(r, delay * 10));
+			for (const nodeId of step.nodeIds) {
+				graph.markPath(nodeId);
+				const node = graph.getNode(nodeId);
+				if (node) manager.updateNode(node);
+				await new Promise(r => setTimeout(r, delay));
+			}
+		}
+	}
+
     const runVisualization = useCallback(async () => {
         if (!manager) return;
 
         const graph = graphRef.current;
+
         graph.clearGrid(true);
         manager.updateAllNodes();
 
@@ -81,21 +101,7 @@ export default function App() {
         while (!result.done) {
             const step = result.value;
 
-            if (step.type === 'visit') {
-                for (const nodeId of step.nodeIds) {
-                    graph.markVisited(nodeId);
-                    const node = graph.getNode(nodeId);
-                    if (node) manager.updateNode(node);
-                }
-            } else if (step.type === 'path') {
-                await new Promise(r => setTimeout(r, delay * 10));
-                for (const nodeId of step.nodeIds) {
-                    graph.markPath(nodeId);
-                    const node = graph.getNode(nodeId);
-                    if (node) manager.updateNode(node);
-                    await new Promise(r => setTimeout(r, delay));
-                }
-            }
+            renderStep(step, graph, manager, delay);
 
             const shouldContinue = await waitForNextStep(delay);
             if (!shouldContinue) {
@@ -110,6 +116,7 @@ export default function App() {
         }
 
         const finalResult = result.value;
+
         setAnimationState('idle');
         generatorRef.current = null;
 
