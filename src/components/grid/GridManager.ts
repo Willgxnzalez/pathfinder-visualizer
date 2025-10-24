@@ -1,9 +1,9 @@
 import { GridNode } from "../../geometry/Node";
-import { GridGraph } from "./GridGraph";
+import GridGraph  from "./GridGraph";
 import { CELL_COLORS } from "../../utils/constants";
 import { INode } from "../../types";
 
-export class GridManager {
+export default class GridManager {
     private container: HTMLElement;
     private graph: GridGraph;
     private cellSize: number;

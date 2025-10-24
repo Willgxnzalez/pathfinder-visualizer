@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useRef } from 'react';
-import { GridManager } from './GridManager';
-import { GridGraph } from './GridGraph';
+import GridManager from './GridManager';
+import GridGraph from './GridGraph';
 
 interface GridViewProps {
     graph: GridGraph;

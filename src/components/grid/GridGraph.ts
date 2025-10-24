@@ -1,7 +1,7 @@
 import { GridNode } from '../../geometry/Node';
 import { INode, IEdge } from '../../types';
 
-export class GridGraph {
+export default class GridGraph {
     private nodes: GridNode[][];
     private nodeMap: Map<number, GridNode>;
     private rows: number;
