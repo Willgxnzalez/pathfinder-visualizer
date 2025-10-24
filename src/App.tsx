@@ -48,7 +48,8 @@ export default function App() {
     };
 
 	const getAlgorithm = (algorithm: Algorithm): ((graph: IGraph) => Generator<AnimationStep, PathfindingResult, unknown>) => {
-		return { bfs, dfs }[algorithm];
+		const algoMap = { bfs, dfs };
+		return algoMap[algorithm] ?? bfs;
 	}
 
     const waitForNextStep = async (delay: number): Promise<boolean> => {
