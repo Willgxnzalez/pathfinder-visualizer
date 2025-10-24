@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest'
-import { GridGraph } from '../src/components/grid/GridGraph';
+import GridGraph from '../src/components/grid/GridGraph';
 
 test('GridGraph creates grid and nodes correctly', () => {
     const rows = 5;
