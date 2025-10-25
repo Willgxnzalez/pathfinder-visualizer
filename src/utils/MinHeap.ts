@@ -1,22 +1,19 @@
-import { INode } from "../types";
-
 export default class MinHeap<T> {
-    private heap: { item: T, priority: number, insertionOrder: number }[];
+    private heap: { item: T, priority: number, tiebreaker: number }[];
     private positions: Map<T, number>;
     private compareFn: (a: number, b: number) => number;
-    private insertionCounter: number = 0;
-
+    
     constructor(compareFn?: (a: number, b: number) => number) {
         this.heap = [];
         this.positions = new Map();
         this.compareFn = compareFn ?? ((a: number , b: number) => a-b);
     }
 
-    private compare(a: { priority: number, insertionOrder: number }, b: { priority: number, insertionOrder: number }): number {
+    private compare(a: { priority: number, tiebreaker: number }, b: { priority: number, tiebreaker: number }): number {
         const priorityDiff = this.compareFn(a.priority, b.priority);
-        return priorityDiff !== 0 ? priorityDiff : a.insertionOrder - b.insertionOrder;
+        return priorityDiff !== 0 ? priorityDiff : a.tiebreaker - b.tiebreaker;
     }
-
+    
     peek(): T | undefined {
         return this.heap.length === 0 ? undefined : this.heap[0].item;
     }
@@ -56,20 +53,21 @@ export default class MinHeap<T> {
         return root;
     }
 
-    insert(item: T, priority: number): void {
-        this.heap.push({ item, priority, insertionOrder: this.insertionCounter++ });
+    insert(item: T, priority: number, tiebreaker: number = 0): void {
+        this.heap.push({ item, priority, tiebreaker });
         const index = this.heap.length - 1;
         this.positions.set(item, index);
         this.heapifyUp(index);
     }
     
-    decreaseKey(item: T, newPriority: number) {
+    decreaseKey(item: T, newPriority: number, newTiebreaker: number = 0) {
         const index = this.positions.get(item);
         if (index === undefined) return;
 
         if(this.compareFn(this.heap[index].priority, newPriority) < 0) return;
         
         this.heap[index].priority = newPriority;
+        this.heap[index].tiebreaker = newTiebreaker;
         this.heapifyUp(index);
     }
 
