@@ -10,7 +10,6 @@ export default function* DFS(graph: IGraph): Generator<AnimationStep, Pathfindin
     
     const stack: INode[] = [start];
     const visited = new Set<INode>();
-    const parent = new Map<INode, INode>();
     let nodesVisited = 0;
 
     while (stack.length !== 0) {
@@ -26,11 +25,11 @@ export default function* DFS(graph: IGraph): Generator<AnimationStep, Pathfindin
 
         if (curr.id === end.id ) {
             const path: INode[] = [];
-            let current: INode | undefined = end;
+            let current: INode | null = end;
 
-            while (current) {
+            while (current != null) {
                 path.unshift(current);
-                current = parent.get(current);
+                current = current.parent;
             }
             yield { type: 'path', nodes: path };
             return { found: true, pathLength: path.length, nodesVisited, path: path };
@@ -39,7 +38,7 @@ export default function* DFS(graph: IGraph): Generator<AnimationStep, Pathfindin
         for (const neighbor of graph.getNeighbors(curr)) {
             if (!visited.has(neighbor)) {
                 stack.push(neighbor);
-                parent.set(neighbor, curr);
+                neighbor.parent = curr;
             }
         }
     }

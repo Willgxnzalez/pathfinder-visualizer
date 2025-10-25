@@ -1,6 +1,6 @@
 import { INode } from "../types";
 
-export default class Minheap<T> {
+export default class MinHeap<T> {
     private heap: { item: T, priority: number }[];
     private positions: Map<T, number>;
     private compareFn: (a: number, b: number) => number;
