@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import BFS from './algorithms/pathfinding/BFS';
 import DFS from './algorithms/pathfinding/DFS';
-import Astar from './algorithms/pathfinding/astar';
+import Astar from './algorithms/pathfinding/Astar';
 import GBFS from './algorithms/pathfinding/GBFS';
+import Dijkstra from './algorithms/pathfinding/Dijkstra';
 import GridManager from './components/grid/GridManager';
 import GridGraph from './components/grid/GridGraph';
 import Grid from './components/grid/GridView';
@@ -54,7 +55,8 @@ export default function App() {
             bfs: BFS, 
             dfs: DFS,
             astar: Astar,
-            gbfs: GBFS
+            gbfs: GBFS,
+            dijkstra: Dijkstra
         };
 		return algoMap[algorithm] ?? BFS;
 	}
