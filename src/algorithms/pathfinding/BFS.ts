@@ -9,15 +9,14 @@ export default function* BFS(graph: IGraph): Generator<AnimationStep, Pathfindin
         return { found: false, pathLength: 0, nodesVisited: 0, path: [] }
     
     const queue: INode[] = [start];
-    const visited = new Set<INode>();
     let nodesVisited = 0;
 
     while (queue.length !== 0) {
         const curr = queue.shift()!;
 
-        if (visited.has(curr)) continue;
+        if (curr.isVisited) continue;
 
-        visited.add(curr);
+        curr.isVisited = true;
 
         ++nodesVisited;
 
@@ -25,20 +24,21 @@ export default function* BFS(graph: IGraph): Generator<AnimationStep, Pathfindin
 
         if (curr.id === end.id ) {
             const path: INode[] = [];
-            let current: INode | null = end;
+            let node: INode | null = end;
 
-            while (current != null) {
-                path.unshift(current);
-                current = current.parent; 
+            while (node != null) {
+                node.isPath = true;
+                path.unshift(node);
+                node = node.parent; 
             }
 
             yield { type: 'path', nodes: path };
-            return { found: true, pathLength: path.length, nodesVisited, path: path };
+            return { found: true, pathLength: path.length, nodesVisited, path };
         }
 
         for (const neighbor of graph.getNeighbors(curr)) {
-            if (!visited.has(neighbor)) {
-                queue.push(neighbor);
+            if (!neighbor.isVisited) {
+                queue.push(neighbor)
                 neighbor.parent = curr;
             }
         }
