@@ -5,20 +5,18 @@ export default function* BFS(graph: IGraph): Generator<AnimationStep, Pathfindin
     const start = graph.getStartNode();
     const end = graph.getEndNode();
 
-    if (start === undefined || end === undefined) 
-        return { found: false, pathLength: 0, nodesVisited: 0, path: [] }
+    if (!start || !end) return { found: false, pathLength: 0, nodesVisited: 0, path: [] }
     
     const queue: INode[] = [start];
+
     let nodesVisited = 0;
 
     while (queue.length !== 0) {
-        const curr = queue.shift()!;
-
-        if (curr.isVisited) continue;
+        const curr = queue.shift();
+        if (!curr || curr.isVisited) continue;
 
         curr.isVisited = true;
-
-        ++nodesVisited;
+        nodesVisited++;
 
         yield { type: 'visit', nodes: [curr] };
 

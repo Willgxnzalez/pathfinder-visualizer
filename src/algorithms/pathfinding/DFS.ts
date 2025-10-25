@@ -5,21 +5,18 @@ export default function* DFS(graph: IGraph): Generator<AnimationStep, Pathfindin
     const start = graph.getStartNode();
     const end = graph.getEndNode();
 
-    if (start === undefined || end === undefined) 
-        return { found: false, pathLength: 0, nodesVisited: 0, path: [] }
+    if (!start || !end) return { found: false, pathLength: 0, nodesVisited: 0, path: [] }
     
     const stack: INode[] = [start];
-    const visited = new Set<INode>();
+
     let nodesVisited = 0;
 
     while (stack.length !== 0) {
-        const curr = stack.pop()!;
+        const curr = stack.pop();
+        if (!curr || curr.isVisited) continue;
 
-        if (visited.has(curr)) continue;
-
-        visited.add(curr);
-
-        ++nodesVisited;
+        curr.isVisited = true;
+        nodesVisited++;
 
         yield { type: 'visit', nodes: [curr] };
 
@@ -32,12 +29,13 @@ export default function* DFS(graph: IGraph): Generator<AnimationStep, Pathfindin
                 path.unshift(node);
                 node = node.parent;
             }
+
             yield { type: 'path', nodes: path };
-            return { found: true, pathLength: path.length, nodesVisited, path: path };
+            return { found: true, pathLength: path.length, nodesVisited, path };
         }
 
         for (const neighbor of graph.getNeighbors(curr)) {
-            if (!visited.has(neighbor)) {
+            if (!neighbor.isVisited) {
                 stack.push(neighbor);
                 neighbor.parent = curr;
             }
