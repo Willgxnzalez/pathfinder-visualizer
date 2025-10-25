@@ -25,11 +25,12 @@ export default function* DFS(graph: IGraph): Generator<AnimationStep, Pathfindin
 
         if (curr.id === end.id ) {
             const path: INode[] = [];
-            let current: INode | null = end;
+            let node: INode | null = end;
 
-            while (current != null) {
-                path.unshift(current);
-                current = current.parent;
+            while (node != null) {
+                node.isPath = true;
+                path.unshift(node);
+                node = node.parent;
             }
             yield { type: 'path', nodes: path };
             return { found: true, pathLength: path.length, nodesVisited, path: path };

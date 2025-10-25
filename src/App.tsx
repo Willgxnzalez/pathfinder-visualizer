@@ -77,13 +77,11 @@ export default function App() {
 	const renderStep = async (step: AnimationStep, manager: GridManager, delay: number): Promise<void> => {
 		if (step.type === 'visit') {
 			for (const node of step.nodes) {
-				node.isVisited = true;
 				manager.updateNode(node);
 			}
 		} else if (step.type === 'path') {
 			await new Promise(r => setTimeout(r, delay * 10));
 			for (const node of step.nodes) {
-				node.isPath = true;
 				manager.updateNode(node);
 				await new Promise(r => setTimeout(r, 10));
 			}
@@ -110,7 +108,7 @@ export default function App() {
         while (!result.done) {
             const step = result.value;
 
-            renderStep(step, manager, delay);
+            await renderStep(step, manager, delay);
 
             const shouldContinue = await waitForNextStep(delay);
             if (!shouldContinue) {
