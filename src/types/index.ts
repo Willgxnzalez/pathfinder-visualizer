@@ -1,5 +1,5 @@
 export interface INode {
-    id: number;
+    id: string;
     
     gCost: number;
     hCost: number;

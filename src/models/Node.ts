@@ -1,7 +1,7 @@
 import { INode } from "../types";
 
 export class GridNode implements INode {
-    id: number;
+    id: string;
     row: number;
     col: number;
 
@@ -15,7 +15,7 @@ export class GridNode implements INode {
     isVisited: boolean = false;
     isPath: boolean = false;
 
-    constructor(id: number, row: number, col: number) {
+    constructor(id: string, row: number, col: number) {
         this.id = id;
         this.row = row;
         this.col = col;
@@ -23,7 +23,7 @@ export class GridNode implements INode {
 }
 
 export class MapNode implements INode {
-    id: number;
+    id: string;
     walkable: boolean;
 
     lat: number;
@@ -39,7 +39,7 @@ export class MapNode implements INode {
     isVisited: boolean = false;
     isPath: boolean = false;
 
-    constructor(id: number, lat: number, lng: number, walkable: boolean) {
+    constructor(id: string, lat: number, lng: number, walkable: boolean) {
         this.id = id;
         this.lat = lat;
         this.lng = lng;

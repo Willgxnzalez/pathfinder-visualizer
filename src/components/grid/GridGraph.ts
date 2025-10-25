@@ -14,7 +14,7 @@ export default class GridGraph implements IGraph {
         this.rows = rows;
         this.cols = cols;
         this.nodes = Array.from({ length: rows }, (_, r) =>
-            Array.from({ length: cols }, (_, c) => new GridNode(r * cols + c, r, c))
+            Array.from({ length: cols }, (_, c) => new GridNode(`${r}-${c}`, r, c))
         );
     }
 
@@ -67,11 +67,11 @@ export default class GridGraph implements IGraph {
     }
 
     getDistance(from: GridNode, to: GridNode): number {
-        return Math.abs(from.row - to.row) + Math.abs(from.col - to.col);
+        return 1;
     }
 
     getHeuristic(from: GridNode, to: GridNode): number {
-        return this.getDistance(from, to);
+        return Math.abs(from.row - to.row) + Math.abs(from.col - to.col);
     }
 
     getStartNode(): GridNode | undefined {

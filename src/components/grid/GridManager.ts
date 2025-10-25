@@ -7,7 +7,7 @@ export default class GridManager {
     private container: HTMLElement;
     private graph: GridGraph;
     private cellSize: number;
-    private cellElements: Map<number, HTMLElement>;
+    private cellElements: Map<string, HTMLElement>;
     private drawMode: 'wall' | 'erase' = 'wall';
     private isDrawing: boolean = false;
 
@@ -41,7 +41,7 @@ export default class GridManager {
 
     private createNodeElement(node: GridNode): HTMLElement {
         const element = document.createElement('div');
-        element.id = `cell-${node.row}-${node.col}`;
+        element.id = `cell-${node.id}`;
         element.dataset.row = node.row.toString();
         element.dataset.col = node.col.toString();
         element.className = this.getNodeClasses(node);
