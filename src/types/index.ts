@@ -10,6 +10,7 @@ export interface INode {
     isEnd: boolean;
     isVisited: boolean;
     isPath: boolean;
+    isFrontier: boolean;
 }
 
 export interface IEdge {
@@ -18,13 +19,22 @@ export interface IEdge {
     weight: number;
 }
 
+export interface IGraph {
+    getNeighbors(node: INode): INode[];
+    getDistance(from: INode, to: INode): number;
+    getHeuristic(from: INode, to: INode): number;
+    getStartNode(): INode | undefined;
+    getEndNode(): INode | undefined;
+}
+
 export type Algorithm = 'bfs' | 'dfs' | 'astar' | 'gbfs' | 'dijkstra';
 
 export type AnimationState = 'idle' | 'running' | 'paused' | 'stepping';
 
 export interface AnimationStep {
-    type: 'visit' | 'path' | 'complete';
+    type: 'visit' | 'path';
     nodes: INode[];
+    frontier: INode[];
 }
 
 export interface PathfindingResult {

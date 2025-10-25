@@ -1,5 +1,4 @@
-import { IGraph } from "../../models/IGraph";
-import { INode, AnimationStep, PathfindingResult } from "../../types"
+import { IGraph, INode, AnimationStep, PathfindingResult } from "../../types"
 import MinHeap from "../../utils/MinHeap";
 
 export default function* Astar(graph: IGraph): Generator<AnimationStep, PathfindingResult, unknown> {
