@@ -8,7 +8,7 @@ import GridManager from "./components/grid/GridManager";
 import GridGraph from "./components/grid/GridGraph";
 import Grid from "./components/grid/GridView";
 import { AnimationState, AnimationStep, PathfindingResult, Algorithm } from "./types";
-import { GRID_ROWS, GRID_COLS, CELL_SIZE, START_NODE_POS, END_NODE_POS } from "./utils/constants";
+import { GRID_ROWS, GRID_COLS, CELL_SIZE } from "./utils/constants";
 import { IGraph } from "./models/IGraph";
 
 export default function App() {
@@ -34,12 +34,6 @@ export default function App() {
     const stepResolveRef = useRef<(() => void) | null>(null);
 
     const [result, setResult] = useState('');
-
-    useEffect(() => {
-        const graph = graphRef.current;
-        graph.setStart(START_NODE_POS.row, START_NODE_POS.col);
-        graph.setEnd(END_NODE_POS.row, END_NODE_POS.col);
-    }, []);
 
     const handleManagerReady = useCallback((mgr: GridManager) => {
         setManager(mgr);

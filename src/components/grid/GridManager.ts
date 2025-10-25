@@ -76,12 +76,35 @@ export default class GridManager {
         return null;
     }
 
-    handleMouseDown(x: number, y: number): void {
+    handleMouseDown(
+        x: number,
+        y: number,
+        setStart: boolean = false,
+        setEnd: boolean = false
+    ): void {
         const coords = this.getCoordsFromPoint(x, y);
         if (!coords) return;
 
         const node = this.graph.getNodeAt(coords.row, coords.col);
         if (!node || node.isStart || node.isEnd) return;
+
+        if (setStart) {
+            const oldStart = this.graph.getStartNode();
+            this.graph.setStart(coords.row, coords.col);
+            const newStart = this.graph.getStartNode();
+            if (oldStart) this.updateNode(oldStart);
+            if (newStart) this.updateNode(newStart);
+            return;
+        }
+
+        if (setEnd) {
+            const oldEnd = this.graph.getEndNode();
+            this.graph.setEnd(coords.row, coords.col);
+            const newEnd = this.graph.getEndNode();
+            if (oldEnd) this.updateNode(oldEnd);
+            if (newEnd) this.updateNode(newEnd);
+            return;
+        }
 
         this.isDrawing = true;
         this.drawMode = node.walkable ? 'wall' : 'erase';

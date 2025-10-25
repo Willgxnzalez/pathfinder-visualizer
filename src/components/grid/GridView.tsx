@@ -1,6 +1,6 @@
-import React, { useEffect, useCallback, useRef } from 'react';
-import GridManager from './GridManager';
-import GridGraph from './GridGraph';
+import React, { useEffect, useCallback, useRef } from "react";
+import GridManager from "./GridManager";
+import GridGraph from "./GridGraph";
 
 interface GridViewProps {
     graph: GridGraph;
@@ -29,7 +29,11 @@ export default function Grid({ graph, manager, cellSize, onManagerReady }: GridV
 
     const handleMouseDown = useCallback((e: React.MouseEvent) => {
         if (!managerRef.current) return;
-        managerRef.current.handleMouseDown(e.clientX, e.clientY);
+        
+        const setStart = e.button === 0 && e.shiftKey;
+        const setEnd = e.button === 2 && e.shiftKey;
+
+        managerRef.current.handleMouseDown(e.clientX, e.clientY, setStart, setEnd);
     }, []);
 
     const handleMouseMove = useCallback((e: React.MouseEvent) => {
@@ -51,6 +55,7 @@ export default function Grid({ graph, manager, cellSize, onManagerReady }: GridV
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
                 onMouseLeave={handleMouseUp}
+                onContextMenu={(e) => e.preventDefault()}
             />
         </div>
     );
