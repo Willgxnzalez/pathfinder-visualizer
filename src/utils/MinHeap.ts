@@ -31,6 +31,10 @@ export default class MinHeap<T> {
     isEmpty(): boolean {
         return this.heap.length === 0;
     }
+
+    has(item: T): boolean {
+        return this.positions.has(item);
+    }
     
     extractMin(): T | undefined {
         if (this.heap.length === 0) return undefined;
