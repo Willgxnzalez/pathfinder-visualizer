@@ -1,5 +1,5 @@
 import { GridNode } from "../../models/Node";
-import GridGraph  from "./GridGraph";
+import GridGraph from "./GridGraph";
 import { CELL_COLORS } from "../../utils/constants";
 import { INode } from "../../types";
 
@@ -10,6 +10,8 @@ export default class GridManager {
     private cellElements: Map<string, HTMLElement>;
     private drawMode: 'wall' | 'erase' = 'wall';
     private isDrawing: boolean = false;
+    private draggedNode: INode | null = null;
+    private isDraggingStartOrEnd: boolean = false;
 
     constructor(container: HTMLElement, graph: GridGraph, cellSize: number) {
         this.container = container;
@@ -45,6 +47,7 @@ export default class GridManager {
         element.dataset.row = node.row.toString();
         element.dataset.col = node.col.toString();
         element.className = this.getNodeClasses(node);
+        element.style.cursor = (node.isStart || node.isEnd) ? 'grab' : 'crosshair';
         return element;
     }
 
@@ -61,7 +64,7 @@ export default class GridManager {
         return `${base} ${bg}`;
     }
 
-    private getCoordsFromPoint(x: number, y: number): { row: number, col: number } | null {
+    private getCoordsFromPoint(x: number, y: number): { row: number; col: number } | null {
         const rect = this.container.getBoundingClientRect();
         const relx = x - rect.left;
         const rely = y - rect.top;
@@ -76,17 +79,20 @@ export default class GridManager {
         return null;
     }
 
-    handleMouseDown(
-        x: number,
-        y: number,
-        setStart: boolean = false,
-        setEnd: boolean = false
-    ): void {
+    handleMouseDown(x: number, y: number, setStart: boolean = false, setEnd: boolean = false): void {
         const coords = this.getCoordsFromPoint(x, y);
         if (!coords) return;
 
         const node = this.graph.getNodeAt(coords.row, coords.col);
-        if (!node || node.isStart || node.isEnd) return;
+        if (!node) return;
+
+        if (node.isStart || node.isEnd) {
+            this.draggedNode = node;
+            this.isDraggingStartOrEnd = true;
+            const element = this.cellElements.get(node.id);
+            if (element) element.style.cursor = 'grabbing';
+            return;
+        }
 
         if (setStart) {
             const oldStart = this.graph.getStartNode();
@@ -114,26 +120,57 @@ export default class GridManager {
 
     handleMouseMove(x: number, y: number): void {
         const coords = this.getCoordsFromPoint(x, y);
-        if (!coords || !this.isDrawing) return;
-
+        if (!coords) return;
+    
         const node = this.graph.getNodeAt(coords.row, coords.col);
-        if (!node || node.isStart || node.isEnd) return;
-
+        if (!node) return;
+    
+        // Dragging start/end nodes
+        if (this.isDraggingStartOrEnd && this.draggedNode) {
+            if (node.walkable && !node.isStart && !node.isEnd) {
+                const isStart = this.draggedNode.isStart;
+                const oldNode = isStart ? this.graph.getStartNode() : this.graph.getEndNode();
+    
+                if (isStart) this.graph.setStart(coords.row, coords.col);
+                else this.graph.setEnd(coords.row, coords.col);
+    
+                const newNode = isStart ? this.graph.getStartNode() : this.graph.getEndNode();
+    
+                if (oldNode) this.updateNode(oldNode);
+                if (newNode) {
+                    this.draggedNode = newNode;
+                    this.updateNode(newNode);
+                }
+            }
+            return;
+        }
+    
+        // Drawing walls
+        if (!this.isDrawing || node.isStart || node.isEnd) return;
+    
         const shouldBeWalkable = this.drawMode === 'erase';
-        if (node.walkable === shouldBeWalkable) return;
-
-        this.graph.setWalkable(node, shouldBeWalkable);
-        this.updateNode(node);
+        if (node.walkable !== shouldBeWalkable) {
+            this.graph.setWalkable(node, shouldBeWalkable);
+            this.updateNode(node);
+        }
     }
+    
 
     handleMouseUp(): void {
         this.isDrawing = false;
+        if (this.draggedNode) {
+            const element = this.cellElements.get(this.draggedNode.id);
+            if (element) element.style.cursor = 'grab';
+            this.draggedNode = null;
+        }
+        this.isDraggingStartOrEnd = false;
     }
 
     updateNode(node: INode): void {
         const element = this.cellElements.get(node.id);
         if (element) {
             element.className = this.getNodeClasses(node);
+            element.style.cursor = (node.isStart || node.isEnd) ? 'grab' : 'crosshair';
         }
     }
 
@@ -141,7 +178,7 @@ export default class GridManager {
         const { rows, cols } = this.graph.getDimensions();
         for (let row = 0; row < rows; ++row) {
             for (let col = 0; col < cols; ++col) {
-                const node = this.graph.getNodeAt(row, col)
+                const node = this.graph.getNodeAt(row, col);
                 if (node) this.updateNode(node);
             }
         }
