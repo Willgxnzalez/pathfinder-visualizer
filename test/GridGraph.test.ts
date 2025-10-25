@@ -1,7 +1,7 @@
-import { expect, test } from 'vitest'
-import GridGraph from '../src/components/grid/GridGraph';
+import { expect, test } from "vitest"
+import GridGraph from "../src/components/grid/GridGraph";
 
-test('GridGraph creates grid and nodes correctly', () => {
+test("GridGraph creates grid and nodes correctly", () => {
     const rows = 5;
     const cols = 4;
     const graph = new GridGraph(rows, cols);
@@ -21,7 +21,7 @@ test('GridGraph creates grid and nodes correctly', () => {
     }
 });
 
-test('GridGraph getNodeAt returns correct node', () => {
+test("GridGraph getNodeAt returns correct node", () => {
     const graph = new GridGraph(6, 7);
     const node = graph.getNodeAt(2, 3);
     expect(node).toBeDefined();
@@ -35,7 +35,7 @@ test('GridGraph getNodeAt returns correct node', () => {
     expect(graph.getNodeAt(0, 99)).toBeUndefined();
 });
 
-test('GridGraph setWalkable toggles wall (walkable) correctly', () => {
+test("GridGraph setWalkable toggles wall (walkable) correctly", () => {
     const graph = new GridGraph(4, 4);
     const node = graph.getNodeAt(1, 2)!;
     expect(node.walkable).toBe(true);
@@ -47,12 +47,12 @@ test('GridGraph setWalkable toggles wall (walkable) correctly', () => {
     expect(node.walkable).toBe(true);
 });
 
-test('GridGraph getDimensions returns correct size', () => {
+test("GridGraph getDimensions returns correct size", () => {
     const graph = new GridGraph(12, 34);
     expect(graph.getDimensions()).toEqual({ rows: 12, cols: 34 });
 });
 
-test('GridGraph getAllNodes returns 2D array with correct nodes', () => {
+test("GridGraph getAllNodes returns 2D array with correct nodes", () => {
     const graph = new GridGraph(3, 5);
     // There is no getAllNodes, so check using getNodeAt
     for (let r = 0; r < 3; r++) {
@@ -65,7 +65,7 @@ test('GridGraph getAllNodes returns 2D array with correct nodes', () => {
     }
 });
 
-test('GridGraph start/end setters', () => {
+test("GridGraph start/end setters", () => {
     const graph = new GridGraph(3, 3);
 
     // Set as start and end, ensure previous is cleared
@@ -95,7 +95,7 @@ test('GridGraph start/end setters', () => {
     expect(graph.getEndNode()!.id).toBe(2 * 3 + 0);
 });
 
-test('GridGraph does not set wall on start or end', () => {
+test("GridGraph does not set wall on start or end", () => {
     const graph = new GridGraph(2, 2);
     graph.setStart(1, 0);
     graph.setEnd(1, 1);
@@ -111,7 +111,7 @@ test('GridGraph does not set wall on start or end', () => {
     expect(graph.getNodeAt(0, 0)!.walkable).toBe(false);
 });
 
-test('GridGraph.getNeighbors returns walkable neighbors only', () => {
+test("GridGraph.getNeighbors returns walkable neighbors only", () => {
     const graph = new GridGraph(3, 3);
     // mark (1,1) as not walkable, should not be returned as neighbor
     const target1 = graph.getNodeAt(1, 1)!;
@@ -125,7 +125,7 @@ test('GridGraph.getNeighbors returns walkable neighbors only', () => {
     expect(neighborIds).toContain(2 * 3 + 0); // (2,0)
     expect(neighborIds).not.toContain(1 * 3 + 1); // (1,1) is a wall
 
-    // Make (1,0) not walkable, check (1,1)'s neighbors returns only walkables
+    // Make (1,0) not walkable, check (1,1)"s neighbors returns only walkables
     graph.setWalkable(node10, false);
     const node11 = graph.getNodeAt(1, 1)!;
     const neighbors2 = graph.getNeighbors(node11);
@@ -133,10 +133,10 @@ test('GridGraph.getNeighbors returns walkable neighbors only', () => {
     expect(neighborIds2).toContain(0 * 3 + 1); // (0,1)
     expect(neighborIds2).toContain(2 * 3 + 1); // (2,1)
     expect(neighborIds2).toContain(1 * 3 + 2); // (1,2)
-    expect(neighborIds2).not.toContain(1 * 3 + 0); // (1,0), since it's a wall
+    expect(neighborIds2).not.toContain(1 * 3 + 0); // (1,0), since it"s a wall
 });
 
-test('GridGraph.getNodeAt(row, col) returns undefined out of bounds', () => {
+test("GridGraph.getNodeAt(row, col) returns undefined out of bounds", () => {
     const graph = new GridGraph(2, 2);
     expect(graph.getNodeAt(-1, 0)).toBeUndefined();
     expect(graph.getNodeAt(0, -1)).toBeUndefined();

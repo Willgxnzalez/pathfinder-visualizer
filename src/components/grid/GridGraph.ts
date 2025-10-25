@@ -1,6 +1,6 @@
-import { GridNode } from '../../models/Node';
-import { INode, IEdge } from '../../types';
-import { IGraph } from '../../models/IGraph';
+import { GridNode } from "../../models/Node";
+import { INode, IEdge } from "../../types";
+import { IGraph } from "../../models/IGraph";
 
 export default class GridGraph implements IGraph {
     private nodes: GridNode[][];

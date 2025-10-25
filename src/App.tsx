@@ -1,15 +1,15 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import BFS from './algorithms/pathfinding/BFS';
-import DFS from './algorithms/pathfinding/DFS';
-import Astar from './algorithms/pathfinding/Astar';
-import GBFS from './algorithms/pathfinding/GBFS';
-import Dijkstra from './algorithms/pathfinding/Dijkstra';
-import GridManager from './components/grid/GridManager';
-import GridGraph from './components/grid/GridGraph';
-import Grid from './components/grid/GridView';
-import { AnimationState, AnimationStep, PathfindingResult, Algorithm } from './types';
-import { GRID_ROWS, GRID_COLS, CELL_SIZE, START_NODE_POS, END_NODE_POS } from './utils/constants';
-import { IGraph } from './models/IGraph';
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import BFS from "./algorithms/pathfinding/BFS";
+import DFS from "./algorithms/pathfinding/DFS";
+import Astar from "./algorithms/pathfinding/Astar";
+import GBFS from "./algorithms/pathfinding/GBFS";
+import Dijkstra from "./algorithms/pathfinding/Dijkstra";
+import GridManager from "./components/grid/GridManager";
+import GridGraph from "./components/grid/GridGraph";
+import Grid from "./components/grid/GridView";
+import { AnimationState, AnimationStep, PathfindingResult, Algorithm } from "./types";
+import { GRID_ROWS, GRID_COLS, CELL_SIZE, START_NODE_POS, END_NODE_POS } from "./utils/constants";
+import { IGraph } from "./models/IGraph";
 
 export default function App() {
     const graphRef = useRef(new GridGraph(GRID_ROWS, GRID_COLS));

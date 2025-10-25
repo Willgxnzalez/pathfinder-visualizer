@@ -1,4 +1,4 @@
-import { INode, IEdge } from '../types';
+import { INode, IEdge } from "../types";
 
 export interface IGraph {
     getNeighbors(node: INode): INode[];
