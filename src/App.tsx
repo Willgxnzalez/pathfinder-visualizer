@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import BFS from './algorithms/pathfinding/BFS';
 import DFS from './algorithms/pathfinding/DFS';
 import Astar from './algorithms/pathfinding/astar';
+import GBFS from './algorithms/pathfinding/GBFS';
 import GridManager from './components/grid/GridManager';
 import GridGraph from './components/grid/GridGraph';
 import Grid from './components/grid/GridView';
@@ -52,7 +53,8 @@ export default function App() {
 		const algoMap = { 
             bfs: BFS, 
             dfs: DFS,
-            astar: Astar
+            astar: Astar,
+            gbfs: GBFS
         };
 		return algoMap[algorithm] ?? BFS;
 	}
@@ -196,8 +198,9 @@ export default function App() {
                     >
                         <option value="bfs">Breadth-First Search</option>
                         <option value="dfs">Depth-First Search</option>
-                        <option value="dijkstra">Dijkstra's</option>
                         <option value="astar">A*</option>
+                        <option value="gbfs">Greedy Best-First Search</option>
+                        <option value="dijkstra">Dijkstra's</option>
                     </select>
                 </div>
 

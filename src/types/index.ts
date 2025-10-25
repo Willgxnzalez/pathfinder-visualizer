@@ -18,7 +18,7 @@ export interface IEdge {
     weight: number;
 }
 
-export type Algorithm = 'bfs' | 'dfs' | 'astar' | 'dijkstra';
+export type Algorithm = 'bfs' | 'dfs' | 'astar' | 'gbfs' | 'dijkstra';
 
 export type AnimationState = 'idle' | 'running' | 'paused' | 'stepping';
 
