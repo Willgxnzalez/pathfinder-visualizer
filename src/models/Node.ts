@@ -14,6 +14,7 @@ export class GridNode implements INode {
     isEnd: boolean = false;
     isVisited: boolean = false;
     isPath: boolean = false;
+    isFrontier: boolean = false;
 
     constructor(id: string, row: number, col: number) {
         this.id = id;
@@ -38,6 +39,7 @@ export class MapNode implements INode {
     isEnd: boolean = false;
     isVisited: boolean = false;
     isPath: boolean = false;
+    isFrontier: boolean = false;
 
     constructor(id: string, lat: number, lng: number, walkable: boolean) {
         this.id = id;

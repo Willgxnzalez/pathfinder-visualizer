@@ -23,8 +23,8 @@ export interface IGraph {
     getNeighbors(node: INode): INode[];
     getDistance(from: INode, to: INode): number;
     getHeuristic(from: INode, to: INode): number;
-    getStartNode(): INode | undefined;
-    getEndNode(): INode | undefined;
+    getStartNode(): INode | null;
+    getEndNode(): INode | null;
 }
 
 export type Algorithm = 'bfs' | 'dfs' | 'astar' | 'gbfs' | 'dijkstra';
@@ -34,7 +34,6 @@ export type AnimationState = 'idle' | 'running' | 'paused' | 'stepping';
 export interface AnimationStep {
     type: 'visit' | 'path';
     nodes: INode[];
-    frontier: INode[];
 }
 
 export interface PathfindingResult {
