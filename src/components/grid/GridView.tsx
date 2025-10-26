@@ -1,5 +1,3 @@
-// components/grid/GridView.tsx
-
 import React, { useEffect, useRef, useCallback } from "react";
 import Grid from "../../models/Grid";
 

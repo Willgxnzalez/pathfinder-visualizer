@@ -1,5 +1,3 @@
-// models/Grid.ts
-
 import { GridNode } from "./Node";
 import { IGraph } from "../types";
 import { INode } from "../types";
