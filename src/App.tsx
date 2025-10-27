@@ -111,12 +111,11 @@ export default function App() {
         );
     }, [selectedAlgorithm, grid]);
 
-    const handlePause = useCallback(() => {
-        if (animationStateRef.current === "running") setAnimationState("paused");
-    }, []);
-
-    const handleResume = useCallback(() => {
-        if (["paused", "stepping"].includes(animationStateRef.current)) {
+    // Combined Play/Pause Handler
+    const handlePlayPause = useCallback(() => {
+        if (animationStateRef.current === "running") {
+            setAnimationState("paused");
+        } else if (["paused", "stepping"].includes(animationStateRef.current)) {
             setAnimationState("running");
             pauseResolveRef.current?.(); pauseResolveRef.current = null;
             stepResolveRef.current?.(); stepResolveRef.current = null;
@@ -146,26 +145,65 @@ export default function App() {
 
     const isAnimating = animationState !== "idle";
 
-    return (
-        <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center p-8">
-            <h1 className="text-3xl font-bold text-white mb-8">Pathfinding Visualizer</h1>
+    // Helper to get Play/Pause button state
+    const playPauseState = (() => {
+        if (animationState === "running") {
+            return { icon: "Pause", label: "Pause", disabled: false };
+        } else if (["paused", "stepping"].includes(animationState)) {
+            return { icon: "Play", label: "Resume", disabled: false };
+        } else {
+            // either before start or after stop
+            return { icon: "Play", label: "Play", disabled: true };
+        }
+    })();
 
-            <div className="flex gap-4 mb-4">
-                <button onClick={runVisualization} disabled={isAnimating} className="px-6 py-3 bg-green-600 text-white rounded disabled:opacity-50">Start</button>
-                <button onClick={handlePause} disabled={animationState !== "running"} className="px-6 py-3 bg-yellow-600 text-white rounded disabled:opacity-50">Pause</button>
-                <button onClick={handleResume} disabled={!["paused", "stepping"].includes(animationState)} className="px-6 py-3 bg-blue-600 text-white rounded disabled:opacity-50">Resume</button>
-                <button onClick={handleStep} disabled={!["paused", "stepping"].includes(animationState)} className="px-6 py-3 bg-cyan-600 text-white rounded disabled:opacity-50">Step</button>
-                <button onClick={handleStop} disabled={animationState === "idle"} className="px-6 py-3 bg-red-600 text-white rounded disabled:opacity-50">Stop</button>
+    return (
+        <div className="min-h-screen bg-surface-1 flex flex-col items-center justify-center p-8">
+            <header className="fixed top-0 left-0 right-0 flex justify-between items-center p-3">
+                <h1 className="text-4xl font-bold text-text-main mb-8">Pathfinding Visualizer</h1>
+            </header>
+            
+
+            <div className="w-5/6 flex gap-4 p-3 mb-4 bg-surface-2 rounded-lg border-1 border-border-main text-text-main">
+                {/* Play/Pause Button */}
+                <button
+                    onClick={handlePlayPause}
+                    disabled={
+                        // Play/Pause is only enabled while running, paused, or stepping
+                        animationState === "idle"
+                    }
+                    className="btn"
+                >
+                    {animationState === "running" ? "Pause" : (["paused", "stepping"].includes(animationState) ? "Resume" : "Play")}
+                </button>
+                <button 
+                    onClick={runVisualization} 
+                    disabled={isAnimating} 
+                    className="px-6 py-3 bg-accent-main rounded-md disabled:opacity-40 hover:bg-accent-hover">
+                    Visualize
+                </button>
+                <button 
+                    onClick={handleStep} 
+                    disabled={!["paused", "stepping"].includes(animationState)} 
+                    className="px-6 py-3 bg-surface-3 rounded-md disabled:opacity-60">
+                    Step
+                </button>
+                <button 
+                    onClick={handleStop} 
+                    disabled={animationState === "idle"} 
+                    className="px-6 py-3 bg-surface-3 rounded-md disabled:opacity-60">
+                    Stop
+                </button>
             </div>
 
-            <div className="flex gap-10 mb-4">
+            <div className="flex gap-10 p-3 mb-4 bg-surface-2 rounded-lg border-1 border-border-main">
                 <div className="flex flex-col gap-2">
                     <label className="text-sm text-gray-400">Algorithm</label>
                     <select
                         value={selectedAlgorithm}
                         onChange={(e) => setSelectedAlgorithm(e.target.value as Algorithm)}
                         disabled={isAnimating}
-                        className="px-4 py-2 bg-gray-800 text-white rounded border border-gray-700"
+                        className="px-4 py-2 bg-surface-3 text-text-main border border-border-main rounded-md focus:outline-none focus:ring-2 focus:ring-accent-main hover:bg-surface-2 disabled:opacity-50"
                     >
                         <option value="bfs">Breadth-First Search</option>
                         <option value="dfs">Depth-First Search</option>
@@ -205,7 +243,7 @@ export default function App() {
             />
 
             <div className="text-white">
-                Status: <span className="font-semibold">{animationState}</span>
+                Status: <span className="font-bold text-accent-main">{animationState}</span>
             </div>
 
             {result && <div className="mt-4 text-white bg-gray-800 px-6 py-3 rounded">{result}</div>}
