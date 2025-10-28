@@ -1,20 +1,28 @@
-import React, { useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Grid from "../models/Grid";
 
 interface GridViewProps {
-    rows: number;
-    cols: number;
-    cellSize: number;
     onGridReady: (grid: Grid) => void;
 }
 
-export default function GridView({ rows, cols, cellSize, onGridReady }: GridViewProps) {
+export default function GridView({ onGridReady }: GridViewProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const gridRef = useRef<Grid | null>(null);
+    const [gridSize, setGridSize] = useState(() => calculateGridSize());
+
+    function calculateGridSize() {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        const cellSize = width < 768 ? 30 : 25;
+        const cols = Math.floor(width / cellSize);
+        const availableHeight = Math.floor(height * 0.65);
+        const rows = Math.floor(availableHeight / cellSize);
+        return { rows, cols, cellSize };
+    }
 
     useEffect(() => {
         if (containerRef.current && !gridRef.current) {
-            // Set up styling
+            const { rows, cols, cellSize } = gridSize;
             containerRef.current.innerHTML = "";
             containerRef.current.className = "grid border-1 border-border-main cursor-crosshair touch-none select-none pt-px pl-px select-none";
             containerRef.current.style.gridTemplateRows = `repeat(${rows}, ${cellSize}px)`;
@@ -27,20 +35,16 @@ export default function GridView({ rows, cols, cellSize, onGridReady }: GridView
             gridRef.current?.destroy();
             gridRef.current = null;
         };
-    }, [rows, cols, cellSize, onGridReady]);
+    }, [onGridReady]);
 
     useEffect(() => {
         const resizeGrid = () => {
+            const newSize = calculateGridSize();
+            setGridSize(newSize);
             if (!containerRef.current || !gridRef.current) return;
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            const cellSize = width < 768 ? 30 : 25;
-            const cols = Math.floor(width / cellSize);
-            const availableHeight = Math.floor(height * 0.65);
-            const rows = Math.floor(availableHeight / cellSize);
-            containerRef.current.style.gridTemplateRows = `repeat(${rows}, ${cellSize}px)`;
-            containerRef.current.style.gridTemplateColumns = `repeat(${cols}, ${cellSize}px)`;
-            gridRef.current.resize(rows, cols, cellSize);
+            containerRef.current.style.gridTemplateRows = `repeat(${newSize.rows}, ${newSize.cellSize}px)`;
+            containerRef.current.style.gridTemplateColumns = `repeat(${newSize.cols}, ${newSize.cellSize}px)`;
+            gridRef.current.resize(newSize.rows, newSize.cols, newSize.cellSize);
         };
         window.addEventListener("resize", resizeGrid);
         resizeGrid();
