@@ -74,7 +74,7 @@ export default function ToolBar({
                     onClick={onRun}
                     disabled={isAnimating}
                     className={
-                        "px-6 py-2 rounded-lg text-xl font-bold text-text-invert transition-all w-full min-w-[96px] max-w-[180px] h-10 flex-shrink-0 flex-grow-0 " +
+                        "px-6 py-2 rounded-lg text-xl font-bold text-text-invert transition-all w-full min-w-[96px] max-w-[180px] h-10 shrink-0 grow-0 " +
                         (isAnimating
                             ? "bg-surface-3 cursor-not-allowed opacity-50"
                             : "bg-accent hover:brightness-110")
@@ -91,7 +91,7 @@ export default function ToolBar({
                     onClick={onReset}
                     disabled={isAnimating}
                     className={
-                        "btn flex-shrink-0 flex-grow-0 min-w-[65px] h-10 max-w-[120px] " +
+                        "btn shrink-0 grow-0 min-w-[65px] h-10 max-w-[120px] " +
                         (isAnimating
                             ? "bg-surface-3 text-text-muted cursor-not-allowed"
                             : "bg-surface-3 text-text-main hover:bg-surface-4")
@@ -100,7 +100,7 @@ export default function ToolBar({
                     Reset
                 </button>
                 {/* Speed Control */}
-                <div className="flex flex-col gap-1 min-w-[90px] max-w-[160px] flex-grow flex-shrink">
+                <div className="flex flex-col gap-1 min-w-[90px] max-w-[160px] grow shrink">
                     <label className="text-sm text-text-muted whitespace-nowrap">Speed</label>
                     <div
                         className={controlBoxClass + " p-0 w-full overflow-hidden"}
@@ -125,7 +125,7 @@ export default function ToolBar({
                     </div>
                 </div>
                 {/* Cell Size Control */}
-                <div className="flex flex-col gap-1 min-w-[120px] max-w-[180px] flex-grow flex-shrink">
+                <div className="flex flex-col gap-1 min-w-[120px] max-w-[180px] grow shrink">
                     <label className="text-sm text-text-muted whitespace-nowrap">
                         Cell size: <span className="font-mono text-text-main">{cellSize} px</span>
                     </label>
