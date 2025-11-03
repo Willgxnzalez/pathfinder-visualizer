@@ -1,0 +1,57 @@
+@layer components {
+  /* === GRID BACKGROUND === */
+  .grid-background {
+    @apply relative w-full h-full;
+    
+    background-image:
+      linear-gradient(to right, oklch(0.3 0.01 260 / 0.45) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(0.3 0.01 260 / 0.45) 1px, transparent 1px),
+      linear-gradient(to right, oklch(0.3 0.01 260 / 0.7) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(0.3 0.01 260 / 0.7) 1px, transparent 1px);
+    
+    background-size:
+      var(--cell-size, 25px) var(--cell-size, 25px),
+      var(--cell-size, 25px) var(--cell-size, 25px),
+      calc(var(--cell-size, 25px) * 5) calc(var(--cell-size, 25px) * 5),
+      calc(var(--cell-size, 25px) * 5) calc(var(--cell-size, 25px) * 5);
+  }
+
+  /* === NODE STYLES === */
+  .node {
+    @apply transition-colors duration-150;
+    background: transparent;
+  }
+
+  .node-wall {
+    background-color: rgba(100, 100, 160, 0.1); 
+    box-shadow: 0 5px 30px rgba(0,0,0, 0.15); 
+    border: 1px solid rgba(80, 80, 110, 0.3); 
+  }
+
+  .node-visited {
+    background: var(--color-secondary);
+    box-shadow: 0 0 4px color-mix(in oklch, var(--color-secondary) 80%, transparent);
+  }
+
+  .node-frontier {
+    background: color-mix(in oklch, var(--color-accent) 60%, var(--color-surface-3));
+    box-shadow: 0 0 6px color-mix(in oklch, var(--color-accent) 80%, transparent);
+  }
+
+  .node-path {
+    background: var(--color-accent);
+    box-shadow: 0 0 8px color-mix(in oklch, var(--color-accent) 100%, transparent);
+  }
+
+  .node-start {
+    background: color-mix(in oklch, var(--color-primary) 85%, white 10%);
+    box-shadow: 0 0 6px var(--color-primary);
+    border-radius: 2px;
+  }
+
+  .node-end {
+    background: color-mix(in oklch, var(--color-accent) 85%, white 10%);
+    box-shadow: 0 0 6px var(--color-accent);
+    border-radius: 2px;
+  }
+}
