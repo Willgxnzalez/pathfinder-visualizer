@@ -1,7 +1,6 @@
 import { GridNode } from "./Node";
 import { IGraph } from "../types";
 import { INode } from "../types";
-import { STATE_STYLES } from "../utils/constants";
 
 export default class Grid implements IGraph {
     // Grid structure
@@ -29,6 +28,7 @@ export default class Grid implements IGraph {
     }
 
     private createGrid(): void {
+        this.grid = [];
         for (let row = 0; row < this.rows; ++row) {
             this.grid[row] = [];
             for (let col = 0; col < this.cols; ++col) {
@@ -205,6 +205,15 @@ export default class Grid implements IGraph {
                 this.cellElements.set(node.id, element);
             }
         }
+    }
+
+    setCellSize(newCellSize: number): void {
+        if (newCellSize <= 0) return;
+        this.cellSize = newCellSize;
+        if (this.container) {
+            this.container.style.setProperty("--cell-size", `${this.cellSize}px`);
+        }
+        this.resizeToContainer();
     }
 
     private createNodeElement(node: GridNode): HTMLElement {

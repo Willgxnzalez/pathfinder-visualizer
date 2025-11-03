@@ -8,7 +8,6 @@ import Grid from "./models/Grid";
 import GridView from "./components/GridView";
 import ToolBar from "./components/ToolBar";
 import { AnimationState, AnimationStep, PathfindingResult, Algorithm } from "./types";
-import { INIT_CELL_SIZE } from "./utils/constants";
 import clsx from "clsx";
 
 export default function App() {
@@ -18,6 +17,7 @@ export default function App() {
     const [selectedAlgorithm, setSelectedAlgorithm] = useState<Algorithm>("bfs");
     const [result, setResult] = useState("");
     const [isDrawing, setIsDrawing] = useState(false);
+    const [cellSize, setCellSize] = useState<number>(0);
 
     const animationStateRef = useRef(animationState);
     const speedRef = useRef(speed);
@@ -33,9 +33,33 @@ export default function App() {
         speedRef.current = speed;
     }, [speed]);
 
-    useEffect(() => {
-        setGrid(new Grid(INIT_CELL_SIZE));
-    }, [])
+    function computeInitialCellSize(): number {
+        const width = window.innerWidth;
+        const height = window.innerHeight; // leave room for header/toolbar
+      
+        // Aim for fewer columns on small screens, more on large screens
+        const targetCols = width < 640 ? 14 : width < 1024 ? 26 : 36;
+        const targetRows = 25;
+      
+        const sizeByWidth = Math.floor(width / targetCols);
+        const sizeByHeight = Math.floor(height / targetRows);
+        const raw = Math.min(sizeByWidth, sizeByHeight);
+      
+        // Clamp and snap to 5px steps for clean sizing
+        const clamped = Math.max(20, Math.min(80, raw));
+        return clamped - (clamped % 5);
+      }
+
+      useEffect(() => {
+        const initial = computeInitialCellSize();
+        setCellSize(initial)
+        setGrid(new Grid(initial));
+      }, []);
+
+    const handleCellSizeChange = useCallback((size: number) => {
+        setCellSize(size);
+        grid?.setCellSize(size);
+    }, [grid]);
 
     const getDelay = (s: "slow" | "medium" | "fast"): number => ({ slow: 75, medium: 40, fast: 0 }[s]);
 
@@ -163,23 +187,17 @@ export default function App() {
                     animationState={animationState}
                     selectedAlgorithm={selectedAlgorithm}
                     speed={speed}
+                    cellSize={cellSize}
                     onRun={runVisualization}
                     onReset={handleReset}
                     onAlgorithmChange={setSelectedAlgorithm}
                     onSpeedChange={setSpeed}
+                    onCellSizeChange={handleCellSizeChange}
                 />
 
                 <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-2 rounded-full glass shadow-lg">
                     <button onClick={handleStop}>STOP</button>
                     <button onClick={handlePlayPause}>⏯</button>
-                    <input
-                        type="range"
-                        min={0}
-                        max={10}
-                        defaultValue={4}
-                        className="accent-accent w-64"
-                        readOnly
-                    />
                     <button onClick={handleStep}>⏭</button>
                 </div>
             </div>

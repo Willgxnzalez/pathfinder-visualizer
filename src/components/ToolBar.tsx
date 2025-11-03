@@ -6,27 +6,31 @@ interface ToolBarProps {
     animationState: AnimationState;
     selectedAlgorithm: Algorithm;
     speed: "slow" | "medium" | "fast";
+    cellSize: number;
 
     onRun: () => void;
     onReset: () => void;
     onAlgorithmChange: (algo: Algorithm) => void;
     onSpeedChange: (s: "slow" | "medium" | "fast") => void;
+    onCellSizeChange: (size: number) => void;
 }
 
 export default function ToolBar({
-    mapMode, 
+    mapMode,
     animationState,
     selectedAlgorithm,
     speed,
+    cellSize,
     onRun,
     onReset,
     onAlgorithmChange,
     onSpeedChange,
+    onCellSizeChange,
 }: ToolBarProps) {
     const isAnimating = animationState !== "idle";
 
     const controlBoxClass =
-        "min-w-[170px] h-10 flex items-center border transition-all bg-surface-2 border-border-main text-text-main" +
+        "min-w-[120px] h-10 flex items-center border transition-all bg-surface-2 border-border-main text-text-main" +
         (isAnimating ? " opacity-50 cursor-not-allowed" : "");
     const speedBtnClass = (active: boolean) =>
         "flex-1 h-full px-0 m-0 rounded-none border-none transition-all text-base font-medium outline-none " +
@@ -34,30 +38,28 @@ export default function ToolBar({
             ? "bg-accent text-white"
             : "bg-transparent text-text-muted hover:text-text-main");
 
-    // Flex solution to center the middle button
     return (
         <div
             className="
-                fixed glass top-15 left-1/2 -translate-x-1/2 px-12 py-3
-                w-4/5
-                flex items-center justify-center gap-12
+                fixed glass top-15 left-1/2 -translate-x-1/2 px-4 py-2
+                w-[95vw]
+                flex
                 transition-all duration-300
                 rounded-full
+                z-20
             "
         >
             {/* Left Side controls */}
-            <div className="basis-2/5 flex flex-col gap-1 flex-1 min-w-0 items-start">
+            <div className="flex flex-col gap-1 min-w-0 justify-start flex-1">
                 <label className="text-sm text-text-muted">Algorithm</label>
                 <select
                     value={selectedAlgorithm}
                     onChange={e => onAlgorithmChange(e.target.value as Algorithm)}
                     disabled={isAnimating}
-                    className={"px-2 pe-1 appearance-none " + controlBoxClass}
-                    style={{
-                        WebkitAppearance: "none",
-                        MozAppearance: "none",
-                        appearance: "none",
-                    }}
+                    className={
+                        "px-2 pe-1 appearance-none w-full " + controlBoxClass
+                        + " min-w-[64px] max-w-full"
+                    }
                 >
                     <option value="bfs">Breadth-First Search</option>
                     <option value="dfs">Depth-First Search</option>
@@ -66,41 +68,42 @@ export default function ToolBar({
                     <option value="dijkstra">Dijkstra's</option>
                 </select>
             </div>
-            {/* Middle "Visualize" button centered */}
-            <button
-                onClick={onRun}
-                disabled={isAnimating}
-                className={
-                    "basis-1/5 px-4 py-2 rounded-lg text-xl font-bold text-text-invert " +
-                    (isAnimating
-                        ? "bg-surface-3 cursor-not-allowed opacity-50"
-                        : "bg-accent hover:brightness-110")
-                }
-                style={{ minWidth: 120, height: 40 }}
+            {/* Middle "Visualize" button always centered */}
+            <div className="flex flex-col items-center min-w-0 justify-center">
+                <button
+                    onClick={onRun}
+                    disabled={isAnimating}
+                    className={
+                        "px-6 py-2 rounded-lg text-xl font-bold text-text-invert transition-all w-full min-w-[96px] max-w-[180px] h-10 flex-shrink-0 flex-grow-0 " +
+                        (isAnimating
+                            ? "bg-surface-3 cursor-not-allowed opacity-50"
+                            : "bg-accent hover:brightness-110")
+                    }
+                >
+                    VISUALIZE
+                </button>
+            </div>
+            {/* Right side controls grow and shrink */}
+            <div
+                className="flex gap-2 flex-wrap items-stretch justify-end flex-1"
             >
-                VISUALIZE
-            </button>
-            {/* Right side controls */}
-            <div className="basis-2/5 flex gap-4 flex-1 min-w-0 justify-end">
                 <button
                     onClick={onReset}
                     disabled={isAnimating}
                     className={
-                        "btn " +
+                        "btn flex-shrink-0 flex-grow-0 min-w-[65px] h-10 max-w-[120px] " +
                         (isAnimating
                             ? "bg-surface-3 text-text-muted cursor-not-allowed"
                             : "bg-surface-3 text-text-main hover:bg-surface-4")
                     }
-                    style={{ minWidth: 90, height: 40 }}
                 >
                     Reset
                 </button>
                 {/* Speed Control */}
-                <div className="flex flex-col gap-1">
-                    <label className="text-sm text-text-muted">Speed</label>
+                <div className="flex flex-col gap-1 min-w-[90px] max-w-[160px] flex-grow flex-shrink">
+                    <label className="text-sm text-text-muted whitespace-nowrap">Speed</label>
                     <div
-                        className={controlBoxClass + " p-0"}
-                        style={{ overflow: "hidden" }}
+                        className={controlBoxClass + " p-0 w-full overflow-hidden"}
                     >
                         {(["slow", "medium", "fast"] as const).map((s, i, arr) => (
                             <button
@@ -111,21 +114,31 @@ export default function ToolBar({
                                     speedBtnClass(speed === s) +
                                     (i === 0 ? " rounded-l" : "") +
                                     (i === arr.length - 1 ? " rounded-r" : "") +
-                                    (speed === s ? " z-10" : "")
+                                    (speed === s ? " z-10" : "") +
+                                    (i !== 0 ? " border-l border-border-main" : "")
                                 }
-                                style={{
-                                    borderLeft:
-                                        i !== 0
-                                            ? "1px solid var(--color-border-main)"
-                                            : undefined,
-                                    height: "100%",
-                                    minWidth: 0,
-                                }}
+                                style={{}}
                             >
                                 {s}
                             </button>
                         ))}
                     </div>
+                </div>
+                {/* Cell Size Control */}
+                <div className="flex flex-col gap-1 min-w-[120px] max-w-[180px] flex-grow flex-shrink">
+                    <label className="text-sm text-text-muted whitespace-nowrap">
+                        Cell size: <span className="font-mono text-text-main">{cellSize} px</span>
+                    </label>
+                    <input
+                        type="range"
+                        min={20}
+                        max={120}
+                        step={5}
+                        value={cellSize}
+                        onChange={(e) => onCellSizeChange(Number(e.target.value))}
+                        disabled={isAnimating}
+                        className={"accent-accent w-full h-10 " + (isAnimating ? "opacity-50 cursor-not-allowed" : "")}
+                    />
                 </div>
             </div>
         </div>
