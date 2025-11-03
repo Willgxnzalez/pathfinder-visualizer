@@ -20,11 +20,11 @@ export interface IEdge {
 }
 
 export interface IGraph {
+    getStartNode(): INode | null;
+    getEndNode(): INode | null;
     getNeighbors(node: INode): INode[];
     getDistance(from: INode, to: INode): number;
     getHeuristic(from: INode, to: INode): number;
-    getStartNode(): INode | null;
-    getEndNode(): INode | null;
 }
 
 export type Algorithm = 'bfs' | 'dfs' | 'astar' | 'gbfs' | 'dijkstra';
