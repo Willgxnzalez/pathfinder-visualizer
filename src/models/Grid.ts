@@ -3,13 +3,11 @@ import { IGraph } from "../types";
 import { INode } from "../types";
 import { STATE_STYLES } from "../utils/constants";
 
-const CELL_BASE = "border border-gray-700 transition-colors duration-150 -mt-px -ml-px box-border";
-
 export default class Grid implements IGraph {
     // Grid structure
-    private grid: GridNode[][];
-    private rows: number;
-    private cols: number;
+    private grid: GridNode[][] = [];
+    private rows: number = 0;
+    private cols: number = 0;
     private cellSize: number = 0;
 
     // Start and end nodes
@@ -18,7 +16,7 @@ export default class Grid implements IGraph {
 
     // DOM/UI references
     private container: HTMLElement | null = null;
-    private cellElements: Map<string, HTMLElement>;
+    private cellElements: Map<string, HTMLElement> = new Map();
 
     // Input handling
     private drawMode: 'wall' | 'erase' = 'wall';
@@ -26,21 +24,11 @@ export default class Grid implements IGraph {
     private draggedNode: INode | null = null;
     private isDraggingStartOrEnd: boolean = false;
 
-    constructor(rows: number, cols: number, cellSize: number, container: HTMLElement) {
-        this.grid = [];
-        this.rows = rows;
-        this.cols = cols;
-        this.cellSize = cellSize;
-
-        this.container = container;
-
-        this.cellElements = new Map();
-
-        this.initialize();
-        this.render();
+    constructor(initialCellSize: number) {
+        this.cellSize = initialCellSize;
     }
 
-    private initialize(): void {
+    private createGrid(): void {
         for (let row = 0; row < this.rows; ++row) {
             this.grid[row] = [];
             for (let col = 0; col < this.cols; ++col) {
@@ -48,8 +36,19 @@ export default class Grid implements IGraph {
                 this.grid[row][col] = new GridNode(id, row, col);
             }
         }
-        this.setStart(0, 0);
-        this.setEnd(this.rows - 1, this.cols - 1);
+        this.setStartNode(0, 0);
+        this.setEndNode(this.rows - 1, this.cols - 1);
+    }
+
+    getNode(row: number, col: number): INode | null {
+        if (row >= 0 && row < this.rows && col >= 0 && col < this.cols) {
+            return this.grid[row][col];
+        }
+        return null;
+    }
+
+    getDimensions(): { rows: number; cols: number } {
+        return { rows: this.rows, cols: this.cols };
     }
 
     // ============ IGraph Implementation ============
@@ -61,18 +60,7 @@ export default class Grid implements IGraph {
     getEndNode(): INode | null {
         return this.endNode;
     }
-
-    getNodeAt(row: number, col: number): INode | null {
-        if (row >= 0 && row < this.rows && col >= 0 && col < this.cols) {
-            return this.grid[row][col];
-        }
-        return null;
-    }
-
-    getDimensions(): { rows: number; cols: number } {
-        return { rows: this.rows, cols: this.cols };
-    }
-
+    
     getNeighbors(node: INode): INode[] {
         const neighbors: INode[] = [];
         if (!(node instanceof GridNode)) return neighbors;
@@ -87,7 +75,7 @@ export default class Grid implements IGraph {
         for (const { row, col } of directions) {
             const newRow = node.row + row;
             const newCol = node.col + col;
-            const neighbor = this.getNodeAt(newRow, newCol);
+            const neighbor = this.getNode(newRow, newCol);
             if (neighbor && neighbor.walkable) {
                 neighbors.push(neighbor);
             }
@@ -103,8 +91,8 @@ export default class Grid implements IGraph {
         return Math.abs(from.row - to.row) + Math.abs(from.col - to.col);
     }
 
-    setStart(row: number, col: number): void {
-        const node = this.getNodeAt(row, col);
+    setStartNode(row: number, col: number): void {
+        const node = this.getNode(row, col);
         if (!node) return;
 
         if (this.startNode) {
@@ -118,8 +106,8 @@ export default class Grid implements IGraph {
         this.updateNodeUI(node);
     }
 
-    setEnd(row: number, col: number): void {
-        const node = this.getNodeAt(row, col);
+    setEndNode(row: number, col: number): void {
+        const node = this.getNode(row, col);
         if (!node) return;
 
         if (this.endNode) {
@@ -133,35 +121,11 @@ export default class Grid implements IGraph {
         this.updateNodeUI(node);
     }
 
-    setWalkable(node: INode, walkable: boolean): void {
+    setNodeWalkable(node: INode, walkable: boolean): void {
         if (node.isStart || node.isEnd) return;
         node.walkable = walkable;
         this.updateNodeUI(node);
     }
-
-    resetNodeState(node: GridNode): void {
-        node.isVisited = false;
-        node.isFrontier = false;
-        node.isPath = false;
-        node.parent = null;
-        node.gCost = Infinity;
-        node.hCost = 0;
-    }
-
-    clearGrid(clearWalls: boolean): void {
-        for (let row = 0; row < this.rows; ++row) {
-            for (let col = 0; col < this.cols; ++col) {
-                const node = this.grid[row][col];
-                this.resetNodeState(node);
-                if (clearWalls && !node.isStart && !node.isEnd) {
-                    node.walkable = true;
-                }
-                this.updateNodeUI(node);
-            }
-        }
-    }
-
-    // ============ Visualization State Methods ============
 
     setNodeVisited(node: INode): void {
         node.isVisited = true;
@@ -178,22 +142,60 @@ export default class Grid implements IGraph {
         this.updateNodeUI(node);
     }
 
-    clearNodeState(node: INode): void {
+    // ============ Node State Reset/Clear Methods ============
+
+    resetNodeState(node: GridNode): void {
         node.isVisited = false;
         node.isFrontier = false;
         node.isPath = false;
+        node.parent = null;
+        node.gCost = Infinity;
+        node.hCost = 0;
         this.updateNodeUI(node);
     }
 
+    resetGrid(clearWalls: boolean): void {
+        for (let row = 0; row < this.rows; ++row) {
+            for (let col = 0; col < this.cols; ++col) {
+                const node = this.grid[row][col];
+                this.resetNodeState(node);
+                if (clearWalls && !node.isStart && !node.isEnd) {
+                    node.walkable = true;
+                }
+                this.updateNodeUI(node);
+            }
+        }
+    }
+
+
     // ============ UI Rendering ============
+
+    mount(container: HTMLElement): void {
+        this.container = container;
+        this.container.style.setProperty("--cell-size", `${this.cellSize}px`);
+        this.resizeToContainer();
+
+        // Adjust grid size on parent resize
+        new ResizeObserver(() => this.resizeToContainer()).observe(this.container.parentElement!);
+    }
+
+    private resizeToContainer(): void {
+        if (!this.container) return;
+        const parent = this.container.parentElement;
+        if (!parent) return;
+        const { width, height } = parent.getBoundingClientRect();
+        this.cols = Math.floor(width / this.cellSize);
+        this.rows = Math.floor(height / this.cellSize);
+        this.container.style.width = `${this.cols * this.cellSize}px`;
+        this.container.style.height = `${this.rows * this.cellSize}px`;
+        this.createGrid();
+        this.render();
+    }
 
     private render(): void {
         if (!this.container) return;
-
         this.container.innerHTML = "";
-        this.container.className = "grid border-2 border-gray-700 cursor-crosshair relative touch-none pt-px pl-px select-none shadow-[0px_0px_23px_4px_#2d3748]";
-        this.container.style.gridTemplateRows = `repeat(${this.rows}, ${this.cellSize}px)`;
-        this.container.style.gridTemplateColumns = `repeat(${this.cols}, ${this.cellSize}px)`;
+        this.cellElements.clear();
 
         for (let row = 0; row < this.rows; ++row) {
             for (let col = 0; col < this.cols; ++col) {
@@ -206,25 +208,34 @@ export default class Grid implements IGraph {
     }
 
     private createNodeElement(node: GridNode): HTMLElement {
-        const element = document.createElement('div');
+        const element = document.createElement("div");
         element.id = `cell-${node.id}`;
         element.dataset.row = node.row.toString();
         element.dataset.col = node.col.toString();
         element.className = this.getNodeClasses(node);
+      
+        const top = node.row * this.cellSize;
+        const left = node.col * this.cellSize;
+        element.style.position = "absolute";
+        element.style.width = `${this.cellSize}px`;
+        element.style.height = `${this.cellSize}px`;
+        element.style.top = `${top}px`;
+        element.style.left = `${left}px`;
+      
         return element;
     }
 
     private getNodeClasses(node: INode): string {
-        let bg: string = STATE_STYLES.default;
-
-        if (node.isPath) bg = STATE_STYLES.path;
-        else if (node.isStart) bg = STATE_STYLES.start;
-        else if (node.isEnd) bg = STATE_STYLES.end;
-        else if (node.isVisited) bg = STATE_STYLES.visited;
-        else if (node.isFrontier) bg = STATE_STYLES.frontier || 'bg-blue-300 opacity-50';
-        else if (!node.walkable) bg = STATE_STYLES.wall;
-
-        return `${CELL_BASE} ${bg}`;
+        const classes = ["node"];
+      
+        if (node.isPath) classes.push("node-path");
+        else if (node.isStart) classes.push("node-start");
+        else if (node.isEnd) classes.push("node-end");
+        else if (node.isVisited) classes.push("node-visited");
+        else if (node.isFrontier) classes.push("node-frontier");
+        else if (!node.walkable) classes.push("node-wall");
+      
+        return classes.join(" ");
     }
 
     private getCursorStyle(node: INode): string {
@@ -249,7 +260,7 @@ export default class Grid implements IGraph {
 
     // ============ Input Handling ============
 
-    private getCoordsFromPoint(x: number, y: number): { row: number; col: number } | null {
+    private getGridCoordinates(x: number, y: number): { row: number; col: number } | null {
         if (!this.container) return null;
 
         const rect = this.container.getBoundingClientRect();
@@ -265,11 +276,11 @@ export default class Grid implements IGraph {
         return null;
     }
 
-    handleMouseDown(x: number, y: number, setStart: boolean = false, setEnd: boolean = false): void {
-        const coords = this.getCoordsFromPoint(x, y);
+    handleMouseDown(x: number, y: number, makeStartNode: boolean = false, makeEndNode: boolean = false): void {
+        const coords = this.getGridCoordinates(x, y);
         if (!coords) return;
 
-        const node = this.getNodeAt(coords.row, coords.col);
+        const node = this.getNode(coords.row, coords.col);
         if (!node) return;
 
         if (node.isStart || node.isEnd) {
@@ -280,33 +291,33 @@ export default class Grid implements IGraph {
             return;
         }
 
-        if (setStart) {
-            this.setStart(coords.row, coords.col);
+        if (makeStartNode) {
+            this.setStartNode(coords.row, coords.col);
             return;
         }
 
-        if (setEnd) {
-            this.setEnd(coords.row, coords.col);
+        if (makeEndNode) {
+            this.setEndNode(coords.row, coords.col);
             return;
         }
 
         this.isDrawing = true;
         this.drawMode = node.walkable ? 'wall' : 'erase';
-        this.setWalkable(node, this.drawMode === 'erase');
+        this.setNodeWalkable(node, this.drawMode === 'erase');
     }
 
     handleMouseMove(x: number, y: number): void {
-        const coords = this.getCoordsFromPoint(x, y);
+        const coords = this.getGridCoordinates(x, y);
         if (!coords) return;
 
-        const node = this.getNodeAt(coords.row, coords.col);
+        const node = this.getNode(coords.row, coords.col);
         if (!node) return;
 
         if (this.isDraggingStartOrEnd && this.draggedNode) {
             if (node.walkable && !node.isStart && !node.isEnd) {
                 const isStart = this.draggedNode.isStart;
-                if (isStart) this.setStart(coords.row, coords.col);
-                else this.setEnd(coords.row, coords.col);
+                if (isStart) this.setStartNode(coords.row, coords.col);
+                else this.setEndNode(coords.row, coords.col);
                 this.draggedNode = isStart ? this.startNode! : this.endNode!;
             }
             return;
@@ -316,7 +327,7 @@ export default class Grid implements IGraph {
 
         const shouldBeWalkable = this.drawMode === 'erase';
         if (node.walkable !== shouldBeWalkable) {
-            this.setWalkable(node, shouldBeWalkable);
+            this.setNodeWalkable(node, shouldBeWalkable);
         }
     }
 
@@ -335,5 +346,6 @@ export default class Grid implements IGraph {
             this.container.innerHTML = '';
         }
         this.cellElements.clear();
+        this.container = null;
     }
 }
