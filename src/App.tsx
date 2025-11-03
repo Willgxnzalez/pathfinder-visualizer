@@ -8,6 +8,7 @@ import Grid from "./models/Grid";
 import GridView from "./components/GridView";
 import ToolBar from "./components/ToolBar";
 import { AnimationState, AnimationStep, PathfindingResult, Algorithm } from "./types";
+import { computeCellSizeBounds, computeInitialCellSize } from "./utils/gridSizing";
 import clsx from "clsx";
 
 export default function App() {
@@ -18,6 +19,9 @@ export default function App() {
     const [result, setResult] = useState("");
     const [isDrawing, setIsDrawing] = useState(false);
     const [cellSize, setCellSize] = useState<number>(0);
+    const [cellMin, setCellMin] = useState<number>(20);
+    const [cellMax, setCellMax] = useState<number>(120);
+    const [cellStep, setCellStep] = useState<number>(5);
 
     const animationStateRef = useRef(animationState);
     const speedRef = useRef(speed);
@@ -33,28 +37,16 @@ export default function App() {
         speedRef.current = speed;
     }, [speed]);
 
-    function computeInitialCellSize(): number {
-        const width = window.innerWidth;
-        const height = window.innerHeight; // leave room for header/toolbar
-      
-        // Aim for fewer columns on small screens, more on large screens
-        const targetCols = width < 640 ? 14 : width < 1024 ? 26 : 36;
-        const targetRows = 25;
-      
-        const sizeByWidth = Math.floor(width / targetCols);
-        const sizeByHeight = Math.floor(height / targetRows);
-        const raw = Math.min(sizeByWidth, sizeByHeight);
-      
-        // Clamp and snap to 5px steps for clean sizing
-        const clamped = Math.max(20, Math.min(80, raw));
-        return clamped - (clamped % 5);
-      }
-
-      useEffect(() => {
+    useEffect(() => {
+        const { min, max, step } = computeCellSizeBounds();
+        setCellMin(min);
+        setCellMax(max);
+        setCellStep(step);
         const initial = computeInitialCellSize();
-        setCellSize(initial)
-        setGrid(new Grid(initial));
-      }, []);
+        const clamped = Math.max(min, Math.min(max, initial));
+        setCellSize(clamped);
+        setGrid(new Grid(clamped));
+    }, []);
 
     const handleCellSizeChange = useCallback((size: number) => {
         setCellSize(size);
@@ -188,6 +180,9 @@ export default function App() {
                     selectedAlgorithm={selectedAlgorithm}
                     speed={speed}
                     cellSize={cellSize}
+                    cellMin={cellMin}
+                    cellMax={cellMax}
+                    cellStep={cellStep}
                     onRun={runVisualization}
                     onReset={handleReset}
                     onAlgorithmChange={setSelectedAlgorithm}

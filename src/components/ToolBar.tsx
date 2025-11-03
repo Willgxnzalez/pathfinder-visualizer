@@ -7,6 +7,9 @@ interface ToolBarProps {
     selectedAlgorithm: Algorithm;
     speed: "slow" | "medium" | "fast";
     cellSize: number;
+    cellMin: number;
+    cellMax: number;
+    cellStep: number;
 
     onRun: () => void;
     onReset: () => void;
@@ -21,6 +24,9 @@ export default function ToolBar({
     selectedAlgorithm,
     speed,
     cellSize,
+    cellMin,
+    cellMax,
+    cellStep,
     onRun,
     onReset,
     onAlgorithmChange,
@@ -131,9 +137,9 @@ export default function ToolBar({
                     </label>
                     <input
                         type="range"
-                        min={20}
-                        max={120}
-                        step={5}
+                        min={cellMin}
+                        max={cellMax}
+                        step={cellStep}
                         value={cellSize}
                         onChange={(e) => onCellSizeChange(Number(e.target.value))}
                         disabled={isAnimating}
