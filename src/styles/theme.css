@@ -1,0 +1,25 @@
+@theme {
+  /* === Surface layers === */
+  --color-background-1: oklch(0.15 0 0); /* darkest - app background */
+
+  /* === Typography === */
+  --color-text-main: oklch(0.94 0.018 201.11);
+  --color-text-muted: oklch(0.70 0.010 215.90);
+  --color-text-invert: oklch(0.15 0.010 270);
+
+  /* === Border === */
+  --color-border-main: oklch(0.35 0.009 260);
+  --color-border-muted: oklch(0.25 0.008 260);
+
+  --color-primary: oklch(0.8359 0.068 200.67);
+  --color-secondary: oklch(0.5269 0.078 203.15);
+  --color-accent: oklch(0.9 .115 202.18);
+  --color-accent-hover: oklch(0.80 0.13 202.18);
+}
+
+.glass { 
+  backdrop-filter: blur(3px); 
+  background-color: transparent; 
+  box-shadow: 0 5px 30px rgba(0,0,0, 0.15); 
+  border: 1px solid rgba(70, 70, 70, 0.3); 
+}
