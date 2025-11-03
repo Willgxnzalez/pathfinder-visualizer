@@ -35,11 +35,10 @@ export default function ToolBar({
 }: ToolBarProps) {
     const isAnimating = animationState !== "idle";
 
-    const controlBoxClass =
-        "min-w-[120px] h-10 flex items-center border transition-all bg-surface-2 border-border-main text-text-main" +
+    const controlBoxClass = "min-w-[120px] h-8 bg-transparent flex items-center border transition-all border-border-main text-text-main" +
         (isAnimating ? " opacity-50 cursor-not-allowed" : "");
     const speedBtnClass = (active: boolean) =>
-        "flex-1 h-full px-0 m-0 rounded-none border-none transition-all text-base font-medium outline-none " +
+        "flex-1 h-full px-0 m-0 rounded border-none transition-all text-base font-medium outline-none " +
         (active
             ? "bg-accent text-white"
             : "bg-transparent text-text-muted hover:text-text-main");
@@ -49,7 +48,7 @@ export default function ToolBar({
             className="
                 fixed glass top-15 left-1/2 -translate-x-1/2 px-4 py-2
                 w-[95vw]
-                flex
+                flex gap-5
                 transition-all duration-300
                 rounded-full
                 z-20
@@ -106,7 +105,7 @@ export default function ToolBar({
                     Reset
                 </button>
                 {/* Speed Control */}
-                <div className="flex flex-col gap-1 min-w-[90px] max-w-[160px] grow shrink">
+                <div className="flex flex-col gap-1 min-w-[90px] max-w-[160px] grow shrink rounded-sm">
                     <label className="text-sm text-text-muted whitespace-nowrap">Speed</label>
                     <div
                         className={controlBoxClass + " p-0 w-full overflow-hidden"}
@@ -116,14 +115,7 @@ export default function ToolBar({
                                 key={s}
                                 type="button"
                                 onClick={() => onSpeedChange(s)}
-                                className={
-                                    speedBtnClass(speed === s) +
-                                    (i === 0 ? " rounded-l" : "") +
-                                    (i === arr.length - 1 ? " rounded-r" : "") +
-                                    (speed === s ? " z-10" : "") +
-                                    (i !== 0 ? " border-l border-border-main" : "")
-                                }
-                                style={{}}
+                                className={speedBtnClass(speed === s)}
                             >
                                 {s}
                             </button>
