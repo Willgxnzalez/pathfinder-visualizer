@@ -2,12 +2,13 @@
   /* === GRID BACKGROUND === */
   .grid-background {
     @apply relative w-full h-full;
+    background-color: var(--color-bg-1);
     
     background-image:
       linear-gradient(to right, oklch(0.3 0.01 260 / 0.45) 1px, transparent 1px),
       linear-gradient(to bottom, oklch(0.3 0.01 260 / 0.45) 1px, transparent 1px),
-      linear-gradient(to right, oklch(0.3 0.01 260 / 0.7) 1px, transparent 1px),
-      linear-gradient(to bottom, oklch(0.3 0.01 260 / 0.7) 1px, transparent 1px);
+      linear-gradient(to right, oklch(0.4 0.01 260 / 0.7) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(0.4 0.01 260 / 0.7) 1px, transparent 1px);
     
     background-size:
       var(--cell-size, 25px) var(--cell-size, 25px),
@@ -23,9 +24,8 @@
   }
 
   .node-wall {
-    background-color: rgba(100, 100, 160, 0.1); 
+    background-color: var(--color-bg-2); 
     box-shadow: 0 5px 30px rgba(0,0,0, 0.15); 
-    border: 1px solid rgba(80, 80, 110, 0.3); 
   }
 
   .node-visited {

@@ -1,5 +1,6 @@
 import React from "react";
 import { Algorithm, AnimationState } from "../types";
+import clsx from "clsx";
 
 interface ToolBarProps {
     mapMode: boolean;
@@ -35,7 +36,7 @@ export default function ToolBar({
 }: ToolBarProps) {
     const isAnimating = animationState !== "idle";
 
-    const controlBoxClass = "min-w-[120px] h-8 bg-transparent flex items-center border transition-all border-border-main text-text-main" +
+    const controlBoxClass = "min-w-[120px] h-8 bg-transparent flex items-center border transition-all border-bdr text-text-main" +
         (isAnimating ? " opacity-50 cursor-not-allowed" : "");
     const speedBtnClass = (active: boolean) =>
         "flex-1 h-full px-0 m-0 rounded border-none transition-all text-base font-medium outline-none " +
@@ -45,14 +46,16 @@ export default function ToolBar({
 
     return (
         <div
-            className="
-                fixed glass top-15 left-1/2 -translate-x-1/2 px-4 py-2
-                w-[95vw]
-                flex gap-5
-                transition-all duration-300
-                rounded-full
-                z-20
-            "
+            className={
+                clsx(
+                    "fixed glass top-25 left-1/2 -translate-x-1/2 px-4 py-2",
+                    "w-[95vw]",
+                    "flex gap-5",
+                    "transition-all duration-300",
+                    "rounded-xl",
+                    "z-20"
+                )
+            }
         >
             {/* Left Side controls */}
             <div className="flex flex-col gap-1 min-w-0 justify-start flex-1">

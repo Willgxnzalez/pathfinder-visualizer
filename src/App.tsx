@@ -23,7 +23,7 @@ export default function App() {
     const [cellMax, setCellMax] = useState<number>(120);
     const [cellStep, setCellStep] = useState<number>(5);
 
-    const animationStateRef = useRef(animationState);
+    const animationStateRef = useRef<AnimationState>(animationState);
     const speedRef = useRef(speed);
     const generatorRef = useRef<Generator<AnimationStep, PathfindingResult, unknown> | null>(null);
     const pauseResolveRef = useRef<(() => void) | null>(null);
@@ -163,7 +163,7 @@ export default function App() {
     }, [grid]);
 
     return (
-        <div className="w-screen h-screen text-text-main relative overflow-hidden bg-background-1">
+        <div className="w-screen h-screen text-text-main relative overflow-hidden bg-bg-1">
             <header className="w-full absolute left-0 top-0 flex justify-between items-center px-4 py-2 z-10 pointer-events-none">
                 <h1 className="text-2xl font-bold text-text-main">Pathfinding Visualizer</h1>
                 <div className="pointer-events-auto">dark mode toggle | map mode toggle</div>
@@ -190,11 +190,13 @@ export default function App() {
                     onCellSizeChange={handleCellSizeChange}
                 />
 
-                <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-2 rounded-full glass shadow-lg">
-                    <button onClick={handleStop}>STOP</button>
-                    <button onClick={handlePlayPause}>⏯</button>
-                    <button onClick={handleStep}>⏭</button>
-                </div>
+                {(animationStateRef.current === 'running' || animationStateRef.current === 'paused' || animationStateRef.current === 'stepping') && (
+                    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-2 rounded-xl glass shadow-lg">
+                        <button onClick={handleStop}>STOP</button>
+                        <button onClick={handlePlayPause}>⏯</button>
+                        <button onClick={handleStep}>⏭</button>
+                    </div>
+                )}
             </div>
         </div>
     );
