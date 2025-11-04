@@ -1,9 +1,7 @@
 @layer components {
   /* === GRID BACKGROUND === */
   .grid-background {
-    @apply relative w-full h-full;
-    background-color: var(--color-bg-1);
-    
+    @apply relative w-full h-full;    
     background-image:
       linear-gradient(to right, oklch(0.3 0.01 260 / 0.45) 1px, transparent 1px),
       linear-gradient(to bottom, oklch(0.3 0.01 260 / 0.45) 1px, transparent 1px),
