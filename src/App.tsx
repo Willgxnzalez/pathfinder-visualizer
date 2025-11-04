@@ -165,8 +165,8 @@ export default function App() {
     return (
         <div className="w-screen h-screen text-text-main relative overflow-hidden bg-bg-1">
             <header className="w-full absolute left-0 top-0 flex justify-between items-center px-4 py-2 z-10 pointer-events-none">
-                <h1 className="text-2xl font-bold text-text-main">Pathfinding Visualizer</h1>
-                <div className="pointer-events-auto">dark mode toggle | map mode toggle</div>
+                <h1 className="text-3xl font-bold text-text-main">Pathfinding Visualizer</h1>
+                
             </header>
 
             {/* Grid */}
@@ -174,6 +174,8 @@ export default function App() {
 
             {/* Floating UI*/}
             <div className={clsx(" transition-all duration-150", isDrawing ? "pointer-events-none opacity-60" : "pointer-events-auto")}>
+                <div className="absolute top-2 right-2">dark mode toggle | map mode toggle</div>
+
                 <ToolBar
                     mapMode={false}
                     animationState={animationState}
