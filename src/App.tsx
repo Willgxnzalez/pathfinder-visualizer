@@ -190,7 +190,7 @@ export default function App() {
                     onCellSizeChange={handleCellSizeChange}
                 />
 
-                {(animationStateRef.current === 'running' || animationStateRef.current === 'paused' || animationStateRef.current === 'stepping') && (
+                {(animationState === 'running' || animationState === 'paused' || animationState === 'stepping') && (
                     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-2 rounded-xl glass shadow-lg">
                         <button onClick={handleStop}>STOP</button>
                         <button onClick={handlePlayPause}>⏯</button>
