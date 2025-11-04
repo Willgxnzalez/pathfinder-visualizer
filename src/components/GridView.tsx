@@ -30,6 +30,32 @@ export default function GridView({ grid, onDrawingChange }: GridViewProps) {
             onMouseMove={(e) => grid.handleMouseMove(e.clientX, e.clientY)}
             onMouseUp={() => { onDrawingChange?.(false); grid.handleMouseUp(); }}
             onMouseLeave={() => { onDrawingChange?.(false); grid.handleMouseUp(); }}
+            onTouchStart={(e) => {
+                e.preventDefault(); // Prevent scrolling while drawing
+                const touch = e.touches[0];
+                onDrawingChange?.(true);
+                grid.handleMouseDown(
+                    touch.clientX,
+                    touch.clientY,
+                    false, // Touch events don't have shiftKey
+                    false
+                );
+            }}
+            onTouchMove={(e) => {
+                e.preventDefault(); // Prevent scrolling while drawing
+                const touch = e.touches[0];
+                grid.handleMouseMove(touch.clientX, touch.clientY);
+            }}
+            onTouchEnd={(e) => {
+                e.preventDefault();
+                onDrawingChange?.(false);
+                grid.handleMouseUp();
+            }}
+            onTouchCancel={(e) => {
+                e.preventDefault();
+                onDrawingChange?.(false);
+                grid.handleMouseUp();
+            }}
             onContextMenu={(e) => e.preventDefault()}
         />
     );
