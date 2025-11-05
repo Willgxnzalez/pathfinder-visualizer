@@ -6,7 +6,6 @@ import GBFS from "./algorithms/pathfinding/GBFS";
 import Dijkstra from "./algorithms/pathfinding/Dijkstra";
 import Grid from "./models/Grid";
 import GridView from "./components/GridView";
-import ToolBar from "./components/ToolBar";
 import Header from "./components/Header";
 import { AnimationState, AnimationStep, PathfindingResult, Algorithm } from "./types";
 import { computeCellSizeBounds } from "./utils/gridSizing";
@@ -16,7 +15,7 @@ export default function App() {
     const [grid, setGrid] = useState<Grid | null>(null);
     const [animationState, setAnimationState] = useState<AnimationState>("idle");
     const [speed, setSpeed] = useState<"slow" | "medium" | "fast">("medium");
-    const [selectedAlgorithm, setSelectedAlgorithm] = useState<Algorithm>("bfs");
+    const [selectedAlgorithm, setSelectedAlgorithm] = useState<Algorithm>("A*");
     const [result, setResult] = useState("");
     const [isDrawing, setIsDrawing] = useState(false);
     const [cellSize, setCellSize] = useState<number>(0);
@@ -58,8 +57,14 @@ export default function App() {
     const getDelay = (s: "slow" | "medium" | "fast"): number => ({ slow: 75, medium: 40, fast: 0 }[s]);
 
     const getAlgorithm = (algorithm: Algorithm) => {
-        const algoMap = { bfs: BFS, dfs: DFS, astar: Astar, gbfs: GBFS, dijkstra: Dijkstra };
-        return algoMap[algorithm] ?? BFS;
+        const algoMap = {
+            'BFS': BFS,
+            'DFS': DFS,
+            'A*': Astar,
+            'GBFS': GBFS,
+            'Dijkstra': Dijkstra,
+        };
+        return algoMap[algorithm] ?? Astar;
     };
 
     const waitForNextStep = async (delay: number): Promise<boolean> => {

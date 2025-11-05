@@ -70,7 +70,7 @@ function Dropdown<T extends string>({
                     disabled && "opacity-60 cursor-not-allowed"
                 )}
             >
-                {value.toUpperCase()}
+                {value}
                 <ChevronDownIcon className="size-5"/>
             </button>
 
@@ -95,7 +95,7 @@ function Dropdown<T extends string>({
                                 opt === value && "font-semibold bg-surface-light"
                             )}
                         >
-                            {opt.toUpperCase()}
+                            {opt}
                         </button>
                     ))}
                 </div>
@@ -151,7 +151,7 @@ export default function ToolBar({
             <div className="flex flex-1 items-center justify-start gap-3 flex-wrap">
                 <Dropdown
                     label="Algorithm"
-                    options={["bfs", "dfs", "astar", "gbfs", "dijkstra"] as const}
+                    options={["BFS", "DFS", "A*", "GBFS", "Dijkstra"] as const}
                     value={selectedAlgorithm}
                     onChange={onAlgorithmChange}
                     disabled={isAnimating}

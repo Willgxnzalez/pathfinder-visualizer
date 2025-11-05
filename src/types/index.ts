@@ -27,7 +27,7 @@ export interface IGraph {
     getHeuristic(from: INode, to: INode): number;
 }
 
-export type Algorithm = 'bfs' | 'dfs' | 'astar' | 'gbfs' | 'dijkstra';
+export type Algorithm = 'BFS' | 'DFS' | 'A*' | 'GBFS' | 'Dijkstra';
 
 export type AnimationState = 'idle' | 'running' | 'paused' | 'stepping';
 
