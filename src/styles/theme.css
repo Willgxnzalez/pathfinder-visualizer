@@ -9,8 +9,6 @@
   /* === Borders === */
   --color-bdr: oklch(0.35 0.009 270);
   --color-bdr-glass: color-mix(in oklch, var(--color-bdr) 60%, transparent);
-  --color-bdr-glass-2: color-mix(in oklch, var(--color-bdr-2) 80%, transparent);
-  --color-bdr-muted: oklch(0.25 0.008 260 / 0.3);
 
   /* === Accents === */
   --color-primary: oklch(0.83 0.068 200.67);
