@@ -7,11 +7,12 @@ export default function* BFS(graph: IGraph): Generator<AnimationStep, Pathfindin
     if (!start || !end) return { found: false, pathLength: 0, nodesVisited: 0, path: [] }
     
     const queue: INode[] = [start];
+    let head = 0;
 
     let nodesVisited = 0;
 
-    while (queue.length !== 0) {
-        const curr = queue.shift();
+    while (head < queue.length) {
+        const curr = queue[head++];
         if (!curr || curr.isVisited) continue;
 
         curr.isVisited = true;
