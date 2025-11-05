@@ -37,8 +37,12 @@ export default class Grid implements IGraph {
                 this.grid[row][col] = new GridNode(id, row, col);
             }
         }
-        this.setStartNode(0, 0);
-        this.setEndNode(this.rows - 1, this.cols - 1);
+        const startRow = Math.floor(this.rows * 0.2);
+        const startCol = Math.floor(this.cols * 0.2);
+        const endRow = Math.floor(this.rows * 0.8);
+        const endCol = Math.floor(this.cols * 0.8);
+        this.setStartNode(startRow, startCol);
+        this.setEndNode(endRow, endCol);
     }
 
     getNode(row: number, col: number): INode | null {
