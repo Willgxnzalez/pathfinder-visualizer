@@ -48,7 +48,7 @@ npm run dev
     - [ ] Heuristic switch (Manhattan ↔ Euclidean)
     - [ ] Toggle diagonal movement
     - [ ] Weighted mode for Dijkstra's and similar algorithms
-- [ ] Algorithm insights sidebar or modal (explain properties like "greedy", "guaranteed shortest path", etc.)
+- [ ] Algorithm insights sidebar or modal (explain properties like "greedy", "guaranteed shortest path", time/space complexity etc.)
 
 ---
 
