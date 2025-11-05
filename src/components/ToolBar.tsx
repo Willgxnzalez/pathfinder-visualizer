@@ -5,7 +5,7 @@ import clsx from "clsx";
 const MAZE_GEN_ALGOS = ["random", "recursive-division", "prim", "eller", "kruskal"] as const;
 type MazeGenAlgo = typeof MAZE_GEN_ALGOS[number];
 
-interface ToolBarProps {
+export interface ToolBarProps {
     mapMode: boolean;
     animationState: AnimationState;
     selectedAlgorithm: Algorithm;
@@ -59,33 +59,43 @@ function Dropdown<T extends string>({
                 onClick={() => setOpen(!open)}
                 className={clsx(
                     "w-full flex justify-between px-4 py-2 rounded-lg  text-text-main",
-                    "bg-bg-glass border border-bdr-glass hover:bg-bg-2 transition-all",
+                    "border border-bdr-glass hover:bg-bg-2 transition-all",
                     disabled && "opacity-60 cursor-not-allowed"
                 )}
             >
                 {value.toUpperCase()}
-                <span>▾</span>
+                <span aria-hidden>▼</span>
             </button>
 
             {open && (
-                <div className="absolute top-full left-0 mt-2 w-full rounded-lg glass backdrop-blur-md shadow-lg z-20 overflow-hidden">
-                    {options.map((opt) => (
-                        <button
-                            key={opt}
-                            onClick={() => {
-                                onChange(opt);
-                                setOpen(false);
-                            }}
-                            className={clsx(
-                                "block w-full text-left px-4 py-2 text-text-main hover:bg-bg-2",
-                                opt === value && "font-semibold bg-bg-2"
-                            )}
-                        >
-                            {opt.toUpperCase()}
-                        </button>
-                    ))}
-                </div>
-            )}
+    <div
+        className={clsx(
+            "absolute top-full left-0 mt-2 w-full rounded-lg z-30 overflow-hidden pointer-events-auto",
+            "before:absolute before:inset-0 before:backdrop-blur-md before:-z-10 before:rounded-lg"
+        )}
+        style={{
+            backgroundColor: "rgba(10, 10, 10, 0.4)",
+            boxShadow: "0 5px 30px rgba(0,0,0, 0.25)",
+            border: "1px solid rgba(80, 80, 110, 0.3)",
+        }}
+    >
+        {options.map((opt) => (
+            <button
+                key={opt}
+                onClick={() => {
+                    onChange(opt);
+                    setOpen(false);
+                }}
+                className={clsx(
+                    "relative z-10 block w-full text-left px-4 py-2 text-text-main hover:bg-bg-2 pointer-events-auto",
+                    opt === value && "font-semibold bg-bg-2"
+                )}
+            >
+                {opt.toUpperCase()}
+            </button>
+        ))}
+    </div>
+)}
         </div>
     );
 }
@@ -128,7 +138,7 @@ export default function ToolBar({
     return (
         <div
             className={clsx(
-                "fixed top-20 left-1/2 -translate-x-1/2 w-[95vw] flex items-center justify-between gap-4 glass rounded-xl px-5 py-3 z-20 transition-opacity",
+                "w-full flex items-center justify-between gap-4 px-5 py-3 z-20 transition-opacity",
                 isDrawing ? "opacity-60" : "opacity-100"
             )}
         >
@@ -158,7 +168,7 @@ export default function ToolBar({
                     "px-6 py-2 text-xl font-bold rounded-lg transition-all",
                     isAnimating
                         ? "bg-bg-2 opacity-50 cursor-not-allowed text-text-muted"
-                        : "bg-accent text-text-invert hover:brightness-110"
+                        : "bg-secondary text-text-main"
                 )}
             >
                 VISUALIZE

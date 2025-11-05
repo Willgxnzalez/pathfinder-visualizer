@@ -7,6 +7,7 @@ import Dijkstra from "./algorithms/pathfinding/Dijkstra";
 import Grid from "./models/Grid";
 import GridView from "./components/GridView";
 import ToolBar from "./components/ToolBar";
+import Header from "./components/Header";
 import { AnimationState, AnimationStep, PathfindingResult, Algorithm } from "./types";
 import { computeCellSizeBounds, computeInitialCellSize } from "./utils/gridSizing";
 import clsx from "clsx";
@@ -163,37 +164,28 @@ export default function App() {
     }, [grid]);
 
     return (
-        <div className="w-screen h-screen text-text-main relative overflow-hidden bg-bg-1">
-            <header className="w-full absolute left-0 top-0 flex justify-between items-center px-4 py-2 z-10 pointer-events-none">
-                <h1 className="text-3xl font-bold text-text-main">Pathfinding Visualizer</h1>
-                
-            </header>
-
-            {/* Grid */}
-            {grid && <GridView grid={grid} onDrawingChange={setIsDrawing} />}
-
-            {/* Floating UI*/}
-            <div className={isDrawing ? "pointer-events-none" : "pointer-events-auto"}>
-                <div className="absolute top-2 right-2">dark mode toggle | map mode toggle</div>
-
-                <ToolBar
-                    mapMode={false}
-                    animationState={animationState}
-                    selectedAlgorithm={selectedAlgorithm}
-                    speed={speed}
-                    cellSize={cellSize}
-                    cellMin={cellMin}
-                    cellMax={cellMax}
-                    cellStep={cellStep}
-                    onRun={runVisualization}
-                    onReset={handleReset}
-                    onAlgorithmChange={setSelectedAlgorithm}
-                    onSpeedChange={setSpeed}
-                    onCellSizeChange={handleCellSizeChange}
-                    isDrawing={isDrawing}
-                />
-
-                {(animationState === 'running' || animationState === 'paused' || animationState === 'stepping') && (
+        <div className="w-screen h-screen text-text-main relative overflow-hidden bg-surface-dark flex flex-col items-center">
+            <Header
+                onDarkModeToggle={()=> {}}
+                onMapModeToggle={() => {}}
+                mapMode={false}
+                animationState={animationState}
+                selectedAlgorithm={selectedAlgorithm}
+                speed={speed}
+                cellSize={cellSize}
+                cellMin={cellMin}
+                cellMax={cellMax}
+                cellStep={cellStep}
+                onRun={runVisualization}
+                onReset={handleReset}
+                onAlgorithmChange={setSelectedAlgorithm}
+                onSpeedChange={setSpeed}
+                onCellSizeChange={handleCellSizeChange}
+            />
+            <main className="w-full flex-1 min-h-0 flex justify-center items-center">
+                {grid && <GridView grid={grid} onDrawingChange={setIsDrawing} />}
+            </main>
+            {(animationState === 'running' || animationState === 'paused' || animationState === 'stepping') && (
                     <div className={clsx(
                         "fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-2 rounded-xl glass shadow-lg transition-opacity",
                         isDrawing ? "opacity-60" : "opacity-100"
@@ -203,7 +195,6 @@ export default function App() {
                         <button onClick={handleStep}>⏭</button>
                     </div>
                 )}
-            </div>
         </div>
     );
 }
