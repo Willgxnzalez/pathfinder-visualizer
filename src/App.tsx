@@ -46,9 +46,8 @@ export default function App() {
         setCellMin(min);
         setCellMax(max);
         setCellStep(step);
-        const clamped = Math.max(min, Math.min(max, initial));
-        setCellSize(clamped);
-        setGrid(new Grid(clamped));
+        setCellSize(initial);
+        setGrid(new Grid(initial));
     }, []);
 
     const handleCellSizeChange = useCallback((size: number) => {
