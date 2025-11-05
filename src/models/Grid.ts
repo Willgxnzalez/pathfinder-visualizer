@@ -175,15 +175,13 @@ export default class Grid implements IGraph {
         this.container.style.setProperty("--cell-size", `${this.cellSize}px`);
         this.resizeToContainer();
 
-        // Adjust grid size on parent resize
-        new ResizeObserver(() => this.resizeToContainer()).observe(this.container.parentElement!);
+        // Adjust grid size on resize
+        new ResizeObserver(() => this.resizeToContainer()).observe(this.container!);
     }
 
     private resizeToContainer(): void {
         if (!this.container) return;
-        const parent = this.container.parentElement;
-        if (!parent) return;
-        const { width, height } = parent.getBoundingClientRect();
+        const { width, height } = this.container.getBoundingClientRect();
         this.cols = Math.floor(width / this.cellSize);
         this.rows = Math.floor(height / this.cellSize);
         this.container.style.width = `${this.cols * this.cellSize}px`;
