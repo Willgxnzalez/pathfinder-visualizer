@@ -39,11 +39,11 @@ npm run dev
 
 - [ ] Maze generation algorithms (e.g., recursive division, Prim's, Kruskal's)
 - [ ] Animation playback slider (scrub through algorithm progress)
-- [ ] Brighter HUD (improved contrast/UI visibility)
+- [x] Brighter HUD (improved contrast/UI visibility)
 - [ ] Visualization on real maps (OpenStreetMap or other APIs)
 - [ ] Light mode/dark mode toggle
 - [ ] Speed slider (for continuous animation rate adjustment)
-- [ ] Improved initial placement for start/end nodes
+- [x] Improved initial placement for start/end nodes
 - [ ] Sidebar for advanced controls (heuristic selection, options, etc.)
     - [ ] Heuristic switch (Manhattan ↔ Euclidean)
     - [ ] Toggle diagonal movement

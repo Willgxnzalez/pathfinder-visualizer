@@ -3,9 +3,10 @@ export const CELL_SIZE_STEP = 5;
 export const snapTo = (step: number, value: number): number =>
     Math.floor(value / step) * step;
 
-export const computeCellSizeBounds = (): { min: number; max: number; step: number } => {
-    const width = window.innerWidth;
-    const height = window.innerHeight; // leave room for UI elements
+export const computeCellSizeBounds = (container?: HTMLElement): { min: number; max: number; step: number, initial: number } => {
+    const rect = container?.getBoundingClientRect();
+    const width = rect?.width ?? window.innerWidth;
+    const height = rect?.height ?? window.innerHeight;
 
     const minRows = 14;
     const maxRows = 28;
@@ -17,21 +18,9 @@ export const computeCellSizeBounds = (): { min: number; max: number; step: numbe
 
     const min = snapTo(CELL_SIZE_STEP, Math.max(12, Math.min(80, sizeForMaxDensity)));
     const max = snapTo(CELL_SIZE_STEP, Math.max(min + CELL_SIZE_STEP, Math.min(220, sizeForMinDensity)));
-    return { min, max, step: CELL_SIZE_STEP };
+    const midpoint = Math.floor((min + max) / 2);
+    return { min, max, step: CELL_SIZE_STEP, initial: midpoint };
 };
 
-export const computeInitialCellSize = (): number => {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
 
-    const targetCols = width < 640 ? 14 : width < 1024 ? 26 : 36;
-    const targetRows = 25;
 
-    const sizeByWidth = Math.floor(width / targetCols);
-    const sizeByHeight = Math.floor(height / targetRows);
-    const raw = Math.min(sizeByWidth, sizeByHeight);
-
-    const { min, max, step } = computeCellSizeBounds();
-    const clamped = Math.max(min, Math.min(max, raw));
-    return clamped - (clamped % step);
-};

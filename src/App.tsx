@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback, useLayoutEffect } from "react";
 import BFS from "./algorithms/pathfinding/BFS";
 import DFS from "./algorithms/pathfinding/DFS";
 import Astar from "./algorithms/pathfinding/Astar";
@@ -9,7 +9,7 @@ import GridView from "./components/GridView";
 import ToolBar from "./components/ToolBar";
 import Header from "./components/Header";
 import { AnimationState, AnimationStep, PathfindingResult, Algorithm } from "./types";
-import { computeCellSizeBounds, computeInitialCellSize } from "./utils/gridSizing";
+import { computeCellSizeBounds } from "./utils/gridSizing";
 import clsx from "clsx";
 
 export default function App() {
@@ -38,12 +38,14 @@ export default function App() {
         speedRef.current = speed;
     }, [speed]);
 
-    useEffect(() => {
-        const { min, max, step } = computeCellSizeBounds();
+    const mainRef = useRef<HTMLDivElement>(null);
+
+    useLayoutEffect(() => {
+        const container = mainRef.current ?? undefined;
+        const { min, max, step, initial } = computeCellSizeBounds(container);
         setCellMin(min);
         setCellMax(max);
         setCellStep(step);
-        const initial = computeInitialCellSize();
         const clamped = Math.max(min, Math.min(max, initial));
         setCellSize(clamped);
         setGrid(new Grid(clamped));
@@ -182,7 +184,7 @@ export default function App() {
                 onSpeedChange={setSpeed}
                 onCellSizeChange={handleCellSizeChange}
             />
-            <main className="w-full flex-1 min-h-0 flex justify-center items-center">
+            <main ref={mainRef} className="w-full flex-1 min-h-0 flex justify-center items-center">
                 {grid && <GridView grid={grid} onDrawingChange={setIsDrawing} />}
             </main>
             {(animationState === 'running' || animationState === 'paused' || animationState === 'stepping') && (
