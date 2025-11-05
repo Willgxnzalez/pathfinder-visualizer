@@ -21,6 +21,7 @@ interface ToolBarProps {
     onMazeGenChange?: (algo: MazeGenAlgo) => void;
     onSpeedChange: (s: "slow" | "medium" | "fast") => void;
     onCellSizeChange: (size: number) => void;
+    isDrawing?: boolean;
 }
 
 /* -------------------- Reusable Dropdown -------------------- */
@@ -105,6 +106,7 @@ export default function ToolBar({
     onMazeGenChange,
     onSpeedChange,
     onCellSizeChange,
+    isDrawing = false,
 }: ToolBarProps) {
     const isAnimating = animationState !== "idle";
 
@@ -126,7 +128,8 @@ export default function ToolBar({
     return (
         <div
             className={clsx(
-                "fixed top-20 left-1/2 -translate-x-1/2 w-[95vw] flex items-center justify-between gap-4 glass rounded-xl px-5 py-3 z-20"
+                "fixed top-20 left-1/2 -translate-x-1/2 w-[95vw] flex items-center justify-between gap-4 glass rounded-xl px-5 py-3 z-20 transition-opacity",
+                isDrawing ? "opacity-60" : "opacity-100"
             )}
         >
             {/* Left - Dropdowns */}

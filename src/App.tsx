@@ -173,7 +173,7 @@ export default function App() {
             {grid && <GridView grid={grid} onDrawingChange={setIsDrawing} />}
 
             {/* Floating UI*/}
-            <div className={clsx(" transition-all duration-150", isDrawing ? "pointer-events-none opacity-60" : "pointer-events-auto")}>
+            <div className={isDrawing ? "pointer-events-none" : "pointer-events-auto"}>
                 <div className="absolute top-2 right-2">dark mode toggle | map mode toggle</div>
 
                 <ToolBar
@@ -190,10 +190,14 @@ export default function App() {
                     onAlgorithmChange={setSelectedAlgorithm}
                     onSpeedChange={setSpeed}
                     onCellSizeChange={handleCellSizeChange}
+                    isDrawing={isDrawing}
                 />
 
                 {(animationState === 'running' || animationState === 'paused' || animationState === 'stepping') && (
-                    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-2 rounded-xl glass shadow-lg">
+                    <div className={clsx(
+                        "fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-2 rounded-xl glass shadow-lg transition-opacity",
+                        isDrawing ? "opacity-60" : "opacity-100"
+                    )}>
                         <button onClick={handleStop}>STOP</button>
                         <button onClick={handlePlayPause}>⏯</button>
                         <button onClick={handleStep}>⏭</button>
