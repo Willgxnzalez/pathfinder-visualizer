@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { ChevronDownIcon } from '@heroicons/react/24/solid';
 import { Algorithm, AnimationState } from "../types";
 import clsx from "clsx";
 
@@ -51,51 +52,54 @@ function Dropdown<T extends string>({
     }, [open]);
 
     return (
-        <div ref={ref} className="relative w-1/2">
+        <div ref={ref} className="relative w-1/3">
             <label className="text-sm text-text-muted block mb-2">{label}</label>
             <button
                 type="button"
                 disabled={disabled}
                 onClick={() => setOpen(!open)}
                 className={clsx(
-                    "w-full flex justify-between px-4 py-2 rounded-lg  text-text-main",
-                    "border border-bdr-glass hover:bg-bg-2 transition-all",
+                    "w-full flex justify-between px-3 py-2 rounded-lg",
+                    "appearance-none font-medium",
+                    "text-text-main",
+                    "border border-bdr",
+                    "cursor-pointer",
+                    "bg-surface-light",
+                    "hover:bg-surface-highlight",
+                    "transition-all",
                     disabled && "opacity-60 cursor-not-allowed"
                 )}
             >
                 {value.toUpperCase()}
-                <span aria-hidden>▼</span>
+                <ChevronDownIcon className="size-5"/>
             </button>
 
             {open && (
-    <div
-        className={clsx(
-            "absolute top-full left-0 mt-2 w-full rounded-lg z-30 overflow-hidden pointer-events-auto",
-            "before:absolute before:inset-0 before:backdrop-blur-md before:-z-10 before:rounded-lg"
-        )}
-        style={{
-            backgroundColor: "rgba(10, 10, 10, 0.4)",
-            boxShadow: "0 5px 30px rgba(0,0,0, 0.25)",
-            border: "1px solid rgba(80, 80, 110, 0.3)",
-        }}
-    >
-        {options.map((opt) => (
-            <button
-                key={opt}
-                onClick={() => {
-                    onChange(opt);
-                    setOpen(false);
-                }}
-                className={clsx(
-                    "relative z-10 block w-full text-left px-4 py-2 text-text-main hover:bg-bg-2 pointer-events-auto",
-                    opt === value && "font-semibold bg-bg-2"
-                )}
-            >
-                {opt.toUpperCase()}
-            </button>
-        ))}
-    </div>
-)}
+                <div
+                    className={clsx(
+                        "absolute top-full left-0 mt-5 w-full z-20 overflow-hidden",
+                        "rounded-lg bg-surface border border-bdr shadow"
+                    )}
+                    onMouseLeave={() => setOpen(false)}
+                >
+                    {options.map((opt) => (
+                        <button
+                            key={opt}
+                            onClick={() => {
+                                onChange(opt);
+                                setOpen(false);
+                            }}
+                            className={clsx(
+                                "relative block w-full px-4 py-2 text-left pointer-events-auto cursor-pointer z-10",
+                                "text-text-main hover:bg-surface-highlight",
+                                opt === value && "font-semibold bg-surface-light"
+                            )}
+                        >
+                            {opt.toUpperCase()}
+                        </button>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }
@@ -125,10 +129,10 @@ export default function ToolBar({
             key={s}
             onClick={() => onSpeedChange(s)}
             className={clsx(
-                "px-4 py-2 text-sm font-medium",
+                "px-3 py-2 text-sm font-medium",
                 (speed === s)
-                    ? "bg-bg-2 text-text-main "
-                    : "bg-bg-glass text-text-muted hover:bg-bg-2",
+                    ? "text-text-main bg-surface-light"
+                    : "text-text-muted hover:bg-surface-light"
             )}
         >
             {s}
@@ -138,12 +142,13 @@ export default function ToolBar({
     return (
         <div
             className={clsx(
-                "w-full flex items-center justify-between gap-4 px-5 py-3 z-20 transition-opacity",
+                "w-full flex items-center justify-between gap-4 px-5 py-3 z-20",
+                "transition-opacity",
                 isDrawing ? "opacity-60" : "opacity-100"
             )}
         >
-            {/* Left - Dropdowns */}
-            <div className="flex flex-1 gap-3">
+            {/* Left controls */}
+            <div className="flex flex-1 items-center justify-start gap-3 flex-wrap">
                 <Dropdown
                     label="Algorithm"
                     options={["bfs", "dfs", "astar", "gbfs", "dijkstra"] as const}
@@ -165,26 +170,38 @@ export default function ToolBar({
                 onClick={onRun}
                 disabled={isAnimating}
                 className={clsx(
-                    "px-6 py-2 text-xl font-bold rounded-lg transition-all",
+                    "px-6 py-4 text-xl font-bold rounded-lg transition-all appearance-none cursor-pointer",
                     isAnimating
-                        ? "bg-bg-2 opacity-50 cursor-not-allowed text-text-muted"
-                        : "bg-secondary text-text-main"
+                        ? "opacity-50 cursor-not-allowed text-text-muted"
+                        : "text-primary border border-primary hover:bg-secondary hover:border-secondary"
                 )}
             >
                 VISUALIZE
             </button>
 
-            {/* Right - Speed / Cell Size / Reset */}
-            <div className="flex flex-1 items-center justify-end gap-3">
-                <div className="flex flex-col gap-2">
-                    <label className="text-sm text-text-muted">Speed</label>
-                    <div className="flex rounded-lg overflow-hidden border border-bdr-glass">
-                        {(["slow", "medium", "fast"] as const).map(speedBtn)}
+            {/* Right controls */}
+            <div className="flex flex-1 items-center justify-around gap-3 flex-wrap">
+                <div className="flex flex-col">
+                    <label className="text-sm text-text-muted mb-2">Speed</label>
+                    <div className="flex rounded-lg overflow-hidden border border-bdr">
+                        {(["slow", "medium", "fast"] as const).map((s: "slow" | "medium" | "fast") => (
+                            <button
+                                key={s}
+                                onClick={() => onSpeedChange(s)}
+                                className={clsx(
+                                    "px-3 py-2 font-medium hover:bg-surface-highlight cursor-pointer",
+                                    (speed === s)
+                                        ? "text-text-main bg-surface-light"
+                                        : "text-text-muted "
+                                )}
+                            >
+                                {s.toUpperCase()}
+                            </button>
+                        ))}
                     </div>
                 </div>
-
-                <div className="flex flex-col w-40">
-                    <label className="text-sm text-text-muted">
+                <div className="flex flex-col">
+                    <label className="text-text-muted mb-2">
                         Cell Size: <span className="text-text-main">{cellSize}px</span>
                     </label>
                     <input
@@ -195,18 +212,17 @@ export default function ToolBar({
                         value={cellSize}
                         onChange={(e) => onCellSizeChange(Number(e.target.value))}
                         disabled={isAnimating}
-                        className="accent-accent"
+                        className="accent-primary"
                     />
                 </div>
-
                 <button
                     onClick={onReset}
                     disabled={isAnimating}
                     className={clsx(
-                        "px-4 py-2 rounded-md text-sm font-medium",
+                        "px-4 py-2 rounded-lg font-medium text-text-muted cursor-pointer",
                         isAnimating
-                            ? "bg-bg-2 opacity-50 cursor-not-allowed text-text-muted"
-                            : "bg-bg-glass border border-bdr-glass text-text-main hover:bg-bg-2"
+                            ? "opacity-50 cursor-not-allowed "
+                            : "border border-bdr hover:text-text-main hover:bg-surface-highlight"
                     )}
                 >
                     Reset
