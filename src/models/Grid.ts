@@ -8,6 +8,7 @@ export default class Grid implements IGraph {
     private rows: number = 0;
     private cols: number = 0;
     private cellSize: number = 0;
+    private majorInterval = 0;
 
     // Start and end nodes
     private startNode: GridNode | null = null;
@@ -175,7 +176,6 @@ export default class Grid implements IGraph {
         this.container.style.setProperty("--cell-size", `${this.cellSize}px`);
         this.resizeToContainer();
 
-        // Adjust grid size on parent resize
         new ResizeObserver(() => this.resizeToContainer()).observe(this.container.parentElement!);
     }
 
@@ -186,6 +186,7 @@ export default class Grid implements IGraph {
         const { width, height } = parent.getBoundingClientRect();
         this.cols = Math.floor(width / this.cellSize);
         this.rows = Math.floor(height / this.cellSize);
+        this.majorInterval = Math.max(2, Math.round(150 / this.cellSize));
         this.container.style.width = `${this.cols * this.cellSize}px`;
         this.container.style.height = `${this.rows * this.cellSize}px`;
         this.createGrid();
@@ -208,22 +209,24 @@ export default class Grid implements IGraph {
     }
 
     private applyCellBorders(node: GridNode, element: HTMLElement): void {
-        // Remove all borders first
-        element.style.borderRight = '';
-        element.style.borderBottom = '';
+        element.style.borderLeft = '';
+        element.style.borderTop = '';
 
-        // No borders on last row/col
-        const isLastCol = node.col >= this.cols - 1;
-        const isLastRow = node.row >= this.rows - 1;
-        
-        // Any typed cell (start/end/visited/frontier/path) OR wall has no borders
         if (!node.walkable || node.isStart || node.isEnd || node.isVisited || node.isFrontier || node.isPath) {
             return;
         }
 
-        const borderColor = 'oklch(0.3 0.01 260 / 0.45)';
-        if (!isLastCol) element.style.borderRight = `1px solid ${borderColor}`;
-        if (!isLastRow) element.style.borderBottom = `1px solid ${borderColor}`;
+        const isMajorRow = node.row % this.majorInterval === 0;
+        const isMajorCol = node.col % this.majorInterval === 0;
+        const minorColor = 'oklch(0.3 0.01 270 / 0.35)';
+        const majorColor = 'oklch(0.3 0.01 270 / 0.8)';
+
+        if (node.col > 0) {
+            element.style.borderLeft = `1px solid ${isMajorCol ? majorColor : minorColor}`;
+        }
+        if (node.row > 0) {
+            element.style.borderTop = `1px solid ${isMajorRow ? majorColor : minorColor}`;
+        }
     }
 
     setCellSize(newCellSize: number): void {
