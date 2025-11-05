@@ -37,10 +37,13 @@ export default function* GBFS(graph: IGraph): Generator<AnimationStep, Pathfindi
         }
 
         for (const neighbor of graph.getNeighbors(curr)) {
-            if (!neighbor.isVisited) {
-                neighbor.hCost = graph.getHeuristic(neighbor, end);
-                frontier.insert(neighbor, neighbor.hCost);
+            if (neighbor.isVisited) continue;
+            neighbor.hCost = graph.getHeuristic(neighbor, end);
+            if (!frontier.has(neighbor)) {
                 neighbor.parent = curr;
+                frontier.insert(neighbor, neighbor.hCost);
+            } else {
+                frontier.decreaseKey(neighbor, neighbor.hCost);
             }
         }
         

@@ -39,14 +39,19 @@ export default function* Astar(graph: IGraph): Generator<AnimationStep, Pathfind
 
         for (const neighbor of graph.getNeighbors(curr)) {
             if (neighbor.isVisited) continue;
-        
-            const newG = curr.gCost + graph.getDistance(curr, neighbor);
-        
-            if (newG < neighbor.gCost) {
+
+            const tentativeG = curr.gCost + graph.getDistance(curr, neighbor);
+
+            if (tentativeG < neighbor.gCost) {
                 neighbor.parent = curr;
-                neighbor.gCost = newG;
+                neighbor.gCost = tentativeG;
                 neighbor.hCost = graph.getHeuristic(neighbor, end);
-                frontier.insert(neighbor, neighbor.gCost + neighbor.hCost, neighbor.hCost);
+                const fScore = neighbor.gCost + neighbor.hCost;
+                if (frontier.has(neighbor)) {
+                    frontier.decreaseKey(neighbor, fScore, neighbor.hCost);
+                } else {
+                    frontier.insert(neighbor, fScore, neighbor.hCost);
+                }
             }
         }
         

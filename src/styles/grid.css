@@ -23,7 +23,7 @@
 
   .node-path {
     background: var(--color-accent);
-    box-shadow: 0 0 8px color-mix(in oklch, var(--color-accent) 100%, transparent);
+    box-shadow: 0 0 5px color-mix(in oklch, var(--color-accent) 100%, transparent);
   }
 
   .node-start {
