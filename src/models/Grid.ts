@@ -175,13 +175,15 @@ export default class Grid implements IGraph {
         this.container.style.setProperty("--cell-size", `${this.cellSize}px`);
         this.resizeToContainer();
 
-        // Adjust grid size on resize
-        new ResizeObserver(() => this.resizeToContainer()).observe(this.container!);
+        // Adjust grid size on parent resize
+        new ResizeObserver(() => this.resizeToContainer()).observe(this.container.parentElement!);
     }
 
     private resizeToContainer(): void {
         if (!this.container) return;
-        const { width, height } = this.container.getBoundingClientRect();
+        const parent = this.container.parentElement;
+        if (!parent) return;
+        const { width, height } = parent.getBoundingClientRect();
         this.cols = Math.floor(width / this.cellSize);
         this.rows = Math.floor(height / this.cellSize);
         this.container.style.width = `${this.cols * this.cellSize}px`;
@@ -203,6 +205,25 @@ export default class Grid implements IGraph {
                 this.cellElements.set(node.id, element);
             }
         }
+    }
+
+    private applyCellBorders(node: GridNode, element: HTMLElement): void {
+        // Remove all borders first
+        element.style.borderRight = '';
+        element.style.borderBottom = '';
+
+        // No borders on last row/col
+        const isLastCol = node.col >= this.cols - 1;
+        const isLastRow = node.row >= this.rows - 1;
+        
+        // Any typed cell (start/end/visited/frontier/path) OR wall has no borders
+        if (!node.walkable || node.isStart || node.isEnd || node.isVisited || node.isFrontier || node.isPath) {
+            return;
+        }
+
+        const borderColor = 'oklch(0.3 0.01 260 / 0.45)';
+        if (!isLastCol) element.style.borderRight = `1px solid ${borderColor}`;
+        if (!isLastRow) element.style.borderBottom = `1px solid ${borderColor}`;
     }
 
     setCellSize(newCellSize: number): void {
@@ -228,6 +249,7 @@ export default class Grid implements IGraph {
         element.style.height = `${this.cellSize}px`;
         element.style.top = `${top}px`;
         element.style.left = `${left}px`;
+        this.applyCellBorders(node, element);
       
         return element;
     }
@@ -254,6 +276,7 @@ export default class Grid implements IGraph {
         if (element) {
             element.className = this.getNodeClasses(node);
             element.style.cursor = this.getCursorStyle(node);
+            if (node instanceof GridNode) this.applyCellBorders(node as GridNode, element);
         }
     }
 
