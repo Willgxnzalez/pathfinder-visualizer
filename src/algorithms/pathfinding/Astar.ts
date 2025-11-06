@@ -11,7 +11,7 @@ export default function* Astar(graph: IGraph): Generator<AnimationStep, Pathfind
     start.hCost = graph.getHeuristic(start, end);
 
     const frontier = new MinHeap<INode>();
-    frontier.insert(start, start.gCost + start.hCost, start.hCost);
+    frontier.insert(start, start.fCost());
 
     let nodesVisited = 0;
 
@@ -29,28 +29,26 @@ export default function* Astar(graph: IGraph): Generator<AnimationStep, Pathfind
             let node: INode | null = end;
             while (node) {
                 node.isPath = true;
-                path.unshift(node);
+                path.push(node);
                 node = node.parent;
             }
 
             yield { type: 'path', nodes: path };
-            return { found: true, pathLength: path.length, nodesVisited, path };
+            return { found: true, pathLength: path.length, nodesVisited, path: path.reverse() };
         }
 
         for (const neighbor of graph.getNeighbors(curr)) {
             if (neighbor.isVisited) continue;
 
             const tentativeG = curr.gCost + graph.getDistance(curr, neighbor);
-
             if (tentativeG < neighbor.gCost) {
                 neighbor.parent = curr;
                 neighbor.gCost = tentativeG;
                 neighbor.hCost = graph.getHeuristic(neighbor, end);
-                const fScore = neighbor.gCost + neighbor.hCost;
                 if (frontier.has(neighbor)) {
-                    frontier.decreaseKey(neighbor, fScore, neighbor.hCost);
+                    frontier.decreaseKey(neighbor, neighbor.fCost());
                 } else {
-                    frontier.insert(neighbor, fScore, neighbor.hCost);
+                    frontier.insert(neighbor, neighbor.fCost());
                 }
             }
         }

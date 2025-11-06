@@ -8,7 +8,6 @@ export default function* BFS(graph: IGraph): Generator<AnimationStep, Pathfindin
     
     const queue: INode[] = [start];
     let head = 0;
-
     let nodesVisited = 0;
 
     while (head < queue.length) {
@@ -26,17 +25,17 @@ export default function* BFS(graph: IGraph): Generator<AnimationStep, Pathfindin
 
             while (node != null) {
                 node.isPath = true;
-                path.unshift(node);
+                path.push(node);
                 node = node.parent; 
             }
 
             yield { type: 'path', nodes: path };
-            return { found: true, pathLength: path.length, nodesVisited, path };
+            return { found: true, pathLength: path.length, nodesVisited, path: path.reverse() };
         }
 
         for (const neighbor of graph.getNeighbors(curr)) {
             if (!neighbor.isVisited) {
-                queue.push(neighbor)
+                queue.push(neighbor);
                 neighbor.parent = curr;
             }
         }
