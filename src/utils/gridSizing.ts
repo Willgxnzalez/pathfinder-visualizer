@@ -1,9 +1,11 @@
 export const CELL_SIZE_STEP = 5;
+const MAJOR_GRID_PIXEL_INTERVAL = 150;
 
-export const snapTo = (step: number, value: number): number =>
-    Math.floor(value / step) * step;
+export function snapTo(step: number, value: number): number {
+    return Math.floor(value / step) * step;
+}
 
-export const computeCellSizeBounds = (container?: HTMLElement): { min: number; max: number; step: number, initial: number } => {
+export function computeCellSizeBounds(container?: HTMLElement): { min: number; max: number; step: number, initial: number } {
     const rect = container?.getBoundingClientRect();
     const width = rect?.width ?? window.innerWidth;
     const height = rect?.height ?? window.innerHeight;
@@ -20,7 +22,11 @@ export const computeCellSizeBounds = (container?: HTMLElement): { min: number; m
     const max = snapTo(CELL_SIZE_STEP, Math.max(min + CELL_SIZE_STEP, Math.min(220, sizeForMinDensity)));
     const midpoint = Math.floor((min + max) / 2);
     return { min, max, step: CELL_SIZE_STEP, initial: midpoint };
-};
+}
+
+export function getMajorGridInterval(cellSize: number) {
+    return Math.max(2, Math.round(MAJOR_GRID_PIXEL_INTERVAL / cellSize));
+}
 
 
 
