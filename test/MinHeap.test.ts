@@ -5,7 +5,7 @@ describe("MinHeap", () => {
     let heap: MinHeap<number>;
 
     beforeEach(() => {
-        heap = new MinHeap<number>((a, b) => a - b);
+        heap = new MinHeap<number>();
     });
 
     it("should insert elements and maintain min-heap order", () => {
@@ -34,16 +34,16 @@ describe("MinHeap", () => {
         expect(heap.extractMin()).toBe(undefined);
     });
 
-    it("should handle duplicate elements", () => {
+    it("should ignore duplicate insertions", () => {
         heap.insert(2, 2);
-        heap.insert(2, 2);
+        heap.insert(2, 2);  // Should be ignored
         heap.insert(3, 3);
         heap.insert(1, 1);
 
         expect(heap.extractMin()).toBe(1);
         expect(heap.extractMin()).toBe(2);
-        expect(heap.extractMin()).toBe(2);
         expect(heap.extractMin()).toBe(3);
+        expect(heap.extractMin()).toBe(undefined);
     });
 
     it("should support peek/top operation", () => {
@@ -55,7 +55,7 @@ describe("MinHeap", () => {
     });
 
     it("should be empty after removing all elements", () => {
-        [3, 1, 4, 1, 5].forEach(n => heap.insert(n, n));
+        [3, 1, 4, 5].forEach(n => heap.insert(n, n));
         while (!heap.isEmpty()) {
             heap.extractMin();
         }
@@ -75,5 +75,15 @@ describe("MinHeap", () => {
         expect(heap.extractMin()).toBe(7);
         expect(heap.extractMin()).toBe(9);
         expect(heap.extractMin()).toBe(undefined);
+    });
+
+    it("should support decreaseKey", () => {
+        heap.insert(5, 5);
+        heap.insert(8, 8);
+        heap.insert(2, 2);
+        heap.decreaseKey(8, 1); // Now 8 should be first
+        expect(heap.extractMin()).toBe(8);
+        expect(heap.extractMin()).toBe(2);
+        expect(heap.extractMin()).toBe(5);
     });
 });
