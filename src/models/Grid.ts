@@ -9,7 +9,7 @@ export default class GridGraph implements IGraph {
     private endNode: GridNode | null = null;
 
     constructor(rows: number, cols: number) {
-        this.createGrid(rows, cols)
+        this.createGrid(rows, cols);
     }
 
     private createGrid(rows: number, cols:number): void {
@@ -23,26 +23,6 @@ export default class GridGraph implements IGraph {
                 const id = `${row}-${col}`;
                 this.grid[row][col] = new GridNode(id, row, col);
             }
-        }
-
-        // Initalize start and end nodes
-        const startRow = Math.floor(this.rows * 0.5);
-        const startCol = Math.floor(this.cols * 0.2);
-        const endRow = Math.floor(this.rows * 0.5);
-        const endCol = Math.floor(this.cols * 0.8);
-
-        const startNode = this.getNode(startRow, startCol);
-        const endNode = this.getNode(endRow, endCol);
-
-        if (startNode) {
-            this.startNode = startNode;
-            startNode.isStart = true;
-            startNode.isWalkable = true;
-        }
-        if (endNode) {
-            this.endNode = endNode;
-            endNode.isStart = true;
-            endNode.isWalkable = true;
         }
     }
 
@@ -106,6 +86,7 @@ export default class GridGraph implements IGraph {
 
         if (this.startNode) this.startNode.isStart = false;
 
+        this.startNode = node;
         node.isStart = true;
         node.isWalkable = true;
     }
@@ -116,6 +97,7 @@ export default class GridGraph implements IGraph {
 
         if (this.endNode) this.endNode.isEnd = false;
 
+        this.endNode = node;
         node.isEnd = true;
         node.isWalkable = true;
     }
