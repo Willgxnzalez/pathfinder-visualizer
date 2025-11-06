@@ -1,5 +1,9 @@
 export const CELL_SIZE_STEP = 5;
 const MAJOR_GRID_PIXEL_INTERVAL = 150;
+const START_ROW_POSITION = 0.5;
+const START_COL_POSITION = 0.2;
+const END_ROW_POSITION = 0.5;
+const END_COL_POSITION = 0.8;
 
 export function snapTo(step: number, value: number): number {
     return Math.floor(value / step) * step;
@@ -28,5 +32,14 @@ export function getMajorGridInterval(cellSize: number) {
     return Math.max(2, Math.round(MAJOR_GRID_PIXEL_INTERVAL / cellSize));
 }
 
+export function computeDefaultStartEndNodes(rows: number, cols: number): {
+    startRow: number, startCol: number, 
+    endRow: number, endCol: number 
+} {
+    const startRow = Math.floor(rows * START_ROW_POSITION);
+    const startCol = Math.floor(cols * START_COL_POSITION);
+    const endRow = Math.floor(rows * END_ROW_POSITION);
+    const endCol = Math.floor(cols * END_COL_POSITION);
 
-
+    return { startRow, startCol, endRow, endCol };
+}
