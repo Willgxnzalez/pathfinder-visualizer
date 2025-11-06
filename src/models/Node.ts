@@ -4,7 +4,7 @@ export class GridNode implements IGridNode {
     id: string;
     row: number;
     col: number;
-    walkable: boolean = true;
+    isWalkable: boolean = true;
     isStart: boolean = false;
     isEnd: boolean = false;
     isVisited: boolean = false;
@@ -29,7 +29,7 @@ export class MapNode implements IMapNode {
     id: string;
     lat: number;
     lon: number;
-    walkable: boolean;
+    isWalkable: boolean;
     isStart: boolean = false;
     isEnd: boolean = false;
     isVisited: boolean = false;
@@ -43,7 +43,7 @@ export class MapNode implements IMapNode {
         this.id = id;
         this.lat = lat;
         this.lon = lon;
-        this.walkable = walkable;
+        this.isWalkable = walkable;
     }
 
     fCost(): number {

@@ -6,7 +6,7 @@ export type VisualizationMode = 'grid' | 'map';
 
 export interface INode {
     id: string;
-    walkable: boolean;
+    isWalkable: boolean;
     isStart: boolean;
     isEnd: boolean;
     isVisited: boolean;
@@ -81,4 +81,9 @@ export interface VisualizationState {
     result: string;
     isAnimating: boolean;
     visualizedNodes: Set<string>;
+}
+
+// Type guards
+export function isGridNode(node: INode): node is IGridNode {
+    return 'row' in node && 'col' in node;
 }
