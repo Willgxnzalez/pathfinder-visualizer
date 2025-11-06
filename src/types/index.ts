@@ -6,16 +6,17 @@ export type VisualizationMode = 'grid' | 'map';
 
 export interface INode {
     id: string;
-    isWall: boolean;
+    walkable: boolean;
     isStart: boolean;
     isEnd: boolean;
     isVisited: boolean;
-    isPath: boolean;
     isFrontier: boolean;
-    
+    isPath: boolean;
     gCost: number;
     hCost: number;
+    fCost: () => number;
     parent: INode | null;
+
 }
 
 export interface IGridNode extends INode {
@@ -52,4 +53,32 @@ export interface PathfindingResult {
 export interface AnimationStep {
     type: 'visit' | 'path';
     nodes: INode[];
+}
+
+export interface VisualizationGraphState {
+    nodes: Map<string, INode>;
+    startNode: INode | null;
+    endNode: INode | null;
+}
+
+export interface GridVisualizationState extends VisualizationGraphState {
+    rows: number;
+    cols: number;
+    cellSize: number;
+}
+
+export interface MapVisualizationState extends VisualizationGraphState {
+    zoom: number;
+    center: { lat: number; lon: number };
+    bounds: { north: number; south: number; east: number; west: number };
+}
+
+export type GraphState = GridVisualizationState | MapVisualizationState;
+
+export interface VisualizationState {
+    mode: VisualizationMode;
+    animationState: AnimationState;
+    result: string;
+    isAnimating: boolean;
+    visualizedNodes: Set<string>;
 }

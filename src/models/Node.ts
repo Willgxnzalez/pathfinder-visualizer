@@ -1,50 +1,52 @@
-import { INode } from "../types";
+import { INode, IGridNode, IMapNode} from "../types";
 
-export class GridNode implements INode {
+export class GridNode implements IGridNode {
     id: string;
     row: number;
     col: number;
-
-    gCost: number = Infinity;
-    hCost: number = 0;
-    parent: GridNode | null = null;
-
     walkable: boolean = true;
     isStart: boolean = false;
     isEnd: boolean = false;
     isVisited: boolean = false;
-    isPath: boolean = false;
     isFrontier: boolean = false;
+    isPath: boolean = false;
+    gCost: number = Infinity;
+    hCost: number = 0;
+    parent: GridNode | null = null;
 
     constructor(id: string, row: number, col: number) {
         this.id = id;
         this.row = row;
         this.col = col;
     }
+
+    fCost(): number {
+        return this.gCost + this.hCost;
+    }
 }
 
-export class MapNode implements INode {
+export class MapNode implements IMapNode {
     id: string;
-    walkable: boolean;
-
     lat: number;
-    lng: number;
-
-    gCost: number = Infinity;
-    hCost: number = 0;
-    fCost: number = 0;
-    parent: MapNode | null = null;
-
+    lon: number;
+    walkable: boolean;
     isStart: boolean = false;
     isEnd: boolean = false;
     isVisited: boolean = false;
-    isPath: boolean = false;
     isFrontier: boolean = false;
+    isPath: boolean = false;
+    gCost: number = Infinity;
+    hCost: number = 0;
+    parent: MapNode | null = null;
 
-    constructor(id: string, lat: number, lng: number, walkable: boolean) {
+    constructor(id: string, lat: number, lon: number, walkable: boolean) {
         this.id = id;
         this.lat = lat;
-        this.lng = lng;
+        this.lon = lon;
         this.walkable = walkable;
+    }
+
+    fCost(): number {
+        return this.gCost + this.hCost;
     }
 }
