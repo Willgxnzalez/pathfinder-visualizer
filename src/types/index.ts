@@ -50,40 +50,71 @@ export interface PathfindingResult {
     path: INode[];
 }
 
+export interface MazeGenerationResult {
+    found: boolean;
+    pathLength: number;
+    nodesVisited: number;
+    path: INode[];
+    success: boolean;
+    cellsProcessed: INode[];
+
+}
+
+
 export interface AnimationStep {
-    type: 'visit' | 'path';
+    type: 'visit' | 'path' | 'wall' | 'carve';
     nodes: INode[];
 }
 
-export interface VisualizationGraphState {
+export interface BaseGraphData {
     nodes: Map<string, INode>;
     startNode: INode | null;
     endNode: INode | null;
 }
 
-export interface GridVisualizationState extends VisualizationGraphState {
+export interface GridViewData extends BaseGraphData {
     rows: number;
     cols: number;
     cellSize: number;
 }
 
-export interface MapVisualizationState extends VisualizationGraphState {
+export interface MapViewData extends BaseGraphData {
     zoom: number;
     center: { lat: number; lon: number };
     bounds: { north: number; south: number; east: number; west: number };
 }
 
-export type GraphState = GridVisualizationState | MapVisualizationState;
+export type ViewData = GridViewData | MapViewData;
 
 export interface VisualizationState {
     mode: VisualizationMode;
     animationState: AnimationState;
     result: string;
-    isAnimating: boolean;
-    visualizedNodes: Set<string>;
+}
+
+export interface VisualizationHookProps {
+    speed: Speed;
+    uiState: VisualizationState;
+    graph: IGraph;
+    onVisualizationStep: (step: AnimationStep) => Promise<void>;
+    onStateChange: (state: AnimationState) => void;
+    onResult: (result: string) => void;
+    onViewDataChange?: (newState: Partial<ViewData>) => void;
 }
 
 // Type guards
+export function isGridViewData(data: ViewData): data is GridViewData {
+    return 'cellSize' in data;
+}
+
+export function isMapViewData(data: ViewData): data is MapViewData {
+    return 'zoom' in data;
+}
+
 export function isGridNode(node: INode): node is IGridNode {
     return 'row' in node && 'col' in node;
+}
+
+export function isMapNode(node: INode): node is IMapNode {
+    return 'lat' in node && 'lon' in node;
 }

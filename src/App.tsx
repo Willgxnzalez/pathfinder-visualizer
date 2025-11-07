@@ -1,44 +1,40 @@
-import React, { useState, useRef, useEffect, useCallback, useLayoutEffect } from "react";
-import BFS from "./algorithms/pathfinding/BFS";
-import DFS from "./algorithms/pathfinding/DFS";
-import Astar from "./algorithms/pathfinding/Astar";
-import GBFS from "./algorithms/pathfinding/GBFS";
-import Dijkstra from "./algorithms/pathfinding/Dijkstra";
-import Grid from "./models/Grid";
-import GridView from "./components/GridView";
-import Header from "./components/Header";
-import { AnimationState, AnimationStep, PathfindingResult, Algorithm } from "./types";
-import { computeCellSizeBounds } from "./utils/gridSizing";
-import clsx from "clsx";
+// App.tsx
+import React, { useState, useRef, useEffect, useLayoutEffect, useCallback } from 'react';
+import GridView from './components/GridView';
+import Header from './components/Header';
+import Grid from './models/Grid';
+import GridRenderer from './models/GridRenderer';
+import { usePathfindingVisualization } from './hooks/usePathfindingVisualization';
+import {
+    computeCellSizeBounds,
+    computeDefaultStartEndNodes,
+    getMajorGridInterval,
+    CELL_SIZE_STEP,
+} from './utils/gridHelpers';
+import type { Algorithm, Speed, AnimationState, AnimationStep } from './types';
+import { GridNode } from './models/Node';
 
 export default function App() {
-    const [grid, setGrid] = useState<Grid | null>(null);
-    const [animationState, setAnimationState] = useState<AnimationState>("idle");
-    const [speed, setSpeed] = useState<"slow" | "medium" | "fast">("medium");
-    const [selectedAlgorithm, setSelectedAlgorithm] = useState<Algorithm>("A*");
-    const [result, setResult] = useState("");
-    const [isDrawing, setIsDrawing] = useState(false);
-    const [cellSize, setCellSize] = useState<number>(0);
-    const [cellMin, setCellMin] = useState<number>(20);
-    const [cellMax, setCellMax] = useState<number>(120);
-    const [cellStep, setCellStep] = useState<number>(5);
-
-    const animationStateRef = useRef<AnimationState>(animationState);
-    const speedRef = useRef(speed);
-    const generatorRef = useRef<Generator<AnimationStep, PathfindingResult, unknown> | null>(null);
-    const pauseResolveRef = useRef<(() => void) | null>(null);
-    const stepResolveRef = useRef<(() => void) | null>(null);
-
-    useEffect(() => {
-        animationStateRef.current = animationState;
-    }, [animationState]);
-
-    useEffect(() => {
-        speedRef.current = speed;
-    }, [speed]);
-
     const mainRef = useRef<HTMLDivElement>(null);
+    const rendererRef = useRef<GridRenderer | null>(null);
 
+    // unified cellSize state and sizing bounds
+    const [cellSize, setCellSize] = useState(25);
+    const [cellMin, setCellMin] = useState(20);
+    const [cellMax, setCellMax] = useState(120);
+    const [cellStep, setCellStep] = useState(CELL_SIZE_STEP);
+
+    const [grid, setGrid] = useState<Grid | null>(null);
+    const [speed, setSpeed] = useState<Speed>('medium');
+    const [algorithm, setAlgorithm] = useState<Algorithm>('A*');
+    const [isDrawing, setIsDrawing] = useState(false);
+
+    const [uiState, setUiState] = useState({
+        animationState: 'idle' as AnimationState,
+        result: '',
+    });
+
+    // Set up cell bounds and initial cell size once on mount
     useLayoutEffect(() => {
         const container = mainRef.current ?? undefined;
         const { min, max, step, initial } = computeCellSizeBounds(container);
@@ -46,161 +42,174 @@ export default function App() {
         setCellMax(max);
         setCellStep(step);
         setCellSize(initial);
-        setGrid(new Grid(initial));
+        // the grid will be created later in other effect
     }, []);
 
-    const handleCellSizeChange = useCallback((size: number) => {
-        setCellSize(size);
-        grid?.setCellSize(size);
-    }, [grid]);
+    useLayoutEffect(() => {
+        if (!mainRef.current) return;
+        const rect = mainRef.current.getBoundingClientRect();
+        if (rect.width < 5 || rect.height < 5) return;
+        const cols = Math.max(5, Math.floor(rect.width / cellSize));
+        const rows = Math.max(5, Math.floor(rect.height / cellSize));
+        const newGrid = new Grid(rows, cols);
+        const { startRow, startCol, endRow, endCol } = computeDefaultStartEndNodes(rows, cols);
+        newGrid.setStartNode(startRow, startCol);
+        newGrid.setEndNode(endRow, endCol);
+        setGrid(newGrid);
+        if (rendererRef.current) {
+            rendererRef.current.updateGrid(newGrid, cellSize);
+            rendererRef.current.setMajorInterval(getMajorGridInterval(cellSize));
+        }
+    }, [cellSize]);
 
-    const getDelay = (s: "slow" | "medium" | "fast"): number => ({ slow: 75, medium: 40, fast: 0 }[s]);
-
-    const getAlgorithm = (algorithm: Algorithm) => {
-        const algoMap = {
-            'BFS': BFS,
-            'DFS': DFS,
-            'A*': Astar,
-            'GBFS': GBFS,
-            'Dijkstra': Dijkstra,
+    useLayoutEffect(() => {
+        if (!mainRef.current) return;
+        let resizeTimeout: number | null = null;
+        const ro = new ResizeObserver(() => {
+            if (resizeTimeout) clearTimeout(resizeTimeout);
+            resizeTimeout = window.setTimeout(() => {
+                if (!mainRef.current) return;
+                if (uiState.animationState !== 'idle') return;
+                const rect = mainRef.current.getBoundingClientRect();
+                if (rect.width < 5 || rect.height < 5) return;
+                setGrid((prev) => {
+                    const cols = Math.max(5, Math.floor(rect.width / cellSize));
+                    const rows = Math.max(5, Math.floor(rect.height / cellSize));
+                    if (prev && prev.getDimensions) {
+                        const { rows: prow, cols: pcol } = prev.getDimensions();
+                        if (prow === rows && pcol === cols) return prev;
+                    }
+                    const newGrid = new Grid(rows, cols);
+                    const { startRow, startCol, endRow, endCol } = computeDefaultStartEndNodes(rows, cols);
+                    newGrid.setStartNode(startRow, startCol);
+                    newGrid.setEndNode(endRow, endCol);
+                    return newGrid;
+                });
+            }, 50);
+        });
+        ro.observe(mainRef.current);
+        return () => {
+            ro.disconnect();
+            if (resizeTimeout) clearTimeout(resizeTimeout);
         };
-        return algoMap[algorithm] ?? Astar;
-    };
+        // eslint-disable-next-line
+    }, [cellSize, uiState.animationState]);
 
-    const waitForNextStep = async (delay: number): Promise<boolean> => {
-        const state = animationStateRef.current;
+    const handleCellSizeChange = useCallback((newSize: number) => {
+        // snap and clamp
+        const snapped = Math.max(cellMin, Math.min(cellMax, newSize - (newSize % cellStep)));
+        setCellSize(snapped);
+        rendererRef.current?.setCellSize(snapped);
+        rendererRef.current?.setMajorInterval(getMajorGridInterval(snapped));
+    }, [cellMin, cellMax, cellStep]);
 
-        if (state === "stepping") {
-            await new Promise<void>((r) => (stepResolveRef.current = r));
-            return animationStateRef.current !== "idle";
-        }
+    const pathfinding = usePathfindingVisualization({
+        speed,
+        uiState,
+        selectedAlgorithm: algorithm,
+        graph: grid,
+        onVisualizationStep: async (step: AnimationStep) => {
+            if (!rendererRef.current || !grid) return;
 
-        await new Promise((r) => setTimeout(r, delay));
-
-        if (animationStateRef.current === "paused") {
-            await new Promise<void>((r) => (pauseResolveRef.current = r));
-        }
-
-        return animationStateRef.current !== "idle";
-    };
-
-    const renderStep = async (step: AnimationStep, grid: Grid, delay: number) => {
-        if (step.type === "visit") {
-            step.nodes.forEach((node) => grid.setNodeVisited(node));
-        } else if (step.type === "path") {
-            await new Promise((r) => setTimeout(r, delay * 10));
             for (const node of step.nodes) {
-                grid.setNodePath(node);
-                await new Promise((r) => setTimeout(r, 10));
+                if (step.type === 'visit') {
+                    node.isVisited = true;
+                    node.isFrontier = false;
+                } else if (step.type === 'path') {
+                    node.isPath = true;
+                }
+                rendererRef.current.updateNode(node as GridNode);
             }
-        }
-    };
-
-    const runVisualization = useCallback(async () => {
-        if (!grid) return;
-
-        grid.resetGrid(false);
-        setResult("");
-        setAnimationState("running");
-
-        const algorithm = getAlgorithm(selectedAlgorithm);
-        generatorRef.current = algorithm(grid);
-
-        let delay = getDelay(speedRef.current);
-        let result = generatorRef.current.next();
-
-        while (!result.done) {
-            await renderStep(result.value, grid, delay);
-            const shouldContinue = await waitForNextStep(delay);
-            if (!shouldContinue) {
-                setResult("Stopped");
-                setAnimationState("idle");
-                generatorRef.current = null;
-                return;
-            }
-
-            delay = getDelay(speedRef.current);
-            result = generatorRef.current.next();
-        }
-
-        const finalResult = result.value;
-        setAnimationState("idle");
-        generatorRef.current = null;
-
-        setResult(
-            finalResult.found
-                ? `Path found! Length: ${finalResult.pathLength}, Nodes visited: ${finalResult.nodesVisited}`
-                : `No path found. Nodes visited: ${finalResult.nodesVisited}`
-        );
-    }, [selectedAlgorithm, grid]);
-
-    const handlePlayPause = useCallback(() => {
-        if (animationStateRef.current === "running") {
-            setAnimationState("paused");
-        } else if (["paused", "stepping"].includes(animationStateRef.current)) {
-            setAnimationState("running");
-            pauseResolveRef.current?.();
-            pauseResolveRef.current = null;
-            stepResolveRef.current?.();
-            stepResolveRef.current = null;
-        }
-    }, []);
-
-    const handleStep = useCallback(() => {
-        if (["paused", "stepping"].includes(animationStateRef.current)) {
-            setAnimationState("stepping");
-            pauseResolveRef.current?.();
-            pauseResolveRef.current = null;
-            stepResolveRef.current?.();
-            stepResolveRef.current = null;
-        }
-    }, []);
-
-    const handleStop = useCallback(() => {
-        setAnimationState("idle");
-        generatorRef.current = null;
-        pauseResolveRef.current = null;
-        stepResolveRef.current = null;
-        setResult("");
-    }, []);
+        },
+        onStateChange: (s: AnimationState) => setUiState(p => ({ ...p, animationState: s })),
+        onResult: (r: string) => setUiState(p => ({ ...p, result: r })),
+    });
 
     const handleReset = useCallback(() => {
-        grid?.resetGrid(true);
-        setResult("");
+        if (!grid) return;
+        grid.resetGrid(true);
+        const { rows, cols } = grid.getDimensions();
+        const { startRow, startCol, endRow, endCol } = computeDefaultStartEndNodes(rows, cols);
+        grid.setStartNode(startRow, startCol);
+        grid.setEndNode(endRow, endCol);
+        rendererRef.current?.updateAll();
+        setUiState({ animationState: 'idle', result: '' });
     }, [grid]);
 
+    // Always render <main> so that mainRef can be measured immediately
     return (
-        <div className="w-screen h-screen text-text-main relative overflow-hidden bg-surface-dark flex flex-col items-center">
+        <div className="w-screen h-screen bg-surface-dark flex flex-col text-text-main overflow-hidden">
             <Header
-                onDarkModeToggle={()=> {}}
-                onMapModeToggle={() => {}}
-                mapMode={false}
-                animationState={animationState}
-                selectedAlgorithm={selectedAlgorithm}
+                animationState={uiState.animationState}
+                selectedAlgorithm={algorithm}
                 speed={speed}
                 cellSize={cellSize}
                 cellMin={cellMin}
                 cellMax={cellMax}
                 cellStep={cellStep}
-                onRun={runVisualization}
+                onRun={pathfinding.runVisualization}
                 onReset={handleReset}
-                onAlgorithmChange={setSelectedAlgorithm}
+                onAlgorithmChange={setAlgorithm}
                 onSpeedChange={setSpeed}
                 onCellSizeChange={handleCellSizeChange}
+                isDrawing={isDrawing}
+                mapMode={false}
+                onDarkModeToggle={() => { throw new Error('Function not implemented.'); }}
+                onMapModeToggle={() => { throw new Error('Function not implemented.'); }}
             />
-            <main ref={mainRef} className="w-full flex-1 min-h-0 flex justify-center items-center">
-                {grid && <GridView grid={grid} onDrawingChange={setIsDrawing} />}
-            </main>
-            {(animationState === 'running' || animationState === 'paused' || animationState === 'stepping') && (
-                    <div className={clsx(
-                        "fixed bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 px-6 py-2 rounded-xl glass shadow-lg transition-opacity",
-                        isDrawing ? "opacity-60" : "opacity-100"
-                    )}>
-                        <button onClick={handleStop}>STOP</button>
-                        <button onClick={handlePlayPause}>⏯</button>
-                        <button onClick={handleStep}>⏭</button>
+
+            <main
+                ref={mainRef}
+                className="flex-1 relative"
+                style={{ ['--cell-size' as string]: `${cellSize}px` }}
+            >
+                {!grid && (
+                    <div className="absolute inset-0 flex items-center justify-center text-white text-xl bg-gray-900">
+                        Loading grid...
                     </div>
                 )}
+                {grid && (
+                    <GridView
+                        key={`${grid.getDimensions().rows}-${grid.getDimensions().cols}`}
+                        grid={grid}
+                        cellSize={cellSize}
+                        onDrawingChange={setIsDrawing}
+                        onRendererReady={(renderer) => {
+                            rendererRef.current = renderer;
+                            renderer.setMajorInterval(getMajorGridInterval(cellSize));
+                        }}
+                    />
+                )}
+            </main>
+
+            {uiState.animationState !== 'idle' && (
+                <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex gap-4 px-8 py-4 rounded-2xl glass shadow-lg border border-bdr bg-surface/90 backdrop-blur-lg">
+                    <button
+                        onClick={pathfinding.handleStop}
+                        className="px-7 py-3 bg-warning hover:bg-warning-dark text-text-main font-bold rounded-xl transition border border-bdr shadow active:scale-95"
+                    >
+                        STOP
+                    </button>
+                    <button
+                        onClick={pathfinding.handlePlayPause}
+                        className="px-7 py-3 bg-accent hover:bg-accent-dark text-text-main font-bold rounded-xl transition border border-bdr shadow active:scale-95"
+                    >
+                        PLAY/PAUSE
+                    </button>
+                    <button
+                        onClick={pathfinding.handleStep}
+                        className="px-7 py-3 bg-purple-700 hover:bg-purple-800 text-text-main font-bold rounded-xl transition border border-bdr shadow active:scale-95"
+                    >
+                        STEP
+                    </button>
+                </div>
+            )}
+
+            {uiState.result && (
+                <div className="fixed bottom-24 left-1/2 -translate-x-1/2 px-8 py-4 rounded-2xl glass shadow-xl border border-bdr bg-surface/90 backdrop-blur-lg text-lg font-semibold text-text-main min-w-[14rem] text-center">
+                    {uiState.result}
+                </div>
+            )}
         </div>
     );
 }

@@ -1,85 +1,91 @@
+// components/GridView.tsx
 import React, { useEffect, useRef, useCallback } from "react";
 import Grid from "../models/Grid";
+import GridRenderer from "../models/GridRenderer";
 
 interface GridViewProps {
     grid: Grid;
-    onDrawingChange?: (isDrawing: boolean) => void;
+    cellSize: number;
+    onDrawingChange?: (drawing: boolean) => void;
+    onRendererReady?: (renderer: GridRenderer) => void;
 }
 
-export default function GridView({ grid, onDrawingChange }: GridViewProps) {
+export default function GridView({
+    grid,
+    cellSize,
+    onDrawingChange,
+    onRendererReady
+}: GridViewProps) {
     const containerRef = useRef<HTMLDivElement>(null);
+    const rendererRef = useRef<GridRenderer | null>(null);
 
+    // create once
     useEffect(() => {
         if (!containerRef.current) return;
-        grid.mount(containerRef.current);
-        return () => grid.destroy();
-    }, [grid]);
+        const renderer = new GridRenderer(grid, cellSize);
+        renderer.mount(containerRef.current);
+        onRendererReady?.(renderer);
+        rendererRef.current = renderer;
+        return () => renderer.destroy();
+    }, []);
 
-    const handleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    // update instead of remounting
+    useEffect(() => {
+        rendererRef.current?.updateGrid(grid, cellSize);
+    }, [grid, cellSize]);
+
+    useEffect(() => {
+        rendererRef.current?.setCellSize(cellSize);
+    }, [cellSize]);
+
+    const handleMouseDown = useCallback((e: React.MouseEvent) => {
         onDrawingChange?.(true);
-        grid.handleMouseDown(
-            e.clientX,
-            e.clientY,
-            e.shiftKey && e.button === 0,
-            e.shiftKey && e.button === 2
-        );
-    }, [grid, onDrawingChange]);
+        const makeStartNode = e.shiftKey && e.button === 0;
+        const makeEndNode = e.shiftKey && e.button === 2;
+        rendererRef.current?.handleMouseDown(e.clientX, e.clientY, makeStartNode, makeEndNode);
+    }, [onDrawingChange]);
 
-    const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-         grid.handleMouseMove(e.clientX, e.clientY);
-    }, [grid]);
+    const handleMouseMove = useCallback((e: React.MouseEvent) => {
+        rendererRef.current?.handleMouseMove(e.clientX, e.clientY);
+    }, []);
 
     const handleMouseUp = useCallback(() => {
         onDrawingChange?.(false);
-        grid.handleMouseUp();
-    }, [grid, onDrawingChange]);
+        rendererRef.current?.handleMouseUp();
+    }, [onDrawingChange]);
 
-    const handleMouseLeave = useCallback(() => {
-        onDrawingChange?.(false);
-        grid.handleMouseUp();
-    }, [grid, onDrawingChange]);
-
-    const handleTouchStart = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    const handleTouchStart = useCallback((e: React.TouchEvent) => {
         e.preventDefault();
         const touch = e.touches[0];
         onDrawingChange?.(true);
-        grid.handleMouseDown(
-            touch.clientX,
-            touch.clientY,
-            false,
-            false
-        );
-    }, [grid, onDrawingChange]);
+        rendererRef.current?.handleMouseDown(touch.clientX, touch.clientY, false, false);
+    }, [onDrawingChange]);
 
-    const handleTouchMove = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    const handleTouchMove = useCallback((e: React.TouchEvent) => {
         e.preventDefault();
         const touch = e.touches[0];
-        grid.handleMouseMove(touch.clientX, touch.clientY);
-    }, [grid]);
+        rendererRef.current?.handleMouseMove(touch.clientX, touch.clientY);
+    }, []);
 
-    const handleTouchEndOrCancel = useCallback((e: React.TouchEvent<HTMLDivElement>) => {
+    const handleTouchEnd = useCallback((e: React.TouchEvent) => {
         e.preventDefault();
         onDrawingChange?.(false);
-        grid.handleMouseUp();
-    }, [grid, onDrawingChange]);
-
-    const handleContextMenu = useCallback((e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-        e.preventDefault();
-    }, []);
+        rendererRef.current?.handleMouseUp();
+    }, [onDrawingChange]);
 
     return (
         <div
-            className="relative select-none cursor-crosshair touch-none"
             ref={containerRef}
+            className="w-full h-full relative select-none cursor-crosshair touch-none"
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseLeave}
+            onMouseLeave={handleMouseUp}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEndOrCancel}
-            onTouchCancel={handleTouchEndOrCancel}
-            onContextMenu={handleContextMenu}
+            onTouchEnd={handleTouchEnd}
+            onTouchCancel={handleTouchEnd}
+            onContextMenu={(e: React.MouseEvent) => e.preventDefault()}
         />
     );
 }
