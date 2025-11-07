@@ -33,8 +33,10 @@ export default function* Astar(graph: IGraph): Generator<AnimationStep, Pathfind
                 node = node.parent;
             }
 
+            path.reverse();
+
             yield { type: 'path', nodes: path };
-            return { found: true, pathLength: path.length, nodesVisited, path: path.reverse() };
+            return { found: true, pathLength: path.length, nodesVisited, path };
         }
 
         for (const neighbor of graph.getNeighbors(curr)) {

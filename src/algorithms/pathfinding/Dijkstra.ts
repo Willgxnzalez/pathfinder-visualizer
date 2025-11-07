@@ -32,8 +32,10 @@ export default function* Dijkstra(graph: IGraph): Generator<AnimationStep, Pathf
                 node = node.parent;
             }
             
+            path.reverse();
+
             yield { type: 'path', nodes: path };
-            return { found: true, pathLength: path.length, nodesVisited, path: path.reverse() };
+            return { found: true, pathLength: path.length, nodesVisited, path};
         }
 
         for (const neighbor of graph.getNeighbors(curr)) {
