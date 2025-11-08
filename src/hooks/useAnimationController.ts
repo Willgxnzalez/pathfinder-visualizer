@@ -76,7 +76,11 @@ export default function useAnimationController({
                 if (isRunningRef.current) {
                     const final = result.value as PathfindingResult;
                     if (final.found && final.path) {
-                        await onAnimateStep({ type: "path", nodes: final.path });
+                        for (const node of final.path) {
+                            //await new Promise((r) => setTimeout(r, 50));
+                            await waitForNextStep(getDelay(speedRef.current));
+                            await onAnimateStep({ type: 'path', node })
+                        }
                     }
                     isRunningRef.current = false;
                     onStateChange('idle');

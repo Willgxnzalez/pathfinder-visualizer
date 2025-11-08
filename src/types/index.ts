@@ -45,7 +45,6 @@ export interface IGraph {
 
 export interface PathfindingResult {
     found: boolean;
-    pathLength: number;
     nodesVisited: number;
     path: INode[];
 }
@@ -60,10 +59,9 @@ export interface MazeGenerationResult {
 
 }
 
-
 export interface AnimationStep {
     type: 'visit' | 'path' | 'wall' | 'carve';
-    nodes: INode[];
+    node: INode;
 }
 
 export function isGridNode(node: INode): node is IGridNode {

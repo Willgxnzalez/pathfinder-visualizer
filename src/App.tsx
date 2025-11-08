@@ -33,7 +33,6 @@ export default function App() {
 
     useEffect(() => {
         speedRef.current = speed;
-        console.log("updated speed: ", speedRef.current)
     }, [speed])
 
     // Compute cell size bounds on mount
@@ -117,18 +116,14 @@ export default function App() {
         algorithm,
         grid,
         async (step: AnimationStep): Promise<void> => {
-            if (!rendererRef.current || !grid) return;
-            for (const node of step.nodes) {
-                if (step.type === 'visit') {
-                    node.isVisited = true;
-                    node.isFrontier = false;
-                } else if (step.type === 'path') {
-                    await new Promise((r) => setTimeout(r, 50));
-                    node.isPath = true;
-                }
-                rendererRef.current.updateNode(node as GridNode);
+        if (!rendererRef.current || !grid) return;
+            if (step.type === 'visit') {
+                step.node.isVisited = true;
+                step.node.isFrontier = false;
+            } else if (step.type === 'path') {
+                step.node.isPath = true;
             }
-            return;
+            rendererRef.current.updateNode(step.node as GridNode);
         },
         setAnimationState,
         setResult

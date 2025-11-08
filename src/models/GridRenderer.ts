@@ -22,7 +22,6 @@ export default class GridRenderer {
 
     mount(container: HTMLElement): void {
         this.container = container;
-        // Reset all positioning and spacing to ensure (0,0) is at top-left
         this.container.style.position = "relative";
         this.container.style.userSelect = "none";
         this.container.style.overflow = "hidden";
@@ -41,7 +40,6 @@ export default class GridRenderer {
 
     // Called by App when grid changes
     updateGrid(newGrid: Grid, newCellSize: number): void {
-        console.log("changed grid")
         this.grid = newGrid;
         this.cellSize = newCellSize;
         this.render();
@@ -140,7 +138,6 @@ export default class GridRenderer {
         el.dataset.state = state;
         el.style.cursor = (node.isStart || node.isEnd) ? 'grab' : 'crosshair';
 
-        // Grid lines - only apply to isWalkable empty nodes
         el.style.border = "";
         el.style.borderLeft = "";
         el.style.borderTop = "";

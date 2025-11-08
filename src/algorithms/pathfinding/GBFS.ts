@@ -5,7 +5,7 @@ export default function* GBFS(graph: IGraph): Generator<AnimationStep, Pathfindi
     const start = graph.getStartNode();
     const end = graph.getEndNode();
 
-    if (!start || !end) return { found: false, pathLength: 0, nodesVisited: 0, path: [] };
+    if (!start || !end) return { found: false, nodesVisited: 0, path: [] };
 
     start.hCost = graph.getHeuristic(start, end);
 
@@ -21,7 +21,7 @@ export default function* GBFS(graph: IGraph): Generator<AnimationStep, Pathfindi
         curr.isVisited = true;
         nodesVisited++;
 
-        yield { type: 'visit', nodes: [curr] };
+        yield { type: 'visit', node: curr};
 
         if (curr.id === end.id) {
             const path: INode[] = [];
@@ -34,8 +34,7 @@ export default function* GBFS(graph: IGraph): Generator<AnimationStep, Pathfindi
             
             path.reverse();
 
-            yield { type: 'path', nodes: path };
-            return { found: true, pathLength: path.length, nodesVisited, path };
+            return { found: true, nodesVisited, path };
         }
 
         for (const neighbor of graph.getNeighbors(curr)) {
@@ -51,5 +50,5 @@ export default function* GBFS(graph: IGraph): Generator<AnimationStep, Pathfindi
         
     }
 
-    return { found: false, pathLength: 0, nodesVisited, path: [] };
+    return { found: false, nodesVisited, path: [] };
 }
