@@ -1,14 +1,13 @@
-// hooks/usePathfindingVisualization.ts
 import { useCallback } from 'react';
-import { Algorithm, AnimationStep, PathfindingResult } from '../types';
-import { useVisualization } from './useVisualization';
+import { Algorithm, AnimationState, AnimationStep, IGraph, PathfindingResult, Speed } from '../types';
+import useAnimationController from './useAnimationController';
 import BFS from '../algorithms/pathfinding/BFS';
 import Astar from '../algorithms/pathfinding/Astar';
 import DFS from '../algorithms/pathfinding/DFS';
 import Dijkstra from '../algorithms/pathfinding/Dijkstra';
 import GBFS from '../algorithms/pathfinding/GBFS';
 
-const algorithms: Record<string, (graph: any) => Generator<AnimationStep, PathfindingResult, unknown>> = {
+const algorithms: Record<string, (graph: IGraph) => Generator<AnimationStep, PathfindingResult, unknown>> = {
     BFS,
     Astar,
     DFS,
@@ -16,26 +15,25 @@ const algorithms: Record<string, (graph: any) => Generator<AnimationStep, Pathfi
     GBFS,
 };
 
-export function usePathfindingVisualization({
-    speed,
-    uiState,
-    selectedAlgorithm,
-    graph,
-    onVisualizationStep,
-    onStateChange,
-    onResult,
-}: any) {
-    // useVisualization takes a single object argument according to fixed API
-    const animation = useVisualization({
-        speed,
-        uiState,
-        graph,
-        onVisualizationStep,
+export default function usePathfinding(
+    speedRef: React.RefObject<Speed>,
+    animationState: AnimationState,
+    selectedAlgorithm: Algorithm,
+    graph: IGraph | null,
+    onAnimateStep: (step: AnimationStep) => Promise<void>,
+    onStateChange: (state: AnimationState) => void,
+    onResult: (result: string) => void,
+) {
+    const animation = useAnimationController({
+        speedRef,
+        animationState,
+        graph: graph!,
+        onAnimateStep: onAnimateStep,
         onStateChange,
         onResult,
     });
 
-    const runVisualization = useCallback(() => {
+    const animate = useCallback(() => {
         if (!graph) {
             onResult("Grid not initialized!");
             return;
@@ -49,14 +47,11 @@ export function usePathfindingVisualization({
     }, [animation, graph, selectedAlgorithm, onResult]);
 
     return {
-        runVisualization,
+        animate,
         handlePlayPause: () => {
-            if (
-                uiState.animationState === "paused" ||
-                uiState.animationState === "stepping"
-            ) {
+            if (["paused", "stepping"].includes(animationState)) {
                 animation.resume();
-            } else if (uiState.animationState === "running") {
+            } else if (animationState === "running") {
                 animation.pause();
             }
         },
