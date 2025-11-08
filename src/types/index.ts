@@ -2,7 +2,7 @@ export type Algorithm = 'BFS' | 'DFS' | 'A*' | 'GBFS' | 'Dijkstra';
 export type MazeAlgorithm = 'RecursiveBacktracking' | 'Prim' | 'Kruskal' | 'DFS';
 export type Speed = 'slow' | 'medium' | 'fast';
 export type AnimationState = 'idle' | 'running' | 'paused' | 'stepping';
-export type VisualizationMode = 'grid' | 'map';
+export type ViewMode = 'grid' | 'map';
 
 export interface INode {
     id: string;
@@ -64,51 +64,6 @@ export interface MazeGenerationResult {
 export interface AnimationStep {
     type: 'visit' | 'path' | 'wall' | 'carve';
     nodes: INode[];
-}
-
-export interface BaseGraphData {
-    nodes: Map<string, INode>;
-    startNode: INode | null;
-    endNode: INode | null;
-}
-
-export interface GridViewData extends BaseGraphData {
-    rows: number;
-    cols: number;
-    cellSize: number;
-}
-
-export interface MapViewData extends BaseGraphData {
-    zoom: number;
-    center: { lat: number; lon: number };
-    bounds: { north: number; south: number; east: number; west: number };
-}
-
-export type ViewData = GridViewData | MapViewData;
-
-export interface VisualizationState {
-    mode: VisualizationMode;
-    animationState: AnimationState;
-    result: string;
-}
-
-export interface VisualizationHookProps {
-    speed: Speed;
-    uiState: VisualizationState;
-    graph: IGraph;
-    onVisualizationStep: (step: AnimationStep) => Promise<void>;
-    onStateChange: (state: AnimationState) => void;
-    onResult: (result: string) => void;
-    onViewDataChange?: (newState: Partial<ViewData>) => void;
-}
-
-// Type guards
-export function isGridViewData(data: ViewData): data is GridViewData {
-    return 'cellSize' in data;
-}
-
-export function isMapViewData(data: ViewData): data is MapViewData {
-    return 'zoom' in data;
 }
 
 export function isGridNode(node: INode): node is IGridNode {
