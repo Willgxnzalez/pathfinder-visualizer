@@ -9,7 +9,7 @@ export function snapTo(step: number, value: number): number {
     return Math.floor(value / step) * step;
 }
 
-export function computeCellSizeBounds(container?: HTMLElement): { min: number; max: number; step: number, initial: number } {
+export function computeCellSizeBounds(container: HTMLElement): { min: number; max: number; step: number, initial: number } {
     const rect = container?.getBoundingClientRect();
     const width = rect?.width ?? window.innerWidth;
     const height = rect?.height ?? window.innerHeight;
