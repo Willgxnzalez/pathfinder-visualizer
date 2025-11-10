@@ -12,16 +12,16 @@ export interface ToolBarProps {
     selectedAlgorithm: Algorithm;
     selectedMazeGen?: MazeGenAlgo;
     speed: "slow" | "medium" | "fast";
-    cellSize: number;
-    cellMin: number;
-    cellMax: number;
-    cellStep: number;
+    nodeSize: number;
+    nodeMin: number;
+    nodeMax: number;
+    nodeStep: number;
     onRun: () => void;
     onReset: () => void;
     onAlgorithmChange: (algo: Algorithm) => void;
     onMazeGenChange?: (algo: MazeGenAlgo) => void;
     onSpeedChange: (s: "slow" | "medium" | "fast") => void;
-    onCellSizeChange: (size: number) => void;
+    onNodeSizeChange: (size: number) => void;
     isDrawing?: boolean;
 }
 
@@ -110,34 +110,19 @@ export default function ToolBar({
     selectedAlgorithm,
     selectedMazeGen,
     speed,
-    cellSize,
-    cellMin,
-    cellMax,
-    cellStep,
+    nodeSize,
+    nodeMin,
+    nodeMax,
+    nodeStep,
     onRun,
     onReset,
     onAlgorithmChange,
     onMazeGenChange,
     onSpeedChange,
-    onCellSizeChange,
+    onNodeSizeChange,
     isDrawing = false,
 }: ToolBarProps) {
     const isAnimating = animationState !== "idle";
-
-    const speedBtn = (s: "slow" | "medium" | "fast") => (
-        <button
-            key={s}
-            onClick={() => onSpeedChange(s)}
-            className={clsx(
-                "px-3 py-2 text-sm font-medium",
-                (speed === s)
-                    ? "text-text-main bg-surface-light"
-                    : "text-text-muted hover:bg-surface-light"
-            )}
-        >
-            {s}
-        </button>
-    );
 
     return (
         <div
@@ -202,15 +187,15 @@ export default function ToolBar({
                 </div>
                 <div className="flex flex-col">
                     <label className="text-text-muted mb-2">
-                        Cell Size: <span className="text-text-main">{cellSize}px</span>
+                        Node Size: <span className="text-text-main">{nodeSize}px</span>
                     </label>
                     <input
                         type="range"
-                        min={cellMin}
-                        max={cellMax}
-                        step={cellStep}
-                        value={cellSize}
-                        onChange={(e) => onCellSizeChange(Number(e.target.value))}
+                        min={nodeMin}
+                        max={nodeMax}
+                        step={nodeStep}
+                        value={nodeSize}
+                        onChange={(e) => onNodeSizeChange(Number(e.target.value))}
                         disabled={isAnimating}
                         className="accent-primary"
                     />

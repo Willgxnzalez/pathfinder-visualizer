@@ -5,14 +5,14 @@ import GridRenderer from "../models/GridRenderer";
 
 interface GridViewProps {
     grid: Grid;
-    cellSize: number;
+    nodeSize: number;
     onDrawingChange?: (drawing: boolean) => void;
     onRendererReady?: (renderer: GridRenderer) => void;
 }
 
 export default function GridView({
     grid,
-    cellSize,
+    nodeSize,
     onDrawingChange,
     onRendererReady
 }: GridViewProps) {
@@ -22,21 +22,20 @@ export default function GridView({
     // create once
     useEffect(() => {
         if (!containerRef.current) return;
-        const renderer = new GridRenderer(grid, cellSize);
+        const renderer = new GridRenderer(grid, nodeSize);
         renderer.mount(containerRef.current);
         onRendererReady?.(renderer);
         rendererRef.current = renderer;
         return () => renderer.destroy();
     }, []);
 
-    // update instead of remounting
     useEffect(() => {
-        rendererRef.current?.updateGrid(grid, cellSize);
-    }, [grid, cellSize]);
+        rendererRef.current?.updateGrid(grid, nodeSize);
+    }, [grid, nodeSize]);
 
     useEffect(() => {
-        rendererRef.current?.setCellSize(cellSize);
-    }, [cellSize]);
+        rendererRef.current?.setNodeSize(nodeSize);
+    }, [nodeSize]);
 
     const handleMouseDown = useCallback((e: React.MouseEvent) => {
         onDrawingChange?.(true);
@@ -74,9 +73,9 @@ export default function GridView({
     }, [onDrawingChange]);
 
     return (
-        <div
+        <div className="w-full h-full flex items-center justify-center overflow-hidden">
+          <div
             ref={containerRef}
-            className="w-full h-full relative select-none cursor-crosshair touch-none"
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
@@ -85,7 +84,9 @@ export default function GridView({
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
             onTouchCancel={handleTouchEnd}
-            onContextMenu={(e: React.MouseEvent) => e.preventDefault()}
-        />
-    );
+            onContextMenu={(e) => e.preventDefault()}
+          />
+        </div>
+      );
+      
 }

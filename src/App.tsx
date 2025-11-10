@@ -5,10 +5,10 @@ import Grid from './models/Grid';
 import GridRenderer from './models/GridRenderer';
 import usePathfinding from './hooks/usePathfinding';
 import {
-    computeCellSizeBounds,
+    computeNodeSizeBounds,
     computeDefaultStartEndNodes,
     getMajorGridInterval,
-    CELL_SIZE_STEP,
+    NODE_SIZE_STEP,
 } from './utils/gridHelpers';
 import type { Algorithm, Speed, AnimationState, AnimationStep } from './types';
 import { GridNode } from './models/Node';
@@ -17,10 +17,10 @@ export default function App() {
     const mainRef = useRef<HTMLDivElement>(null);
     const rendererRef = useRef<GridRenderer | null>(null);
 
-    const [cellSize, setCellSize] = useState(25);
-    const [cellMin, setCellMin] = useState(20);
-    const [cellMax, setCellMax] = useState(120);
-    const [cellStep, setCellStep] = useState(CELL_SIZE_STEP);
+    const [nodeSize, setNodeSize] = useState(25);
+    const [nodeMin, setNodeMin] = useState(20);
+    const [nodeMax, setNodeMax] = useState(120);
+    const [nodeStep, setNodeStep] = useState(NODE_SIZE_STEP);
 
 
     const [grid, setGrid] = useState<Grid | null>(null);
@@ -35,14 +35,14 @@ export default function App() {
         speedRef.current = speed;
     }, [speed])
 
-    // Compute cell size bounds on mount
+    // Compute node size bounds on mount
     useLayoutEffect(() => {
         if (!mainRef.current) return;
-        const { min, max, step, initial } = computeCellSizeBounds(mainRef.current);
-        setCellMin(min);
-        setCellMax(max);
-        setCellStep(step);
-        setCellSize(initial);
+        const { min, max, step, initial } = computeNodeSizeBounds(mainRef.current);
+        setNodeMin(min);
+        setNodeMax(max);
+        setNodeStep(step);
+        setNodeSize(initial);
     }, []);
 
     // Initialize grid on first layout
@@ -51,8 +51,8 @@ export default function App() {
         const rect = mainRef.current.getBoundingClientRect();
         if (rect.width < 5 || rect.height < 5) return;
 
-        const cols = Math.max(5, Math.floor(rect.width / cellSize));
-        const rows = Math.max(5, Math.floor(rect.height / cellSize));
+        const cols = Math.max(5, Math.floor(rect.width / nodeSize));
+        const rows = Math.max(5, Math.floor(rect.height / nodeSize));
         const newGrid = new Grid(rows, cols);
 
         const { startRow, startCol, endRow, endCol } = computeDefaultStartEndNodes(rows, cols);
@@ -61,10 +61,10 @@ export default function App() {
 
         setGrid(newGrid);
         if (rendererRef.current) {
-            rendererRef.current.updateGrid(newGrid, cellSize);
-            rendererRef.current.setMajorInterval(getMajorGridInterval(cellSize));
+            rendererRef.current.updateGrid(newGrid, nodeSize);
+            rendererRef.current.setMajorInterval(getMajorGridInterval(nodeSize));
         }
-    }, [cellSize]);
+    }, [nodeSize]);
 
     // Handle window resize
     useLayoutEffect(() => {
@@ -79,8 +79,8 @@ export default function App() {
                 if (rect.width < 5 || rect.height < 5) return;
 
                 setGrid((prev) => {
-                    const cols = Math.max(5, Math.floor(rect.width / cellSize));
-                    const rows = Math.max(5, Math.floor(rect.height / cellSize));
+                    const cols = Math.max(5, Math.floor(rect.width / nodeSize));
+                    const rows = Math.max(5, Math.floor(rect.height / nodeSize));
 
                     if (prev) {
                         const { rows: prow, cols: pcol } = prev.getDimensions();
@@ -101,14 +101,14 @@ export default function App() {
             ro.disconnect();
             clearTimeout(resizeTimeout);
         };
-    }, [cellSize, animationState]);
+    }, [nodeSize, animationState]);
 
-    const handleCellSizeChange = useCallback((newSize: number) => {
-        const snapped = Math.max(cellMin, Math.min(cellMax, newSize - (newSize % CELL_SIZE_STEP)));
-        setCellSize(snapped);
-        rendererRef.current?.setCellSize(snapped);
+    const handleNodeSizeChange = useCallback((newSize: number) => {
+        const snapped = Math.max(nodeMin, Math.min(nodeMax, newSize - (newSize % NODE_SIZE_STEP)));
+        setNodeSize(snapped);
+        rendererRef.current?.setNodeSize(snapped);
         rendererRef.current?.setMajorInterval(getMajorGridInterval(snapped));
-    }, [cellMin, cellMax]);
+    }, [nodeMin, nodeMax]);
 
     const pathfinding = usePathfinding(
         speedRef,
@@ -136,7 +136,7 @@ export default function App() {
         const { startRow, startCol, endRow, endCol } = computeDefaultStartEndNodes(rows, cols);
         grid.setStartNode(startRow, startCol);
         grid.setEndNode(endRow, endCol);
-        rendererRef.current?.updateAll();
+        //rendererRef.current?.updateAll();
         setAnimationState('idle');
         setResult('');
     }, [grid]);
@@ -147,32 +147,32 @@ export default function App() {
                 animationState={animationState}
                 selectedAlgorithm={algorithm}
                 speed={speed}
-                cellSize={cellSize}
-                cellMin={cellMin}
-                cellMax={cellMax}
-                cellStep={CELL_SIZE_STEP}
+                nodeSize={nodeSize}
+                nodeMin={nodeMin}
+                nodeMax={nodeMax}
+                nodeStep={NODE_SIZE_STEP}
                 onRun={pathfinding.animate}
                 onReset={handleReset}
                 onAlgorithmChange={setAlgorithm}
                 onSpeedChange={setSpeed}
-                onCellSizeChange={handleCellSizeChange}
+                onNodeSizeChange={handleNodeSizeChange}
                 isDrawing={isDrawing}
                 mapMode={false}
                 onDarkModeToggle={() => {}}
                 onMapModeToggle={() => {}}
             />
 
-            <main ref={mainRef} className="flex-1 relative" style={{ ['--cell-size' as string]: `${cellSize}px` }}>
+            <main ref={mainRef} className="flex-1 relative ">
                 {!grid && <div className="absolute inset-0 flex items-center justify-center">Loading grid...</div>}
                 {grid && (
                     <GridView
                         key={`${grid.getDimensions().rows}-${grid.getDimensions().cols}`}
                         grid={grid}
-                        cellSize={cellSize}
+                        nodeSize={nodeSize}
                         onDrawingChange={setIsDrawing}
                         onRendererReady={(renderer) => {
                             rendererRef.current = renderer;
-                            renderer.setMajorInterval(getMajorGridInterval(cellSize));
+                            renderer.setMajorInterval(getMajorGridInterval(nodeSize));
                         }}
                     />
                 )}

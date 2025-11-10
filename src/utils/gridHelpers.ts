@@ -1,4 +1,4 @@
-export const CELL_SIZE_STEP = 5;
+export const NODE_SIZE_STEP = 5;
 const MAJOR_GRID_PIXEL_INTERVAL = 150;
 const START_ROW_POSITION = 0.5;
 const START_COL_POSITION = 0.2;
@@ -9,7 +9,7 @@ export function snapTo(step: number, value: number): number {
     return Math.floor(value / step) * step;
 }
 
-export function computeCellSizeBounds(container: HTMLElement): { min: number; max: number; step: number, initial: number } {
+export function computeNodeSizeBounds(container: HTMLElement): { min: number; max: number; step: number, initial: number } {
     const rect = container?.getBoundingClientRect();
     const width = rect?.width ?? window.innerWidth;
     const height = rect?.height ?? window.innerHeight;
@@ -22,14 +22,14 @@ export function computeCellSizeBounds(container: HTMLElement): { min: number; ma
     const sizeForMaxDensity = Math.min(Math.floor(width / maxCols), Math.floor(height / maxRows));
     const sizeForMinDensity = Math.min(Math.floor(width / minCols), Math.floor(height / minRows));
 
-    const min = snapTo(CELL_SIZE_STEP, Math.max(12, Math.min(80, sizeForMaxDensity)));
-    const max = snapTo(CELL_SIZE_STEP, Math.max(min + CELL_SIZE_STEP, Math.min(220, sizeForMinDensity)));
+    const min = snapTo(NODE_SIZE_STEP, Math.max(12, Math.min(80, sizeForMaxDensity)));
+    const max = snapTo(NODE_SIZE_STEP, Math.max(min + NODE_SIZE_STEP, Math.min(220, sizeForMinDensity)));
     const midpoint = Math.floor((min + max) / 2);
-    return { min, max, step: CELL_SIZE_STEP, initial: midpoint };
+    return { min, max, step: NODE_SIZE_STEP, initial: midpoint };
 }
 
-export function getMajorGridInterval(cellSize: number) {
-    return Math.max(2, Math.round(MAJOR_GRID_PIXEL_INTERVAL / cellSize));
+export function getMajorGridInterval(nodeSize: number) {
+    return Math.max(2, Math.round(MAJOR_GRID_PIXEL_INTERVAL / nodeSize));
 }
 
 export function computeDefaultStartEndNodes(rows: number, cols: number): {
