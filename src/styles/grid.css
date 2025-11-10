@@ -1,12 +1,5 @@
 @layer components {
   /* === NODE STYLES === */
-  .node {
-    transition: 
-      background 0.15s cubic-bezier(0.4,0,0.2,1), 
-      box-shadow 0.15s cubic-bezier(0.4,0,0.2,1); 
-    background: transparent;
-  }
-
   .node-wall {
     background-color: var(--color-surface-light); 
   }
