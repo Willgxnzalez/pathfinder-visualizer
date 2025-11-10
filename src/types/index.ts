@@ -3,6 +3,7 @@ export type MazeAlgorithm = 'RecursiveBacktracking' | 'Prim' | 'Kruskal' | 'DFS'
 export type Speed = 'slow' | 'medium' | 'fast';
 export type AnimationState = 'idle' | 'running' | 'paused' | 'stepping';
 export type ViewMode = 'grid' | 'map';
+export type DrawMode = 'draw' | 'erase';
 
 export interface INode {
     id: string;
@@ -55,7 +56,7 @@ export interface MazeGenerationResult {
     nodesVisited: number;
     path: INode[];
     success: boolean;
-    cellsProcessed: INode[];
+    nodesProcessed: INode[];
 
 }
 
