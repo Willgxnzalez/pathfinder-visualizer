@@ -1,258 +1,242 @@
-// models/GridRenderer.ts
 import { GridNode } from "./Node";
-import Grid from "./Grid";
+import { DrawMode } from "../types";
+import GridGraph from "./Grid";
 
+/**
+ * GridRenderer handles DOM rendering for a Grid model.
+ * Only visible nodes are shown due to lazy rendering.
+ */
 export default class GridRenderer {
     private container: HTMLElement | null = null;
-    private cellElements: Map<string, HTMLElement> = new Map();
-    private grid: Grid;
-    private cellSize: number;
-    private majorInterval: number = 5;
+    private renderedNodes: Map<string, HTMLElement> = new Map();
+    private grid: GridGraph;
+    private nodeSize: number;
+    private majorInterval = 5;
 
-    // Input handling
-    private drawMode: 'wall' | 'erase' = 'wall';
+    private drawMode: DrawMode = 'draw';
     private isDrawing: boolean = false;
-    private draggedNode: GridNode | null = null;
     private isDraggingStartOrEnd: boolean = false;
+    private draggedNode: GridNode | null = null;
+    private lastCoords: { row: number; col: number } | null = null;
 
-    constructor(grid: Grid, cellSize: number = 25) {
+    constructor(grid: GridGraph, nodeSize = 25) {
         this.grid = grid;
-        this.cellSize = cellSize;
+        this.nodeSize = nodeSize;
     }
 
     mount(container: HTMLElement): void {
         this.container = container;
-        this.container.style.position = "relative";
-        this.container.style.userSelect = "none";
-        this.container.style.overflow = "hidden";
-        this.container.style.margin = "0";
-        this.container.style.padding = "0";
-        this.container.style.border = "0";
-        this.render();
+        this.container.className = "absolute w-full h-full top-1/2 left-1/2 -translate-1/2 select-none overflow-hidden m-0 p-0 border-none";
+        this.updateContainerSize();
+        this.updateBackgroundGrid();
+        this.renderStartAndEnd();
     }
 
     destroy(): void {
-        if (this.container) {
-            this.container.innerHTML = "";
-        }
-        this.cellElements.clear();
+        this.container?.replaceChildren();
+        this.renderedNodes.clear();
     }
 
-    // Called by App when grid changes
-    updateGrid(newGrid: Grid, newCellSize: number): void {
-        this.grid = newGrid;
-        this.cellSize = newCellSize;
-        this.render();
-    }
-
-    setCellSize(size: number): void {
-        this.cellSize = size;
-        if (this.container) {
-            this.container.style.setProperty("--cell-size", `${this.cellSize}px`);
-        }
-        this.updatePositions();
-    }
-
-    private render(): void {
+    private updateContainerSize(): void {
         if (!this.container) return;
-        this.container.innerHTML = "";
-        this.cellElements.clear();
-
-        for (const node of this.grid.nodes()) {
-            const el = this.createCell(node);
-            this.container.appendChild(el);
-            this.cellElements.set(node.id, el);
-        }
+        const { rows, cols } = this.grid.getDimensions();
+        this.container.style.width = `${cols * this.nodeSize}px`;
+        this.container.style.height = `${rows * this.nodeSize}px`;
     }
 
-    private createCell(node: GridNode): HTMLElement {
-        const el = document.createElement("div");
-        el.id = `cell-${node.id}`;
-        el.className = "node";
-        el.dataset.row = node.row.toString();
-        el.dataset.col = node.col.toString();
+    private updateBackgroundGrid(): void {
+        if (!this.container) return;
+        const major = this.majorInterval * this.nodeSize;
+        const minor = this.nodeSize;
+        const minorColor = "oklch(0.3 0.01 270 / 0.35)";
+        const majorColor = "oklch(0.3 0.01 270 / 0.8)";
 
-        Object.assign(el.style, {
-            position: "absolute",
-            width: `${this.cellSize}px`,
-            height: `${this.cellSize}px`,
-            left: `${node.col * this.cellSize}px`,
-            top: `${node.row * this.cellSize}px`,
-            boxSizing: "border-box",
-            cursor: (node.isStart || node.isEnd) ? 'grab' : 'crosshair',
+        Object.assign(this.container.style, {
+            backgroundImage: `
+                linear-gradient(90deg, ${majorColor} 2px, transparent 2px),
+                linear-gradient(${majorColor} 2px, transparent 2px),
+                linear-gradient(90deg, ${minorColor} 1px, transparent 1px),
+                linear-gradient(${minorColor} 1px, transparent 1px)
+            `,
+            backgroundSize: `
+                ${major}px ${minor}px,
+                ${minor}px ${major}px,
+                ${minor}px ${minor}px,
+                ${minor}px ${minor}px
+            `,
+            backgroundPosition: "0 0, 0 0, 0 0, 0 0",
         });
-
-        this.updateCell(node, el);
-        return el;
-    }
-
-    updateNode(node: GridNode): void {
-        const el = this.cellElements.get(node.id);
-        if (el) this.updateCell(node, el);
-    }
-
-    updateAll(): void {
-        for (const node of this.grid.nodes()) {
-            this.updateNode(node);
-        }
-    }
-
-    private updatePositions(): void {
-        for (const node of this.grid.nodes()) {
-            const el = this.cellElements.get(node.id);
-            if (el) {
-                el.style.width = `${this.cellSize}px`;
-                el.style.height = `${this.cellSize}px`;
-                el.style.left = `${node.col * this.cellSize}px`;
-                el.style.top = `${node.row * this.cellSize}px`;
-            }
-        }
-    }
-
-    private updateCell(node: GridNode, el: HTMLElement): void {
-        const classes = ["node"];
-
-        // Priority order: path > start/end > frontier > visited > wall
-        let state = "empty";
-        if (node.isPath) {
-            classes.push("node-path");
-            state = "path";
-        } else if (node.isStart) {
-            classes.push("node-start");
-            state = "start";
-        } else if (node.isEnd) {
-            classes.push("node-end");
-            state = "end";
-        } else if (node.isFrontier) {
-            classes.push("node-frontier");
-            state = "frontier";
-        } else if (node.isVisited) {
-            classes.push("node-visited");
-            state = "visited";
-        } else if (!node.isWalkable) {
-            classes.push("node-wall");
-            state = "wall";
-        }
-
-        el.className = classes.join(" ");
-        el.dataset.state = state;
-        el.style.cursor = (node.isStart || node.isEnd) ? 'grab' : 'crosshair';
-
-        el.style.border = "";
-        el.style.borderLeft = "";
-        el.style.borderTop = "";
-
-        if (node.isWalkable && !node.isStart && !node.isEnd && !node.isVisited && !node.isFrontier && !node.isPath) {
-            const isMajorRow = node.row % this.majorInterval === 0;
-            const isMajorCol = node.col % this.majorInterval === 0;
-            const minorColor = 'oklch(0.3 0.01 270 / 0.35)';
-            const majorColor = 'oklch(0.3 0.01 270 / 0.8)';
-
-            if (node.col > 0) {
-                el.style.borderLeft = `1px solid ${isMajorCol ? majorColor : minorColor}`;
-            }
-            if (node.row > 0) {
-                el.style.borderTop = `1px solid ${isMajorRow ? majorColor : minorColor}`;
-            }
-        }
     }
 
     setMajorInterval(interval: number): void {
         this.majorInterval = interval;
-        this.updateAll();
+        this.updateBackgroundGrid();
     }
 
-    // ============ Input Handling ============
+    private renderStartAndEnd(): void {
+        const start = this.grid.getStartNode();
+        const end = this.grid.getEndNode();
+        start && this.addNodeElement(start);
+        end && this.addNodeElement(end);
+    }
+
+    private addNodeElement(node: GridNode): void {
+        if (!this.container || this.renderedNodes.has(node.id)) return;
+        const el = document.createElement("div");
+        el.id = `node-${node.id}`;
+        el.dataset.id = node.id;
+        el.className = this.getNodeClass(node);
+        Object.assign(el.style, {
+            position: "absolute",
+            width: `${this.nodeSize}px`,
+            height: `${this.nodeSize}px`,
+            left: `${node.col * this.nodeSize}px`,
+            top: `${node.row * this.nodeSize}px`,
+            zIndex: "10",
+        });
+        this.container.appendChild(el);
+        this.renderedNodes.set(node.id, el);
+    }
+
+    private removeNodeElement(node: GridNode): void {
+        this.renderedNodes.get(node.id)?.remove();
+        this.renderedNodes.delete(node.id);
+    }
+
+    private getNodeClass(node: GridNode): string {
+        if (node.isStart) return "node node-start";
+        if (node.isEnd) return "node node-end";
+        if (!node.isWalkable) return "node node-wall";
+        if (node.isPath) return "node node-path";
+        if (node.isFrontier) return "node node-frontier";
+        if (node.isVisited) return "node node-visited";
+        return "node";
+    }
+
+    updateNode(node: GridNode): void {
+        const el = this.renderedNodes.get(node.id);
+        if (el) {
+            el.className = this.getNodeClass(node);
+            el.style.left = `${node.col * this.nodeSize}px`;
+            el.style.top = `${node.row * this.nodeSize}px`;
+        } else {
+            this.addNodeElement(node);
+        }
+    }
+
+    setNodeSize(size: number): void {
+        this.nodeSize = size;
+        for (const [id, el] of this.renderedNodes) {
+            const node = this.grid.getNodeById(id);
+            if (node) {
+                el.style.width = `${size}px`;
+                el.style.height = `${size}px`;
+                el.style.left = `${node.col * size}px`;
+                el.style.top = `${node.row * size}px`;
+            }
+        }
+        this.updateBackgroundGrid();
+    }
+
+    updateGrid(newGrid: GridGraph, newSize: number): void {
+        this.grid = newGrid;
+        this.nodeSize = newSize;
+        this.renderedNodes.clear();
+        this.container?.replaceChildren();
+        this.renderStartAndEnd();
+        this.updateBackgroundGrid();
+    }
 
     private getGridCoordinates(x: number, y: number): { row: number; col: number } | null {
         if (!this.container) return null;
-
         const rect = this.container.getBoundingClientRect();
-        const relx = x - rect.left;
-        const rely = y - rect.top;
-
-        const row = Math.floor(rely / this.cellSize);
-        const col = Math.floor(relx / this.cellSize);
-
-        if (row >= 0 && row < this.grid.getDimensions().rows && col >= 0 && col < this.grid.getDimensions().cols) {
-            return { row, col };
-        }
-        return null;
+        const row = Math.floor((y - rect.top) / this.nodeSize);
+        const col = Math.floor((x - rect.left) / this.nodeSize);
+        const { rows, cols } = this.grid.getDimensions();
+        return row >= 0 && row < rows && col >= 0 && col < cols ? { row, col } : null;
     }
 
-    handleMouseDown(x: number, y: number, makeStartNode: boolean = false, makeEndNode: boolean = false): void {
+    private drawOrErase(node: GridNode): void {
+        const shouldBeWalkable = this.drawMode === "erase";
+        if (node.isWalkable !== shouldBeWalkable) {
+            this.grid.setNodeWalkable(node, shouldBeWalkable);
+            shouldBeWalkable ? this.removeNodeElement(node) : this.updateNode(node);
+        }
+    }
+
+    private interpolateAndDraw(from: { row: number; col: number }, to: { row: number; col: number }): void {
+        const dx = to.col - from.col;
+        const dy = to.row - from.row;
+        const steps = Math.ceil(Math.sqrt(dx * dx + dy * dy)) + 1;
+        for (let i = 0; i <= steps; i++) {
+            const t = i / steps;
+            const row = Math.round(from.row + dy * t);
+            const col = Math.round(from.col + dx * t);
+            const node = this.grid.getNode(row, col);
+            if (node && !node.isStart && !node.isEnd) this.drawOrErase(node);
+        }
+    }
+
+    handleMouseDown(x: number, y: number, makeStart = false, makeEnd = false): void {
         const coords = this.getGridCoordinates(x, y);
         if (!coords) return;
-
         const node = this.grid.getNode(coords.row, coords.col);
         if (!node) return;
 
         if (node.isStart || node.isEnd) {
             this.draggedNode = node;
             this.isDraggingStartOrEnd = true;
-            const element = this.cellElements.get(node.id);
-            if (element) element.style.cursor = 'grabbing';
             return;
         }
-
-        if (makeStartNode) {
+        if (makeStart) {
+            this.removeNodeElement(this.grid.getStartNode()!);
             this.grid.setStartNode(coords.row, coords.col);
-            this.updateNode(node as GridNode);
+            this.updateNode(this.grid.getStartNode()!);
             return;
         }
-
-        if (makeEndNode) {
+        if (makeEnd) {
+            this.removeNodeElement(this.grid.getEndNode()!);
             this.grid.setEndNode(coords.row, coords.col);
-            this.updateNode(node as GridNode);
+            this.updateNode(this.grid.getEndNode()!);
             return;
         }
-
         this.isDrawing = true;
-        this.drawMode = node.isWalkable ? 'wall' : 'erase';
-        this.grid.setNodeWalkable(node, this.drawMode === 'erase');
-        this.updateNode(node as GridNode);
+        this.drawMode = node.isWalkable ? 'draw' : 'erase';
+        this.drawOrErase(node);
+        this.lastCoords = coords;
     }
 
     handleMouseMove(x: number, y: number): void {
         const coords = this.getGridCoordinates(x, y);
         if (!coords) return;
 
-        const node = this.grid.getNode(coords.row, coords.col);
-        if (!node) return;
-
         if (this.isDraggingStartOrEnd && this.draggedNode) {
-            if (node.isWalkable && !node.isStart && !node.isEnd) {
-                const isStart = this.draggedNode.isStart;
-                if (isStart) {
-                    this.grid.setStartNode(coords.row, coords.col);
-                    this.updateNode(this.draggedNode as GridNode);
-                    this.draggedNode = this.grid.getStartNode() as GridNode;
-                    this.updateNode(this.draggedNode);
-                } else {
-                    this.grid.setEndNode(coords.row, coords.col);
-                    this.updateNode(this.draggedNode as GridNode);
-                    this.draggedNode = this.grid.getEndNode() as GridNode;
-                    this.updateNode(this.draggedNode);
-                }
-            }
+            const node = this.grid.getNode(coords.row, coords.col);
+            if (!node || !node.isWalkable || node.isStart || node.isEnd) return;
+            const isStart = this.draggedNode.isStart;
+            this.removeNodeElement(this.draggedNode);
+
+            isStart
+                ? this.grid.setStartNode(coords.row, coords.col)
+                : this.grid.setEndNode(coords.row, coords.col);
+
+            this.draggedNode = isStart
+                ? this.grid.getStartNode()
+                : this.grid.getEndNode();
+
+            this.updateNode(this.draggedNode!);
             return;
         }
-        if (!this.isDrawing || node.isStart || node.isEnd) return;
 
-        const shouldBeWalkable = this.drawMode === 'erase';
-        if (node.isWalkable !== shouldBeWalkable) {
-            this.grid.setNodeWalkable(node, shouldBeWalkable);
-            this.updateNode(node as GridNode);
-        }
+        if (!this.isDrawing) return;
+        if (this.lastCoords) this.interpolateAndDraw(this.lastCoords, coords);
+        this.lastCoords = coords;
     }
 
     handleMouseUp(): void {
         this.isDrawing = false;
-        if (this.draggedNode) {
-            const element = this.cellElements.get(this.draggedNode.id);
-            if (element) element.style.cursor = 'grab';
-            this.draggedNode = null;
-        }
         this.isDraggingStartOrEnd = false;
+        this.draggedNode = null;
+        this.lastCoords = null;
     }
 }
