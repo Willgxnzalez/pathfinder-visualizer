@@ -46,27 +46,79 @@ export default class GridRenderer {
 
     private updateBackgroundGrid(): void {
         if (!this.container) return;
-        const major = this.majorInterval * this.nodeSize;
-        const minor = this.nodeSize;
-        const minorColor = "oklch(0.3 0.01 270 / 0.35)";
-        const majorColor = "oklch(0.3 0.01 270 / 0.8)";
 
-        Object.assign(this.container.style, {
-            backgroundImage: `
-                linear-gradient(90deg, ${majorColor} 2px, transparent 2px),
-                linear-gradient(${majorColor} 2px, transparent 2px),
-                linear-gradient(90deg, ${minorColor} 1px, transparent 1px),
-                linear-gradient(${minorColor} 1px, transparent 1px)
-            `,
-            backgroundSize: `
-                ${major}px ${minor}px,
-                ${minor}px ${major}px,
-                ${minor}px ${minor}px,
-                ${minor}px ${minor}px
-            `,
-            backgroundPosition: "0 0, 0 0, 0 0, 0 0",
-        });
+        const minorLineThickness = 1; // px
+        const majorLineThickness = 2; // px
+
+        // Remove any existing grid SVG
+        const oldSvg = this.container.querySelector('svg.grid-background');
+        if (oldSvg) oldSvg.remove();
+
+        const { rows, cols } = this.grid.getDimensions();
+        const width = cols * this.nodeSize;
+        const height = rows * this.nodeSize;
+
+        // === SVG Root ===
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.classList.add(
+            'grid-background',
+            'absolute',
+            'inset-0',
+            'w-full',
+            'h-full',
+            'pointer-events-none',
+            'select-none'
+        );
+        svg.setAttribute('width', width.toString());
+        svg.setAttribute('height', height.toString());
+        svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+        svg.setAttribute('shape-rendering', 'crispEdges'); // make 1px lines sharp
+
+        const addLine = (
+            x1: number,
+            y1: number,
+            x2: number,
+            y2: number,
+            color: string,
+            thickness: number
+        ) => {
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x1.toString());
+            line.setAttribute('y1', y1.toString());
+            line.setAttribute('x2', x2.toString());
+            line.setAttribute('y2', y2.toString());
+            line.setAttribute('stroke', color);
+            line.setAttribute('stroke-width', thickness.toString());
+            svg.appendChild(line);
+        };
+
+        // === Minor grid lines ===
+        const minorLineColor = 'var(--color-grid-minor)';
+        for (let col = 1; col < cols; col++) {
+            const x = col * this.nodeSize + 0.5;
+            addLine(x, 0, x, height, minorLineColor, minorLineThickness);
+        }
+        for (let row = 1; row < rows; row++) {
+            const y = row * this.nodeSize + 0.5;
+            addLine(0, y, width, y, minorLineColor, minorLineThickness);
+        }
+
+        // === Major grid lines ===
+        const majorLineColor = 'var(--color-grid-major)';
+        for (let col = this.majorInterval; col < cols; col += this.majorInterval) {
+            const x = col * this.nodeSize + 0.5;
+            addLine(x, 0, x, height, majorLineColor, majorLineThickness);
+        }
+        for (let row = this.majorInterval; row < rows; row += this.majorInterval) {
+            const y = row * this.nodeSize + 0.5;
+            addLine(0, y, width, y, majorLineColor, majorLineThickness);
+        }
+
+        // Mount SVG behind nodes
+        this.container.prepend(svg);
     }
+    
+    
 
     setMajorInterval(interval: number): void {
         this.majorInterval = interval;
@@ -104,12 +156,12 @@ export default class GridRenderer {
     }
 
     private getNodeClass(node: GridNode): string {
-        if (node.isStart) return "node node-start";
-        if (node.isEnd) return "node node-end";
-        if (!node.isWalkable) return "node node-wall";
-        if (node.isPath) return "node node-path";
-        if (node.isFrontier) return "node node-frontier";
-        if (node.isVisited) return "node node-visited";
+        if (node.isStart) return "node-start";
+        if (node.isEnd) return "node-end";
+        if (!node.isWalkable) return "node-wall";
+        if (node.isPath) return "node-path";
+        if (node.isFrontier) return "node-frontier";
+        if (node.isVisited) return "node-visited";
         return "node";
     }
 
