@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { ChevronDownIcon } from '@heroicons/react/24/solid';
-import { Algorithm, AnimationState } from "../types";
+import { Algorithm, AnimationState, Speed } from "../types";
 import clsx from "clsx";
 
 const MAZE_GEN_ALGOS = ["random", "recursive-division", "prim", "eller", "kruskal"] as const;
@@ -11,7 +11,7 @@ export interface ToolBarProps {
     animationState: AnimationState;
     selectedAlgorithm: Algorithm;
     selectedMazeGen?: MazeGenAlgo;
-    speed: "slow" | "medium" | "fast";
+    speed: Speed;
     nodeSize: number;
     nodeMin: number;
     nodeMax: number;
@@ -20,7 +20,7 @@ export interface ToolBarProps {
     onReset: () => void;
     onAlgorithmChange: (algo: Algorithm) => void;
     onMazeGenChange?: (algo: MazeGenAlgo) => void;
-    onSpeedChange: (s: "slow" | "medium" | "fast") => void;
+    onSpeedChange: (s: Speed) => void;
     onNodeSizeChange: (size: number) => void;
     isDrawing?: boolean;
 }
@@ -169,7 +169,7 @@ export default function ToolBar({
                 <div className="flex flex-col">
                     <label className="text-sm text-text-muted mb-2">Speed</label>
                     <div className="flex rounded-lg overflow-hidden border border-bdr">
-                        {(["slow", "medium", "fast"] as const).map((s: "slow" | "medium" | "fast") => (
+                        {(["slow", "medium", "fast"] as const).map((s: Speed) => (
                             <button
                                 key={s}
                                 onClick={() => onSpeedChange(s)}
