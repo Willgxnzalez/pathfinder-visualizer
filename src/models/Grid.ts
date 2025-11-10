@@ -1,4 +1,4 @@
-import { IGraph, INode, isGridNode } from "../types";
+import { IGraph, isGridNode } from "../types";
 import { GridNode } from "./Node";
 
 export default class GridGraph implements IGraph {
@@ -33,7 +33,7 @@ export default class GridGraph implements IGraph {
         return null;
     }
 
-    getNodeById(id: string) {
+    getNodeById(id: string): GridNode | null {
         const [rowStr, colStr] = id.split("-");
         const row = Number(rowStr);
         const col = Number(colStr);
@@ -46,28 +46,28 @@ export default class GridGraph implements IGraph {
     }
 
     // IGraph
-    getStartNode(): INode | null { return this.startNode; }
+    getStartNode(): GridNode | null { return this.startNode; }
 
-    getEndNode(): INode | null { return this.endNode; }
+    getEndNode(): GridNode | null { return this.endNode; }
 
-    getNeighbors(node: INode): INode[] {
+    getNeighbors(node: GridNode): GridNode[] {
         if (!isGridNode(node)) return [];
         const dirs = [
-            [-1, 0], // up
-            [1, 0],  // down
-            [0, -1], // left
-            [0, 1],  // right
+            [-1, 0], [1, 0], [0, -1], [0, 1]
         ];
-        return dirs
-            .map(([dr, dc]) => this.getNode((node as any).row + dr, (node as any).col + dc))
-            .filter((n): n is GridNode => !!n && n.isWalkable);
+        const neighbors: GridNode[] = [];
+        for (const [dr, dc] of dirs) {
+            const n = this.getNode(node.row + dr, node.col + dc);
+            if (n && n.isWalkable) neighbors.push(n);
+        }
+        return neighbors;
     }
 
-    getDistance(from: INode, to: INode): number {
+    getDistance(from: GridNode, to: GridNode): number {
         return 1;
     }
 
-    getHeuristic(from: INode, to: INode): number {
+    getHeuristic(from: GridNode, to: GridNode): number {
         if (isGridNode(from) && isGridNode(to)) {
             return Math.abs(from.row - to.row) + Math.abs(from.col - to.col);
         }
@@ -98,7 +98,7 @@ export default class GridGraph implements IGraph {
         node.isWalkable = true;
     }
 
-    setNodeWalkable(node: INode, walkable: boolean): void {
+    setNodeWalkable(node: GridNode, walkable: boolean): void {
         if (node.isStart || node.isEnd) return;
         node.isWalkable = walkable;
     }
