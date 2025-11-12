@@ -26,7 +26,6 @@ export default class GridRenderer {
 
     mount(container: HTMLElement): void {
         this.container = container;
-        this.container.className = "absolute w-full h-full top-1/2 left-1/2 -translate-1/2 select-none overflow-hidden m-0 p-0 border-none";
         this.updateContainerSize();
         this.updateBackgroundGrid();
         this.renderStartAndEnd();

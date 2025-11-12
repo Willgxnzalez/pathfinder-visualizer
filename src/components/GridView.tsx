@@ -73,8 +73,8 @@ export default function GridView({
     }, [onDrawingChange]);
 
     return (
-        <div className="w-full h-full flex items-center justify-center overflow-hidden">
-          <div
+        <div
+            className="absolute w-full h-full top-1/2 left-1/2 -translate-1/2 select-none overflow-hidden m-0 p-0 border-none"
             ref={containerRef}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
@@ -85,8 +85,7 @@ export default function GridView({
             onTouchEnd={handleTouchEnd}
             onTouchCancel={handleTouchEnd}
             onContextMenu={(e) => e.preventDefault()}
-          />
-        </div>
+        />
       );
       
 }

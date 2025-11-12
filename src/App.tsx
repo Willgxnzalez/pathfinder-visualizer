@@ -162,7 +162,7 @@ export default function App() {
                 onMapModeToggle={() => {}}
             />
 
-            <main ref={mainRef} className="flex-1 relative ">
+            <main ref={mainRef} className="flex-1 relative">
                 {!grid && <div className="absolute inset-0 flex items-center justify-center">Loading grid...</div>}
                 {grid && (
                     <GridView
