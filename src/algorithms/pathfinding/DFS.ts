@@ -1,4 +1,4 @@
-import { IGraph, INode, AnimationStep, PathfindingResult } from "../../types";
+import { IGraph, INode, AnimationStep, PathfindingResult } from '../../types';
 
 export default function* DFS(graph: IGraph): Generator<AnimationStep, PathfindingResult, unknown> {
     const start = graph.getStartNode();

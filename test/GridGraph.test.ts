@@ -1,7 +1,7 @@
-import { expect, test } from "vitest"
-import GridGraph from "../src/models/Grid";
+import { expect, test } from 'vitest'
+import GridGraph from '../src/models/Grid';
 
-test("GridGraph creates grid and nodes correctly", () => {
+test('GridGraph creates grid and nodes correctly', () => {
     const rows = 5;
     const cols = 4;
     const graph = new GridGraph(rows, cols);
@@ -21,7 +21,7 @@ test("GridGraph creates grid and nodes correctly", () => {
     }
 });
 
-test("GridGraph getNode(row, col) returns correct node", () => {
+test('GridGraph getNode(row, col) returns correct node', () => {
     const graph = new GridGraph(6, 7);
     const node = graph.getNode(2, 3);
     expect(node).toBeDefined();
@@ -35,7 +35,7 @@ test("GridGraph getNode(row, col) returns correct node", () => {
     expect(graph.getNode(0, 99)).toBeNull();
 });
 
-test("GridGraph setNodeWalkable sets walkable correctly", () => {
+test('GridGraph setNodeWalkable sets walkable correctly', () => {
     const graph = new GridGraph(4, 4);
     const node = graph.getNode(1, 2)!;
     expect(node.isWalkable).toBe(true);
@@ -47,12 +47,12 @@ test("GridGraph setNodeWalkable sets walkable correctly", () => {
     expect(node.isWalkable).toBe(true);
 });
 
-test("GridGraph getDimensions returns correct size", () => {
+test('GridGraph getDimensions returns correct size', () => {
     const graph = new GridGraph(12, 34);
     expect(graph.getDimensions()).toEqual({ rows: 12, cols: 34 });
 });
 
-test("GridGraph node iteration returns correct nodes", () => {
+test('GridGraph node iteration returns correct nodes', () => {
     const graph = new GridGraph(3, 5);
     for (let r = 0; r < 3; r++) {
         for (let c = 0; c < 5; c++) {
@@ -64,7 +64,7 @@ test("GridGraph node iteration returns correct nodes", () => {
     }
 });
 
-test("GridGraph start/end setters", () => {
+test('GridGraph start/end setters', () => {
     const graph = new GridGraph(3, 3);
 
     // Set as start
@@ -77,21 +77,21 @@ test("GridGraph start/end setters", () => {
     graph.setStartNode(2, 2);
     expect(node.isStart).toBe(false);
     expect(graph.getNode(2, 2)!.isStart).toBe(true);
-    expect(graph.getStartNode()!.id).toBe("2-2");
+    expect(graph.getStartNode()!.id).toBe('2-2');
 
     // Do similarly for end
     graph.setEndNode(0, 2);
     let endNode = graph.getNode(0, 2)!;
     expect(endNode.isEnd).toBe(true);
-    expect(graph.getEndNode()!.id).toBe("0-2");
+    expect(graph.getEndNode()!.id).toBe('0-2');
 
     graph.setEndNode(2, 0);
     expect(endNode.isEnd).toBe(false);
     expect(graph.getNode(2, 0)!.isEnd).toBe(true);
-    expect(graph.getEndNode()!.id).toBe("2-0");
+    expect(graph.getEndNode()!.id).toBe('2-0');
 });
 
-test("GridGraph does not set wall on start or end", () => {
+test('GridGraph does not set wall on start or end', () => {
     const graph = new GridGraph(2, 2);
     graph.setStartNode(1, 0);
     graph.setEndNode(1, 1);
@@ -107,7 +107,7 @@ test("GridGraph does not set wall on start or end", () => {
     expect(graph.getNode(0, 0)!.isWalkable).toBe(false);
 });
 
-test("GridGraph.getNeighbors returns walkable neighbors only", () => {
+test('GridGraph.getNeighbors returns walkable neighbors only', () => {
     const graph = new GridGraph(3, 3);
     const target1 = graph.getNode(1, 1)!;
     graph.setNodeWalkable(target1, false);
@@ -116,22 +116,22 @@ test("GridGraph.getNeighbors returns walkable neighbors only", () => {
     const node10 = graph.getNode(1, 0)!;
     const neighbors = graph.getNeighbors(node10);
     const neighborIds = neighbors.map((n: any) => n.id);
-    expect(neighborIds).toContain("0-0");
-    expect(neighborIds).toContain("2-0");
-    expect(neighborIds).not.toContain("1-1");
+    expect(neighborIds).toContain('0-0');
+    expect(neighborIds).toContain('2-0');
+    expect(neighborIds).not.toContain('1-1');
 
     // Make (1,0) not walkable, check (1,1)'s neighbors returns only walkables
     graph.setNodeWalkable(node10, false);
     const node11 = graph.getNode(1, 1)!;
     const neighbors2 = graph.getNeighbors(node11);
     const neighborIds2 = neighbors2.map((n: any) => n.id);
-    expect(neighborIds2).toContain("0-1");
-    expect(neighborIds2).toContain("2-1");
-    expect(neighborIds2).toContain("1-2");
-    expect(neighborIds2).not.toContain("1-0");
+    expect(neighborIds2).toContain('0-1');
+    expect(neighborIds2).toContain('2-1');
+    expect(neighborIds2).toContain('1-2');
+    expect(neighborIds2).not.toContain('1-0');
 });
 
-test("GridGraph.getNode(row, col) returns undefined out of bounds", () => {
+test('GridGraph.getNode(row, col) returns undefined out of bounds', () => {
     const graph = new GridGraph(2, 2);
     expect(graph.getNode(-1, 0)).toBeNull();
     expect(graph.getNode(0, -1)).toBeNull();

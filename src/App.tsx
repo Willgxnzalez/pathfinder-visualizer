@@ -136,13 +136,13 @@ export default function App() {
         const { startRow, startCol, endRow, endCol } = computeDefaultStartEndNodes(rows, cols);
         grid.setStartNode(startRow, startCol);
         grid.setEndNode(endRow, endCol);
-        //rendererRef.current?.updateAll();
+        rendererRef.current?.updateAllNodes();
         setAnimationState('idle');
         setResult('');
     }, [grid]);
 
     return (
-        <div className="w-screen h-screen bg-surface-dark flex flex-col text-text-main overflow-hidden">
+        <div className='w-screen h-screen bg-surface-dark flex flex-col text-text-main overflow-hidden'>
             <Header
                 animationState={animationState}
                 selectedAlgorithm={algorithm}
@@ -162,8 +162,8 @@ export default function App() {
                 onMapModeToggle={() => {}}
             />
 
-            <main ref={mainRef} className="flex-1 relative ">
-                {!grid && <div className="absolute inset-0 flex items-center justify-center">Loading grid...</div>}
+            <main ref={mainRef} className='flex-1 relative'>
+                {!grid && <div className='absolute inset-0 flex items-center justify-center'>Loading grid...</div>}
                 {grid && (
                     <GridView
                         key={`${grid.getDimensions().rows}-${grid.getDimensions().cols}`}
@@ -179,21 +179,21 @@ export default function App() {
             </main>
 
             {animationState !== 'idle' && (
-                <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex gap-4 px-8 py-4 rounded-2xl glass shadow-lg border border-bdr bg-surface/90 backdrop-blur-lg">
-                    <button onClick={pathfinding.handleStop} className="px-7 py-3 bg-warning hover:bg-warning-dark text-text-main font-bold rounded-xl transition border border-bdr shadow active:scale-95">
+                <div className='fixed bottom-4 left-1/2 -translate-x-1/2 flex gap-4 px-8 py-4 rounded-2xl glass shadow-lg border border-bdr bg-surface/90 backdrop-blur-lg'>
+                    <button onClick={pathfinding.handleStop} className='px-7 py-3 bg-warning hover:bg-warning-dark text-text-main font-bold rounded-xl transition border border-bdr shadow active:scale-95'>
                         STOP
                     </button>
-                    <button onClick={pathfinding.handlePlayPause} className="px-7 py-3 bg-accent hover:bg-accent-dark text-text-main font-bold rounded-xl transition border border-bdr shadow active:scale-95">
+                    <button onClick={pathfinding.handlePlayPause} className='px-7 py-3 bg-accent hover:bg-accent-dark text-text-main font-bold rounded-xl transition border border-bdr shadow active:scale-95'>
                         PLAY/PAUSE
                     </button>
-                    <button onClick={pathfinding.handleStep} className="px-7 py-3 bg-purple-700 hover:bg-purple-800 text-text-main font-bold rounded-xl transition border border-bdr shadow active:scale-95">
+                    <button onClick={pathfinding.handleStep} className='px-7 py-3 bg-purple-700 hover:bg-purple-800 text-text-main font-bold rounded-xl transition border border-bdr shadow active:scale-95'>
                         STEP
                     </button>
                 </div>
             )}
 
             {result && (
-                <div className="fixed bottom-24 left-1/2 -translate-x-1/2 px-8 py-4 rounded-2xl glass shadow-xl border border-bdr bg-surface/90 backdrop-blur-lg text-lg font-semibold text-text-main min-w-56 text-center">
+                <div className='fixed bottom-24 left-1/2 -translate-x-1/2 px-8 py-4 rounded-2xl glass shadow-xl border border-bdr bg-surface/90 backdrop-blur-lg text-lg font-semibold text-text-main min-w-56 text-center'>
                     {result}
                 </div>
             )}

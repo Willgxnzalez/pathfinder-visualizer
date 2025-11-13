@@ -1,4 +1,4 @@
-import { INode, IEdge } from "../types";
+import { INode, IEdge } from '../types';
 
 export default class Edge implements IEdge {
     from: INode;

@@ -1,5 +1,5 @@
-import { IGraph, INode, AnimationStep, PathfindingResult } from "../../types"
-import MinHeap from "../../utils/MinHeap";
+import { IGraph, INode, AnimationStep, PathfindingResult } from '../../types'
+import MinHeap from '../../utils/MinHeap';
 
 export default function* Dijkstra(graph: IGraph): Generator<AnimationStep, PathfindingResult, unknown> {
     const start = graph.getStartNode();

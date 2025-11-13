@@ -1,6 +1,6 @@
-import { GridNode } from "./Node";
-import { DrawMode } from "../types";
-import GridGraph from "./Grid";
+import { GridNode } from './Node';
+import { DrawMode } from '../types';
+import GridGraph from './Grid';
 
 /**
  * GridRenderer handles DOM rendering for a Grid model.
@@ -8,7 +8,7 @@ import GridGraph from "./Grid";
  */
 export default class GridRenderer {
     private container: HTMLElement | null = null;
-    private renderedNodes: Map<string, HTMLElement> = new Map();
+    private renderedNodes: Map<GridNode, HTMLElement> = new Map();
     private grid: GridGraph;
     private nodeSize: number;
     private majorInterval = 5;
@@ -26,7 +26,6 @@ export default class GridRenderer {
 
     mount(container: HTMLElement): void {
         this.container = container;
-        this.container.className = "absolute w-full h-full top-1/2 left-1/2 -translate-1/2 select-none overflow-hidden m-0 p-0 border-none";
         this.updateContainerSize();
         this.updateBackgroundGrid();
         this.renderStartAndEnd();
@@ -117,8 +116,6 @@ export default class GridRenderer {
         // Mount SVG behind nodes
         this.container.prepend(svg);
     }
-    
-    
 
     setMajorInterval(interval: number): void {
         this.majorInterval = interval;
@@ -133,53 +130,60 @@ export default class GridRenderer {
     }
 
     private addNodeElement(node: GridNode): void {
-        if (!this.container || this.renderedNodes.has(node.id)) return;
-        const el = document.createElement("div");
+        if (!this.container || this.renderedNodes.has(node)) return;
+        const el = document.createElement('div');
         el.id = `node-${node.id}`;
         el.dataset.id = node.id;
         el.className = this.getNodeClass(node);
         Object.assign(el.style, {
-            position: "absolute",
+            position: 'absolute',
             width: `${this.nodeSize}px`,
             height: `${this.nodeSize}px`,
             left: `${node.col * this.nodeSize}px`,
             top: `${node.row * this.nodeSize}px`,
-            zIndex: "10",
+            zIndex: '10',
         });
         this.container.appendChild(el);
-        this.renderedNodes.set(node.id, el);
+        this.renderedNodes.set(node, el);
     }
 
     private removeNodeElement(node: GridNode): void {
-        this.renderedNodes.get(node.id)?.remove();
-        this.renderedNodes.delete(node.id);
+        this.renderedNodes.get(node)?.remove();
+        this.renderedNodes.delete(node);
     }
 
     private getNodeClass(node: GridNode): string {
-        if (node.isStart) return "node-start";
-        if (node.isEnd) return "node-end";
-        if (!node.isWalkable) return "node-wall";
-        if (node.isPath) return "node-path";
-        if (node.isFrontier) return "node-frontier";
-        if (node.isVisited) return "node-visited";
-        return "node";
+        if (node.isStart) return 'node-start';
+        if (node.isEnd) return 'node-end';
+        if (!node.isWalkable) return 'node-wall';
+        if (node.isPath) return 'node-path';
+        if (node.isFrontier) return 'node-frontier';
+        if (node.isVisited) return 'node-visited';
+        return 'empty';
     }
 
     updateNode(node: GridNode): void {
-        const el = this.renderedNodes.get(node.id);
+        const el = this.renderedNodes.get(node);
         if (el) {
-            el.className = this.getNodeClass(node);
-            el.style.left = `${node.col * this.nodeSize}px`;
-            el.style.top = `${node.row * this.nodeSize}px`;
+            const nodeClass = this.getNodeClass(node);
+            if (nodeClass === 'empty')  {
+                this.removeNodeElement(node);
+            }
+            el.className = nodeClass;
         } else {
             this.addNodeElement(node);
         }
     }
 
+    updateAllNodes(): void {
+        for (const [node, el] of this.renderedNodes) {
+            this.updateNode(node);
+        }
+    }
+
     setNodeSize(size: number): void {
         this.nodeSize = size;
-        for (const [id, el] of this.renderedNodes) {
-            const node = this.grid.getNodeById(id);
+        for (const [node, el] of this.renderedNodes) {
             if (node) {
                 el.style.width = `${size}px`;
                 el.style.height = `${size}px`;
@@ -209,7 +213,7 @@ export default class GridRenderer {
     }
 
     private drawOrErase(node: GridNode): void {
-        const shouldBeWalkable = this.drawMode === "erase";
+        const shouldBeWalkable = this.drawMode === 'erase';
         if (node.isWalkable !== shouldBeWalkable) {
             this.grid.setNodeWalkable(node, shouldBeWalkable);
             shouldBeWalkable ? this.removeNodeElement(node) : this.updateNode(node);

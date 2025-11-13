@@ -1,4 +1,4 @@
-import { INode, IGridNode, IMapNode} from "../types";
+import { INode, IGridNode, IMapNode} from '../types';
 
 export class GridNode implements IGridNode {
     id: string;
