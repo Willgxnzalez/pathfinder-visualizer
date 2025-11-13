@@ -1,7 +1,7 @@
 // components/GridView.tsx
-import React, { useEffect, useRef, useCallback } from "react";
-import Grid from "../models/Grid";
-import GridRenderer from "../models/GridRenderer";
+import React, { useEffect, useRef, useCallback } from 'react';
+import Grid from '../models/Grid';
+import GridRenderer from '../models/GridRenderer';
 
 interface GridViewProps {
     grid: Grid;
@@ -74,7 +74,7 @@ export default function GridView({
 
     return (
         <div
-            className="absolute w-full h-full top-1/2 left-1/2 -translate-1/2 select-none overflow-hidden m-0 p-0 border-none"
+            className='absolute w-full h-full top-1/2 left-1/2 -translate-1/2 select-none overflow-hidden m-0 p-0 border-none'
             ref={containerRef}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}

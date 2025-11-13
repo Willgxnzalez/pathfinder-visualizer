@@ -1,5 +1,5 @@
-import { IGraph, isGridNode } from "../types";
-import { GridNode } from "./Node";
+import { IGraph, isGridNode } from '../types';
+import { GridNode } from './Node';
 
 export default class GridGraph implements IGraph {
     private grid: GridNode[][] = [];
@@ -34,7 +34,7 @@ export default class GridGraph implements IGraph {
     }
 
     getNodeById(id: string): GridNode | null {
-        const [rowStr, colStr] = id.split("-");
+        const [rowStr, colStr] = id.split('-');
         const row = Number(rowStr);
         const col = Number(colStr);
         if (isNaN(row) || isNaN(col)) return null;
