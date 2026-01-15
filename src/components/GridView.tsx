@@ -86,6 +86,6 @@ export default function GridView({
             onTouchCancel={handleTouchEnd}
             onContextMenu={(e) => e.preventDefault()}
         />
-      );
-      
+    );
+    
 }
