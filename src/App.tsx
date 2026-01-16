@@ -69,25 +69,25 @@ export default function App() {
             
             {/* Playback controls */}
             {animationState !== 'idle' && (
-                <div className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 flex gap-4 px-8 py-4 rounded-2xl glass">
+                <div className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 flex gap-4 px-8 py-4 rounded-2xl glass shadow-highlight border border-bdr-glass">
                     <button
                         onClick={pathfinding.handleStop}
-                        className="px-7 py-3 rounded-xl font-bold transition border border-bdr shadow active:scale-95
-                            bg-secondary hover:bg-surface-highlight text-text-main"
+                        className="px-7 py-3 rounded-xl font-bold transition border border-bdr-glass shadow-highlight
+                            bg-surface-light-glass hover:bg-surface-highlight-glass text-text-muted hover:text-text-main"
                     >
                         STOP
                     </button>
                     <button
                         onClick={pathfinding.handlePlayPause}
-                        className="px-7 py-3 rounded-xl font-bold transition border border-bdr shadow active:scale-95
-                            bg-secondary hover:bg-surface-highlight text-text-invert"
+                        className="px-7 py-3 rounded-xl font-bold transition border border-bdr-glass shadow-highlight 
+                            bg-surface-light-glass hover:bg-surface-highlight-glass text-text-muted hover:text-text-main"
                     >
                         PLAY/PAUSE
                     </button>
                     <button
                         onClick={pathfinding.handleStep}
-                        className="px-7 py-3 rounded-xl font-bold transition border border-bdr shadow active:scale-95
-                            bg-primary hover:bg-surface-highlight text-text-invert"
+                        className="px-7 py-3 rounded-xl font-bold transition border border-bdr-glass shadow-highlight
+                            bg-surface-light-glass hover:bg-surface-highlight-glass text-text-muted hover:text-text-main"
                     >
                         STEP
                     </button>
@@ -97,7 +97,7 @@ export default function App() {
 
             {/* Result display */}
             {result && (
-                <div className='fixed bottom-24 left-1/2 -translate-x-1/2 px-8 py-4 rounded-2xl glass shadow-xl border border-bdr bg-surface-glass backdrop-blur-lg text-lg font-semibold text-text-main min-w-56 text-center'>
+                <div className='fixed Z-50 bottom-24 left-1/2 -translate-x-1/2 px-8 py-4 rounded-2xl glass shadow-highlight border border-bdr-glass text-lg font-semibold text-text-main text-center'>
                     {result}
                 </div>
             )}
