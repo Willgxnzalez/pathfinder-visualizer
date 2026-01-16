@@ -178,7 +178,7 @@ export default function ToolBar({
                                 disabled={isAnimating}
                                 className={`px-3 py-1 rounded-lg font-mono text-lg font-bold cursor-pointer transition-all flex items-center justify-center ${
                                     speed === s
-                                        ? 'text-primary bg-surface-light shadow-lg scale-110'
+                                        ? 'text-primary bg-surface-light shadow-lg scale-120'
                                         : 'text-text-muted hover:text-text-main'
                                 }`}
                             >
