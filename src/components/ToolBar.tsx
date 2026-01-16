@@ -160,7 +160,7 @@ export default function ToolBar({
                     'px-6 py-4 text-xl font-bold rounded-lg transition-all duration-300 appearance-none cursor-pointer',
                     isAnimating
                         ? 'opacity-50 cursor-not-allowed text-text-muted'
-                        : 'text-primary border-2 border-primary hover:bg-primary hover:border-primary hover:text-text-invert'
+                        : 'text-primary border-2 border-primary hover:bg-primary hover:border-primary hover:text-text-invert hover:scale-105'
                 )}
             >
                 VISUALIZE
@@ -175,12 +175,12 @@ export default function ToolBar({
                             <button
                                 key={s}
                                 onClick={() => onSpeedChange(s)}
-                                disabled={isAnimating}
-                                className={`px-3 py-1 rounded-lg font-mono text-lg font-bold cursor-pointer transition-all flex items-center justify-center ${
+                                className={clsx(
+                                    'px-3 py-1 rounded-lg font-mono text-lg font-bold cursor-pointer transition-all flex items-center justify-center',
                                     speed === s
                                         ? 'text-primary bg-surface-highlight shadow-lg scale-120'
                                         : 'text-text-muted hover:text-text-main'
-                                }`}
+                                )}
                             >
                                 {speedSymbols[i]}
                             </button>
