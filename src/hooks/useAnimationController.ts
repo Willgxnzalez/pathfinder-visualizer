@@ -29,7 +29,7 @@ export default function useAnimationController({
     }, [animationState]);
 
     const getDelay = useCallback((s: Speed): number => {
-        return { slow: 75, medium: 40, fast: 0 }[s];
+        return { slow: 75, medium:30, fast: 0 }[s];
     }, []);
 
     const waitForNextStep = async (delay: number): Promise<boolean> => {
