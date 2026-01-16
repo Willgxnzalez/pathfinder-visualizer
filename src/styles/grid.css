@@ -10,13 +10,13 @@
   }
 
   .node-frontier {
-    background: color-mix(in oklch, var(--color-accent) 60%, var(--color-surface));
-    box-shadow: 0 0 6px color-mix(in oklch, var(--color-accent) 80%, transparent);
+    background: color-mix(in oklch, var(--color-primary) 60%, var(--color-surface));
+    box-shadow: 0 0 6px color-mix(in oklch, var(--color-primary) 80%, transparent);
   }
 
   .node-path {
-    background: var(--color-accent);
-    box-shadow: 0 0 5px color-mix(in oklch, var(--color-accent) 100%, transparent);
+    background: var(--color-primary);
+    box-shadow: 0 0 5px color-mix(in oklch, var(--color-primary) 100%, transparent);
   }
 
   .node-start {

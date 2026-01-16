@@ -155,10 +155,10 @@ export default function ToolBar({
                 onClick={onRun}
                 disabled={isAnimating}
                 className={clsx(
-                    'px-6 py-4 text-xl font-bold rounded-lg transition-all appearance-none cursor-pointer',
+                    'px-6 py-4 text-xl font-bold rounded-lg transition-all duration-300 appearance-none cursor-pointer',
                     isAnimating
                         ? 'opacity-50 cursor-not-allowed text-text-muted'
-                        : 'text-primary border border-primary hover:bg-secondary hover:border-secondary'
+                        : 'text-primary border-2 border-primary hover:bg-secondary hover:border-secondary hover:text-text-main'
                 )}
             >
                 VISUALIZE
