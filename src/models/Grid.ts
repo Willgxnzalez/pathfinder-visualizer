@@ -1,4 +1,5 @@
 import { IGraph, isGridNode } from '../types';
+import { computeDefaultStartEndNodes } from '../utils/gridHelpers';
 import { GridNode } from './Node';
 
 export default class GridGraph implements IGraph {
@@ -9,7 +10,9 @@ export default class GridGraph implements IGraph {
     private endNode: GridNode | null = null;
 
     constructor(rows: number, cols: number) {
+        if (rows < 1 || cols < 1) console.error("Grid must be created with non-zero dimensions.");
         this.createGrid(rows, cols);
+        this.resetStartEndNodes();
     }
 
     createGrid(rows: number, cols: number): void {
@@ -79,7 +82,7 @@ export default class GridGraph implements IGraph {
         if (!node) return;
         if (this.startNode) {
             this.startNode.isStart = false;
-            this.resetNodeState(this.startNode);
+            this.resetNodePathFindingState(this.startNode);
         }
         this.startNode = node;
         node.isStart = true;
@@ -91,7 +94,7 @@ export default class GridGraph implements IGraph {
         if (!node) return;
         if (this.endNode) {
             this.endNode.isEnd = false;
-            this.resetNodeState(this.endNode);
+            this.resetNodePathFindingState(this.endNode);
         }
         this.endNode = node;
         node.isEnd = true;
@@ -103,7 +106,13 @@ export default class GridGraph implements IGraph {
         node.isWalkable = walkable;
     }
 
-    resetNodeState(node: GridNode): void {
+    resetStartEndNodes(): void {
+        const { startRow, startCol, endRow, endCol } = computeDefaultStartEndNodes(this.rows, this.cols);
+        this.setStartNode(startRow, startCol);
+        this.setEndNode(endRow, endCol);
+    }
+
+    resetNodePathFindingState(node: GridNode): void {
         node.isVisited = false;
         node.isFrontier = false;
         node.isPath = false;
@@ -116,7 +125,7 @@ export default class GridGraph implements IGraph {
         for (let r = 0; r < this.rows; r++) {
             for (let c = 0; c < this.cols; c++) {
                 const node = this.grid[r][c];
-                this.resetNodeState(node);
+                this.resetNodePathFindingState(node);
                 if (clearWalls && !node.isStart && !node.isEnd) {
                     node.isWalkable = true;
                 }
