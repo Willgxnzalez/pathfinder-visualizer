@@ -59,7 +59,7 @@ function Dropdown<T extends string>({
                 disabled={disabled}
                 onClick={() => setOpen(!open)}
                 className={clsx(
-                    'w-full flex justify-between px-3 py-2 rounded-lg',
+                    'w-full flex justify-between px-3 py-1 rounded-lg',
                     'appearance-none font-medium',
                     'text-text-main',
                     'border border-bdr',
@@ -78,7 +78,7 @@ function Dropdown<T extends string>({
                 <div
                     className={clsx(
                         'absolute top-full left-0 mt-5 w-full z-20 overflow-hidden',
-                        'rounded-lg bg-surface border border-bdr shadow'
+                        'rounded-lg border border-bdr-glass glass shadow-highlight'
                     )}
                     onMouseLeave={() => setOpen(false)}
                 >
@@ -91,8 +91,8 @@ function Dropdown<T extends string>({
                             }}
                             className={clsx(
                                 'relative block w-full px-4 py-2 text-left pointer-events-auto cursor-pointer z-10',
-                                'text-text-main hover:bg-surface-highlight',
-                                opt === value && 'font-semibold bg-surface-light'
+                                'text-text-main hover:bg-surface-highlight-glass',
+                                opt === value && 'font-semibold bg-surface-light-glass'
                             )}
                         >
                             {opt}
@@ -123,6 +123,8 @@ export default function ToolBar({
     isDrawing = false,
 }: ToolBarProps) {
     const isAnimating = animationState !== 'idle';
+    const valueToSpeed = ['slow', 'medium', 'fast'] as const;
+    const speedSymbols = ['>', '>>', '>>>']
 
     return (
         <div
@@ -158,7 +160,7 @@ export default function ToolBar({
                     'px-6 py-4 text-xl font-bold rounded-lg transition-all duration-300 appearance-none cursor-pointer',
                     isAnimating
                         ? 'opacity-50 cursor-not-allowed text-text-muted'
-                        : 'text-primary border-2 border-primary hover:bg-secondary hover:border-secondary hover:text-text-main'
+                        : 'text-primary border-2 border-primary hover:bg-primary hover:border-primary hover:text-text-invert'
                 )}
             >
                 VISUALIZE
@@ -168,19 +170,19 @@ export default function ToolBar({
             <div className='flex flex-1 items-center justify-around gap-3 flex-wrap'>
                 <div className='flex flex-col'>
                     <label className='text-sm text-text-muted mb-2'>Speed</label>
-                    <div className='flex rounded-lg overflow-hidden border border-bdr'>
-                        {(['slow', 'medium', 'fast'] as const).map((s: Speed) => (
+                    <div className='flex gap-1 items-center rounded-lg border border-bdr-muted'>
+                        {valueToSpeed.map((s: Speed, i) => (
                             <button
                                 key={s}
                                 onClick={() => onSpeedChange(s)}
-                                className={clsx(
-                                    'px-3 py-2 font-medium hover:bg-surface-highlight cursor-pointer',
-                                    (speed === s)
-                                        ? 'text-text-main bg-surface-light'
-                                        : 'text-text-muted '
-                                )}
+                                disabled={isAnimating}
+                                className={`px-3 py-1 rounded-lg font-mono text-lg font-bold cursor-pointer transition-all flex items-center justify-center ${
+                                    speed === s
+                                        ? 'text-primary bg-surface-light shadow-lg scale-110'
+                                        : 'text-text-muted hover:text-text-main'
+                                }`}
                             >
-                                {s.toUpperCase()}
+                                {speedSymbols[i]}
                             </button>
                         ))}
                     </div>
