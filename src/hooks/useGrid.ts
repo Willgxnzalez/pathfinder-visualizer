@@ -11,7 +11,8 @@ import {
 import Grid from '../models/Grid';
 import GridRenderer from '../models/GridRenderer';
 import { computeNodeSizeBounds, NODE_SIZE_STEP } from '../utils/gridHelpers';
-import { AnimationState } from '../types';
+import { AnimationState, AnimationStep, isGridNode } from '../types';
+import { GridNode } from '../models/Node';
 
 export default function useGrid(
     gridContainerRef: RefObject<HTMLElement | null>,
@@ -116,16 +117,9 @@ export default function useGrid(
 
     const handleNodeSizeChange = useCallback(
         (newSize: number) => {
-            const snapped = Math.max(
-                nodeMin,
-                Math.min(
-                    nodeMax,
-                    newSize - (newSize % NODE_SIZE_STEP)
-                )
-            );
+            const snapped = Math.max(nodeMin, Math.min(nodeMax, newSize - (newSize % NODE_SIZE_STEP)));
             setNodeSize(snapped);
-        },
-        [nodeMin, nodeMax]
+        }, [nodeMin, nodeMax]
     );
 
     const handleReset = useCallback(() => {
@@ -136,6 +130,18 @@ export default function useGrid(
         setResult('');
     }, [grid, setResult]);
 
+    const handleAnimationStep = useCallback(
+        async (step: AnimationStep): Promise<void> => {
+            if (!rendererRef.current || !grid || !isGridNode(step.node)) return;
+            if (step.type === 'visit') {
+                grid.setNodeVisited(step.node as GridNode, true);
+            } else if (step.type === 'path') {
+                grid.setNodeInPath(step.node as GridNode, true);
+            }
+            rendererRef.current.updateNode(step.node as GridNode);
+        }, [grid]
+    );
+
     return {
         grid,
         gridRenderer: rendererRef.current,
@@ -145,5 +151,6 @@ export default function useGrid(
         nodeStep,
         handleNodeSizeChange,
         handleReset,
+        handleAnimationStep,
     };
 }

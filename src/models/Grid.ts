@@ -106,6 +106,17 @@ export default class GridGraph implements IGraph {
         node.isWalkable = walkable;
     }
 
+    setNodeVisited(node: GridNode, visited: boolean): void {
+        node.isVisited = visited;
+        if (!visited) {
+            node.isFrontier = false;
+        }
+    }
+
+    setNodeInPath(node: GridNode, inPath: boolean): void {
+        node.isPath = inPath;
+    }
+
     resetStartEndNodes(): void {
         const { startRow, startCol, endRow, endCol } = computeDefaultStartEndNodes(this.rows, this.cols);
         this.setStartNode(startRow, startCol);

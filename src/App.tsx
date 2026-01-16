@@ -3,8 +3,7 @@ import GridView from './components/GridView';
 import Header from './components/Header';
 import usePathfinding from './hooks/usePathfinding';
 import useGrid from './hooks/useGrid';
-import type { Algorithm, Speed, AnimationState, AnimationStep } from './types';
-import { GridNode } from './models/Node';
+import type { Algorithm, Speed, AnimationState } from './types';
 
 export default function App() {
     const gridContainerRef = useRef<HTMLElement>(null);
@@ -21,7 +20,7 @@ export default function App() {
         speedRef.current = speed;
     }, [speed]);
 
-    const { grid, gridRenderer, nodeSize, nodeMin, nodeMax, nodeStep, handleNodeSizeChange, handleReset } = useGrid( // called every rerender
+    const { grid, gridRenderer, nodeSize, nodeMin, nodeMax, nodeStep, handleNodeSizeChange, handleReset, handleAnimationStep } = useGrid( // called every rerender
         gridContainerRef,
         gridViewRef,
         animationState,
@@ -34,16 +33,7 @@ export default function App() {
         animationState,
         algorithm,
         grid,
-        async (step: AnimationStep): Promise<void> => {
-        if (!gridRenderer || !grid) return;
-            if (step.type === 'visit') {
-                step.node.isVisited = true;
-                step.node.isFrontier = false;
-            } else if (step.type === 'path') {
-                step.node.isPath = true;
-            }
-            gridRenderer.updateNode(step.node as GridNode);
-        },
+        handleAnimationStep,
         setAnimationState,
         setResult
     );
@@ -79,22 +69,35 @@ export default function App() {
             
             {/* Playback controls */}
             {animationState !== 'idle' && (
-                <div className='fixed bottom-4 left-1/2 -translate-x-1/2 flex gap-4 px-8 py-4 rounded-2xl glass shadow-lg border border-bdr bg-surface/90 backdrop-blur-lg'>
-                    <button onClick={pathfinding.handleStop} className='px-7 py-3 bg-warning hover:bg-warning-dark text-text-main font-bold rounded-xl transition border border-bdr shadow active:scale-95'>
+                <div className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 flex gap-4 px-8 py-4 rounded-2xl glass">
+                    <button
+                        onClick={pathfinding.handleStop}
+                        className="px-7 py-3 rounded-xl font-bold transition border border-bdr shadow active:scale-95
+                            bg-secondary hover:bg-surface-highlight text-text-main"
+                    >
                         STOP
                     </button>
-                    <button onClick={pathfinding.handlePlayPause} className='px-7 py-3 bg-accent hover:bg-accent-dark text-text-main font-bold rounded-xl transition border border-bdr shadow active:scale-95'>
+                    <button
+                        onClick={pathfinding.handlePlayPause}
+                        className="px-7 py-3 rounded-xl font-bold transition border border-bdr shadow active:scale-95
+                            bg-secondary hover:bg-surface-highlight text-text-invert"
+                    >
                         PLAY/PAUSE
                     </button>
-                    <button onClick={pathfinding.handleStep} className='px-7 py-3 bg-purple-700 hover:bg-purple-800 text-text-main font-bold rounded-xl transition border border-bdr shadow active:scale-95'>
+                    <button
+                        onClick={pathfinding.handleStep}
+                        className="px-7 py-3 rounded-xl font-bold transition border border-bdr shadow active:scale-95
+                            bg-primary hover:bg-surface-highlight text-text-invert"
+                    >
                         STEP
                     </button>
                 </div>
             )}
+            
 
             {/* Result display */}
             {result && (
-                <div className='fixed bottom-24 left-1/2 -translate-x-1/2 px-8 py-4 rounded-2xl glass shadow-xl border border-bdr bg-surface/90 backdrop-blur-lg text-lg font-semibold text-text-main min-w-56 text-center'>
+                <div className='fixed bottom-24 left-1/2 -translate-x-1/2 px-8 py-4 rounded-2xl glass shadow-xl border border-bdr bg-surface-glass backdrop-blur-lg text-lg font-semibold text-text-main min-w-56 text-center'>
                     {result}
                 </div>
             )}
