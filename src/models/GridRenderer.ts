@@ -1,17 +1,18 @@
 import { GridNode } from './Node';
 import { DrawMode } from '../types';
 import GridGraph from './Grid';
+import { getMajorGridInterval } from '../utils/gridHelpers';
 
 /**
  * GridRenderer handles DOM rendering for a Grid model.
  * Only visible nodes are shown due to lazy rendering.
  */
 export default class GridRenderer {
-    private container: HTMLElement | null = null;
+    private container: HTMLDivElement | null = null;
     private renderedNodes: Map<GridNode, HTMLElement> = new Map();
-    private grid: GridGraph;
-    private nodeSize: number;
-    private majorInterval = 5;
+    private grid: GridGraph | null = null;
+    private nodeSize: number = 25;
+    private majorInterval: number = 5;
 
     private drawMode: DrawMode = 'draw';
     private isDrawing: boolean = false;
@@ -19,16 +20,8 @@ export default class GridRenderer {
     private draggedNode: GridNode | null = null;
     private lastCoords: { row: number; col: number } | null = null;
 
-    constructor(grid: GridGraph, nodeSize = 25) {
-        this.grid = grid;
-        this.nodeSize = nodeSize;
-    }
-
-    mount(container: HTMLElement): void {
+    mount(container: HTMLDivElement): void {
         this.container = container;
-        this.updateContainerSize();
-        this.updateBackgroundGrid();
-        this.renderStartAndEnd();
     }
 
     destroy(): void {
@@ -37,14 +30,15 @@ export default class GridRenderer {
     }
 
     private updateContainerSize(): void {
-        if (!this.container) return;
+        if (!this.container || !this.grid) return;
         const { rows, cols } = this.grid.getDimensions();
+        console.log(rows, cols);
         this.container.style.width = `${cols * this.nodeSize}px`;
         this.container.style.height = `${rows * this.nodeSize}px`;
     }
 
     private updateBackgroundGrid(): void {
-        if (!this.container) return;
+        if (!this.container || !this.grid) return;
 
         const minorLineThickness = 1; // px
         const majorLineThickness = 2; // px
@@ -117,16 +111,12 @@ export default class GridRenderer {
         this.container.prepend(svg);
     }
 
-    setMajorInterval(interval: number): void {
-        this.majorInterval = interval;
-        this.updateBackgroundGrid();
-    }
-
-    private renderStartAndEnd(): void {
+    renderStartAndEnd(): void {
+        if (!this.grid) return;
         const start = this.grid.getStartNode();
         const end = this.grid.getEndNode();
-        start && this.addNodeElement(start);
-        end && this.addNodeElement(end);
+        if (start) this.addNodeElement(start);
+        if (end) this.addNodeElement(end);
     }
 
     private addNodeElement(node: GridNode): void {
@@ -148,7 +138,10 @@ export default class GridRenderer {
     }
 
     private removeNodeElement(node: GridNode): void {
-        this.renderedNodes.get(node)?.remove();
+        const el = this.renderedNodes.get(node);
+        if (el) {
+            el.remove();
+        }
         this.renderedNodes.delete(node);
     }
 
@@ -179,32 +172,25 @@ export default class GridRenderer {
         for (const [node, el] of this.renderedNodes) {
             this.updateNode(node);
         }
-    }
-
-    setNodeSize(size: number): void {
-        this.nodeSize = size;
-        for (const [node, el] of this.renderedNodes) {
-            if (node) {
-                el.style.width = `${size}px`;
-                el.style.height = `${size}px`;
-                el.style.left = `${node.col * size}px`;
-                el.style.top = `${node.row * size}px`;
-            }
-        }
-        this.updateBackgroundGrid();
-    }
-
-    updateGrid(newGrid: GridGraph, newSize: number): void {
-        this.grid = newGrid;
-        this.nodeSize = newSize;
-        this.renderedNodes.clear();
-        this.container?.replaceChildren();
         this.renderStartAndEnd();
+    }
+
+    setGrid(newGrid: GridGraph, nodeSize: number): void {
+        this.grid = newGrid;
+        this.nodeSize = nodeSize;
+        this.majorInterval = getMajorGridInterval(nodeSize);
+
+        if (!this.container) return;
+
+        this.renderedNodes.clear();
+        this.container.replaceChildren();
+        this.updateContainerSize();
         this.updateBackgroundGrid();
+        this.renderStartAndEnd();
     }
 
     private getGridCoordinates(x: number, y: number): { row: number; col: number } | null {
-        if (!this.container) return null;
+        if (!this.container || !this.grid) return null;
         const rect = this.container.getBoundingClientRect();
         const row = Math.floor((y - rect.top) / this.nodeSize);
         const col = Math.floor((x - rect.left) / this.nodeSize);
@@ -215,12 +201,15 @@ export default class GridRenderer {
     private drawOrErase(node: GridNode): void {
         const shouldBeWalkable = this.drawMode === 'erase';
         if (node.isWalkable !== shouldBeWalkable) {
-            this.grid.setNodeWalkable(node, shouldBeWalkable);
+            if (this.grid) {
+                this.grid.setNodeWalkable(node, shouldBeWalkable);
+            }
             shouldBeWalkable ? this.removeNodeElement(node) : this.updateNode(node);
         }
     }
 
     private interpolateAndDraw(from: { row: number; col: number }, to: { row: number; col: number }): void {
+        if (!this.grid) return;
         const dx = to.col - from.col;
         const dy = to.row - from.row;
         const steps = Math.ceil(Math.sqrt(dx * dx + dy * dy)) + 1;
@@ -234,6 +223,7 @@ export default class GridRenderer {
     }
 
     handleMouseDown(x: number, y: number, makeStart = false, makeEnd = false): void {
+        if (!this.grid) return;
         const coords = this.getGridCoordinates(x, y);
         if (!coords) return;
         const node = this.grid.getNode(coords.row, coords.col);
@@ -245,15 +235,19 @@ export default class GridRenderer {
             return;
         }
         if (makeStart) {
-            this.removeNodeElement(this.grid.getStartNode()!);
+            const prevStart = this.grid.getStartNode();
+            if (prevStart) this.removeNodeElement(prevStart);
             this.grid.setStartNode(coords.row, coords.col);
-            this.updateNode(this.grid.getStartNode()!);
+            const newStart = this.grid.getStartNode();
+            if (newStart) this.updateNode(newStart);
             return;
         }
         if (makeEnd) {
-            this.removeNodeElement(this.grid.getEndNode()!);
+            const prevEnd = this.grid.getEndNode();
+            if (prevEnd) this.removeNodeElement(prevEnd);
             this.grid.setEndNode(coords.row, coords.col);
-            this.updateNode(this.grid.getEndNode()!);
+            const newEnd = this.grid.getEndNode();
+            if (newEnd) this.updateNode(newEnd);
             return;
         }
         this.isDrawing = true;
@@ -263,6 +257,7 @@ export default class GridRenderer {
     }
 
     handleMouseMove(x: number, y: number): void {
+        if (!this.grid) return;
         const coords = this.getGridCoordinates(x, y);
         if (!coords) return;
 
@@ -272,15 +267,17 @@ export default class GridRenderer {
             const isStart = this.draggedNode.isStart;
             this.removeNodeElement(this.draggedNode);
 
-            isStart
-                ? this.grid.setStartNode(coords.row, coords.col)
-                : this.grid.setEndNode(coords.row, coords.col);
+            if (isStart) {
+                this.grid.setStartNode(coords.row, coords.col);
+            } else {
+                this.grid.setEndNode(coords.row, coords.col);
+            }
 
             this.draggedNode = isStart
                 ? this.grid.getStartNode()
                 : this.grid.getEndNode();
 
-            this.updateNode(this.draggedNode!);
+            if (this.draggedNode) this.updateNode(this.draggedNode);
             return;
         }
 
