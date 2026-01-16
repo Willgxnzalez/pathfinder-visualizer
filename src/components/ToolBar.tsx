@@ -188,7 +188,7 @@ export default function ToolBar({
                     </div>
                 </div>
                 <div className='flex flex-col'>
-                    <label className='text-text-muted mb-2'>
+                    <label className='text-sm text-text-muted mb-2'>
                         Node Size: <span className='text-text-main'>{nodeSize}px</span>
                     </label>
                     <input
@@ -199,7 +199,7 @@ export default function ToolBar({
                         value={nodeSize}
                         onChange={(e) => onNodeSizeChange(Number(e.target.value))}
                         disabled={isAnimating}
-                        className='accent-primary'
+                        className='py-3 accent-primary'
                     />
                 </div>
                 <button
