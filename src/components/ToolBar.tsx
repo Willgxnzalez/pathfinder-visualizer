@@ -155,33 +155,9 @@ export default function ToolBar({
                         className="w-full accent-primary cursor-pointer"
                     />
                 </LabelControl>
-                <button
-                    onClick={onResetAll}
-                    disabled={isAnimating}
-                    className={clsx(
-                        'px-4 py-2 rounded-lg font-medium text-text-muted cursor-pointer text-sm',
-                        isAnimating
-                            ? 'opacity-50 cursor-not-allowed'
-                            : 'border border-bdr hover:text-text-main hover:bg-surface-highlight'
-                    )}
-                >
-                    Reset All
-                </button>
-                <button
-                    onClick={onResetAlgorithmState}
-                    disabled={isAnimating}
-                    className={clsx(
-                        'px-4 py-2 rounded-lg font-medium text-text-muted cursor-pointer text-sm',
-                        isAnimating
-                            ? 'opacity-50 cursor-not-allowed'
-                            : 'border border-bdr hover:text-text-main hover:bg-surface-highlight'
-                    )}
-                >
-                    Reset Algo
-                </button>
-                {onClearWalls && (
+                <div className="flex flex-col gap-1">
                     <button
-                        onClick={onClearWalls}
+                        onClick={onResetAll}
                         disabled={isAnimating}
                         className={clsx(
                             'px-4 py-2 rounded-lg font-medium text-text-muted cursor-pointer text-sm',
@@ -190,9 +166,35 @@ export default function ToolBar({
                                 : 'border border-bdr hover:text-text-main hover:bg-surface-highlight'
                         )}
                     >
-                        Clear Walls
+                        Reset All
                     </button>
-                )}
+                    <button
+                        onClick={onResetAlgorithmState}
+                        disabled={isAnimating}
+                        className={clsx(
+                            'px-4 py-2 rounded-lg font-medium text-text-muted cursor-pointer text-sm',
+                            isAnimating
+                                ? 'opacity-50 cursor-not-allowed'
+                                : 'border border-bdr hover:text-text-main hover:bg-surface-highlight'
+                        )}
+                    >
+                        Reset Algo
+                    </button>
+                    {onClearWalls && (
+                        <button
+                            onClick={onClearWalls}
+                            disabled={isAnimating}
+                            className={clsx(
+                                'px-4 py-2 rounded-lg font-medium text-text-muted cursor-pointer text-sm',
+                                isAnimating
+                                    ? 'opacity-50 cursor-not-allowed'
+                                    : 'border border-bdr hover:text-text-main hover:bg-surface-highlight'
+                            )}
+                        >
+                            Clear Walls
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     );
