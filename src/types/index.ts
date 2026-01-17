@@ -1,4 +1,4 @@
-export type Algorithm = 'BFS' | 'DFS' | 'A*' | 'GBFS' | 'Dijkstra';
+export type pathFindingAlgorithm = 'BFS' | 'DFS' | 'A*' | 'GBFS' | 'Dijkstra';
 export type MazeAlgorithm = 'RecursiveBacktracking' | 'Prim' | 'Kruskal' | 'DFS';
 export type Speed = 'slow' | 'medium' | 'fast';
 export type AnimationState = 'idle' | 'running' | 'paused' | 'stepping';

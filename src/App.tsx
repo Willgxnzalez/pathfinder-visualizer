@@ -3,7 +3,7 @@ import GridView from './components/GridView';
 import Header from './components/Header';
 import usePathfinding from './hooks/usePathfinding';
 import useGrid from './hooks/useGrid';
-import type { Algorithm, Speed, AnimationState } from './types';
+import type { pathFindingAlgorithm, Speed, AnimationState } from './types';
 
 export default function App() {
     const gridContainerRef = useRef<HTMLElement>(null);
@@ -11,7 +11,7 @@ export default function App() {
 
     const [speed, setSpeed] = useState<Speed>('medium');
     const speedRef = useRef<Speed>(speed); // Reference since speed can change during animation
-    const [algorithm, setAlgorithm] = useState<Algorithm>('A*');
+    const [algorithm, setAlgorithm] = useState<pathFindingAlgorithm>('A*');
     const [isDrawing, setIsDrawing] = useState(false);
     const [animationState, setAnimationState] = useState<AnimationState>('idle');
     const [result, setResult] = useState(''); 

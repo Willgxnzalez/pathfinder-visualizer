@@ -29,6 +29,8 @@
   --color-text-main: oklch(0.97 0.018 270);
   --color-text-muted: oklch(0.75 0.010 270);
   --color-text-invert: oklch(0.15 0.010 270);
+
+  --breakpoint-xs: 20rem;
 }
 
 @layer utilities {

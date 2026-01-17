@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Algorithm, AnimationState, AnimationStep, IGraph, PathfindingResult, Speed } from '../types';
+import { pathFindingAlgorithm, AnimationState, AnimationStep, IGraph, PathfindingResult, Speed } from '../types';
 import useAnimationController from './useAnimationController';
 import BFS from '../algorithms/pathfinding/BFS';
 import Astar from '../algorithms/pathfinding/Astar';
@@ -18,7 +18,7 @@ const algorithms: Record<string, (graph: IGraph) => Generator<AnimationStep, Pat
 export default function usePathfinding(
     speedRef: React.RefObject<Speed>,
     animationState: AnimationState,
-    selectedAlgorithm: Algorithm,
+    selectedAlgorithm: pathFindingAlgorithm,
     graph: IGraph | null,
     onAnimateStep: (step: AnimationStep) => Promise<void>,
     onStateChange: (state: AnimationState) => void,

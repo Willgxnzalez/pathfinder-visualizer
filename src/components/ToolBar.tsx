@@ -1,15 +1,22 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDownIcon } from '@heroicons/react/24/solid';
-import { Algorithm, AnimationState, Speed } from '../types';
+import React from 'react';
 import clsx from 'clsx';
+import Dropdown from './Dropdown';
+import LabelControl from './LabelControl';
+import { pathFindingAlgorithm, AnimationState, Speed } from '../types';
 
-const MAZE_GEN_ALGOS = ['random', 'recursive-division', 'prim', 'eller', 'kruskal'] as const;
-type MazeGenAlgo = typeof MAZE_GEN_ALGOS[number];
+const MAZE_GEN_ALGOS = [
+    'random',
+    'recursive-division',
+    'prim',
+    'eller',
+    'kruskal',
+] as const;
+type MazeGenAlgo = (typeof MAZE_GEN_ALGOS)[number];
 
 export interface ToolBarProps {
     mapMode: boolean;
     animationState: AnimationState;
-    selectedAlgorithm: Algorithm;
+    selectedAlgorithm: pathFindingAlgorithm;
     selectedMazeGen?: MazeGenAlgo;
     speed: Speed;
     nodeSize: number;
@@ -18,93 +25,24 @@ export interface ToolBarProps {
     nodeStep: number;
     onRun: () => void;
     onReset: () => void;
-    onAlgorithmChange: (algo: Algorithm) => void;
+    onAlgorithmChange: (algo: pathFindingAlgorithm) => void;
     onMazeGenChange?: (algo: MazeGenAlgo) => void;
     onSpeedChange: (s: Speed) => void;
     onNodeSizeChange: (size: number) => void;
     isDrawing?: boolean;
 }
 
-/* -------------------- Reusable Dropdown -------------------- */
-function Dropdown<T extends string>({
-    label,
-    options,
-    value,
-    onChange,
-    disabled,
-}: {
-    label: string;
-    options: readonly T[];
-    value: T;
-    onChange: (v: T) => void;
-    disabled?: boolean;
-}) {
-    const [open, setOpen] = useState(false);
-    const ref = useRef<HTMLDivElement>(null);
+const ALGORITHM_OPTIONS: pathFindingAlgorithm[] = [
+    'BFS',
+    'DFS',
+    'A*',
+    'GBFS',
+    'Dijkstra',
+];
 
-    useEffect(() => {
-        if (!open) return;
-        const handleClick = (e: MouseEvent) => {
-            if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-        };
-        document.addEventListener('mousedown', handleClick);
-        return () => document.removeEventListener('mousedown', handleClick);
-    }, [open]);
+const SPEED_OPTIONS: Speed[] = ['slow', 'medium', 'fast'];
+const SPEED_SYMBOLS = ['>', '>>', '>>>'];
 
-    return (
-        <div ref={ref} className='relative w-1/3'>
-            <label className='text-sm text-text-muted block mb-2'>{label}</label>
-            <button
-                type='button'
-                disabled={disabled}
-                onClick={() => setOpen(!open)}
-                className={clsx(
-                    'w-full flex justify-between px-3 py-1 rounded-lg',
-                    'appearance-none font-medium',
-                    'text-text-main',
-                    'border border-bdr',
-                    'cursor-pointer',
-                    'bg-surface-light',
-                    'hover:bg-surface-highlight',
-                    'transition-all',
-                    disabled && 'opacity-60 cursor-not-allowed'
-                )}
-            >
-                {value}
-                <ChevronDownIcon className='size-5'/>
-            </button>
-
-            {open && (
-                <div
-                    className={clsx(
-                        'absolute top-full left-0 mt-5 w-full z-20 overflow-hidden',
-                        'rounded-lg border border-bdr-glass glass shadow-highlight'
-                    )}
-                    onMouseLeave={() => setOpen(false)}
-                >
-                    {options.map((opt) => (
-                        <button
-                            key={opt}
-                            onClick={() => {
-                                onChange(opt);
-                                setOpen(false);
-                            }}
-                            className={clsx(
-                                'relative block w-full px-4 py-2 text-left pointer-events-auto cursor-pointer z-10',
-                                'text-text-main hover:bg-surface-highlight-glass',
-                                opt === value && 'font-semibold bg-surface-light-glass'
-                            )}
-                        >
-                            {opt}
-                        </button>
-                    ))}
-                </div>
-            )}
-        </div>
-    );
-}
-
-/* -------------------- Toolbar -------------------- */
 export default function ToolBar({
     animationState,
     selectedAlgorithm,
@@ -123,85 +61,95 @@ export default function ToolBar({
     isDrawing = false,
 }: ToolBarProps) {
     const isAnimating = animationState !== 'idle';
-    const valueToSpeed = ['slow', 'medium', 'fast'] as const;
-    const speedSymbols = ['>', '>>', '>>>']
 
     return (
         <div
             className={clsx(
-                'w-full flex items-center justify-between gap-4 px-5 py-3 z-20',
-                'transition-opacity',
+                'w-full px-4 py-3 z-20 transition-opacity',
+                'grid grid-cols-1 gap-4',
+                'xs:grid-cols-3 xs:items-center',
                 isDrawing ? 'opacity-60' : 'opacity-100'
             )}
         >
             {/* Left controls */}
-            <div className='flex flex-1 items-center justify-start gap-3 flex-wrap'>
-                <Dropdown
-                    label='Algorithm'
-                    options={['BFS', 'DFS', 'A*', 'GBFS', 'Dijkstra'] as const}
-                    value={selectedAlgorithm}
-                    onChange={onAlgorithmChange}
-                    disabled={isAnimating}
-                />
-                <Dropdown
-                    label='Maze Generation'
-                    options={MAZE_GEN_ALGOS}
-                    value={selectedMazeGen || 'random'}
-                    onChange={(v) => onMazeGenChange?.(v)}
-                    disabled={isAnimating}
-                />
+            <div
+                className={clsx(
+                    'flex flex-1 items-center gap-3 flex-col',
+                    'sm:flex-row sm:items-start sm:justify-start'
+                )}
+            >
+                <LabelControl label="Algorithm" className="w-full">
+                    <Dropdown
+                        options={ALGORITHM_OPTIONS}
+                        value={selectedAlgorithm}
+                        onChange={onAlgorithmChange}
+                        disabled={isAnimating}
+                    />
+                </LabelControl>
+                <LabelControl label="Maze Generation" className="w-full">
+                    <Dropdown
+                        options={MAZE_GEN_ALGOS}
+                        value={selectedMazeGen || 'random'}
+                        onChange={v => onMazeGenChange?.(v)}
+                        disabled={isAnimating}
+                    />
+                </LabelControl>
             </div>
 
             {/* Center - Run */}
-            <button
-                onClick={onRun}
-                disabled={isAnimating}
-                className={clsx(
-                    'px-6 py-4 text-xl font-bold rounded-lg transition-all duration-300 appearance-none cursor-pointer',
-                    isAnimating
-                        ? 'opacity-50 cursor-not-allowed text-text-muted'
-                        : 'text-primary border-2 border-primary hover:bg-primary hover:border-primary hover:text-text-invert hover:scale-105'
-                )}
-            >
-                VISUALIZE
-            </button>
+            <div className="flex justify-center items-center transition-all order-first xs:order-0">
+                <button
+                    onClick={onRun}
+                    disabled={isAnimating}
+                    className={clsx(
+                        'font-bold rounded-lg border-2 border-primary',
+                        'text-primary hover:bg-primary hover:text-text-invert transition-all',
+                        'py-2 text-lg w-3/5 min-w-fit max-w-3/5',
+                        'xs:px-2 xs:py-4',
+                        'sm:text-xl'
+                    )}
+                >
+                    VISUALIZE
+                </button>
+            </div>
 
             {/* Right controls */}
-            <div className='flex flex-1 items-center justify-around gap-3 flex-wrap'>
-                <div className='flex flex-col'>
-                    <label className='text-sm text-text-muted mb-2'>Speed</label>
-                    <div className='flex gap-1 items-center rounded-lg border border-bdr-muted'>
-                        {valueToSpeed.map((s: Speed, i) => (
+            <div
+                className={clsx(
+                    'flex flex-1 items-center gap-3 flex-col',
+                    'sm:flex-row sm:items-start sm:justify-end'
+                )}
+            >
+                <LabelControl label="Speed">
+                    <div className="w-full max-w-[170px] flex gap-1 items-center rounded-lg border border-bdr-muted">
+                        {SPEED_OPTIONS.map((s, i) => (
                             <button
                                 key={s}
                                 onClick={() => onSpeedChange(s)}
                                 className={clsx(
-                                    'px-3 py-1 rounded-lg font-mono text-lg font-bold cursor-pointer transition-all flex items-center justify-center',
+                                    'w-10 h-10 rounded-lg text-lg font-mono font-bold cursor-pointer transition-all',
                                     speed === s
                                         ? 'text-primary bg-surface-highlight shadow-lg scale-120'
                                         : 'text-text-muted hover:text-text-main'
                                 )}
                             >
-                                {speedSymbols[i]}
+                                {SPEED_SYMBOLS[i]}
                             </button>
                         ))}
                     </div>
-                </div>
-                <div className='flex flex-col'>
-                    <label className='text-sm text-text-muted mb-2'>
-                        Node Size: <span className='text-text-main'>{nodeSize}px</span>
-                    </label>
+                </LabelControl>
+                <LabelControl label={`Node Size: ${nodeSize}px`}>
                     <input
-                        type='range'
+                        type="range"
                         min={nodeMin}
                         max={nodeMax}
                         step={nodeStep}
                         value={nodeSize}
-                        onChange={(e) => onNodeSizeChange(Number(e.target.value))}
+                        onChange={e => onNodeSizeChange(Number(e.target.value))}
                         disabled={isAnimating}
-                        className='py-3 accent-primary'
+                        className="w-full accent-primary"
                     />
-                </div>
+                </LabelControl>
                 <button
                     onClick={onReset}
                     disabled={isAnimating}
