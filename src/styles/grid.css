@@ -16,18 +16,17 @@
 
   .node-path {
     background: var(--color-primary);
-    box-shadow: 0 0 5px color-mix(in oklch, var(--color-primary) 100%, transparent);
   }
 
   .node-start {
     background: var(--color-start);
     box-shadow: 0 0 6px var(--color-start);
-    border-radius: 2px;
+    cursor: pointer;
   }
   
   .node-end {
     background: var(--color-end);
     box-shadow: 0 0 6px var(--color-end);
-    border-radius: 2px;
+    cursor: pointer;
   }
 }
