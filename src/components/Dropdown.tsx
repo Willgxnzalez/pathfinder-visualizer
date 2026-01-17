@@ -36,7 +36,7 @@ export default function Dropdown<T extends string>({
                 disabled={disabled}
                 onClick={() => setOpen(!open)}
                 className={clsx(
-                    'w-full flex justify-between px-3 py-1 rounded-lg',
+                    'w-full flex justify-between items-center px-3 py-1 rounded-lg',
                     'appearance-none font-medium',
                     'text-text-main',
                     'border border-bdr',
