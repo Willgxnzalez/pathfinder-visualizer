@@ -147,7 +147,7 @@ export default function ToolBar({
                         value={nodeSize}
                         onChange={e => onNodeSizeChange(Number(e.target.value))}
                         disabled={isAnimating}
-                        className="w-full accent-primary"
+                        className="w-full accent-primary cursor-pointer"
                     />
                 </LabelControl>
                 <button
