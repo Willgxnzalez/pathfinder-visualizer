@@ -23,6 +23,7 @@ export default function usePathfinding(
     onAnimateStep: (step: AnimationStep) => Promise<void>,
     onStateChange: (state: AnimationState) => void,
     onResult: (result: string) => void,
+    onResetAlgorithmState?: () => void,
 ) {
     const animation = useAnimationController({
         speedRef,
@@ -42,9 +43,13 @@ export default function usePathfinding(
             onResult("Set start and end nodes!");
             return;
         }
+        // Auto-reset algorithm state before running
+        if (onResetAlgorithmState) {
+            onResetAlgorithmState();
+        }
         const Algo = algorithms[selectedAlgorithm] || Astar;
         animation.run(() => Algo(graph));
-    }, [animation, graph, selectedAlgorithm, onResult]);
+    }, [animation, graph, selectedAlgorithm, onResult, onResetAlgorithmState]);
 
     return {
         animate,
