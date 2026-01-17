@@ -97,7 +97,7 @@ export default function App() {
 
             {/* Result display */}
             {result && (
-                <div className='fixed Z-50 bottom-24 left-1/2 -translate-x-1/2 px-8 py-4 rounded-2xl glass shadow-highlight border border-bdr-glass text-lg font-semibold text-text-main text-center'>
+                <div className='fixed z-50 bottom-24 left-1/2 -translate-x-1/2 px-8 py-4 rounded-2xl glass shadow-highlight border border-bdr-glass text-lg font-semibold text-text-main text-center'>
                     {result}
                 </div>
             )}
