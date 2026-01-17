@@ -20,14 +20,14 @@
   }
 
   .node-start {
-    background: color-mix(in oklch, var(--color-primary) 85%, white 10%);
-    box-shadow: 0 0 6px var(--color-primary);
+    background: var(--color-start);
+    box-shadow: 0 0 6px var(--color-start);
     border-radius: 2px;
   }
-
+  
   .node-end {
-    background: color-mix(in oklch, var(--color-primary) 85%, white 10%);
-    box-shadow: 0 0 6px var(--color-primary);
+    background: var(--color-end);
+    box-shadow: 0 0 6px var(--color-end);
     border-radius: 2px;
   }
 }
