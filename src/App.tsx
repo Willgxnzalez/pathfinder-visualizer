@@ -20,7 +20,7 @@ export default function App() {
         speedRef.current = speed;
     }, [speed]);
 
-    const { grid, gridRenderer, nodeSize, nodeMin, nodeMax, nodeStep, handleNodeSizeChange, handleReset, handleAnimationStep } = useGrid( // called every rerender
+    const { grid, gridRenderer, nodeSize, nodeMin, nodeMax, nodeStep, handleNodeSizeChange, handleResetAll, handleResetAlgorithmState, handleClearWalls, handleAnimationStep } = useGrid( // called every rerender
         gridContainerRef,
         gridViewRef,
         animationState,
@@ -35,7 +35,8 @@ export default function App() {
         grid,
         handleAnimationStep,
         setAnimationState,
-        setResult
+        setResult,
+        handleResetAlgorithmState
     );
 
     return (
@@ -49,7 +50,9 @@ export default function App() {
                 nodeMax={nodeMax}
                 nodeStep={nodeStep}
                 onRun={pathfinding.animate}
-                onReset={handleReset}
+                onResetAll={handleResetAll}
+                onResetAlgorithmState={handleResetAlgorithmState}
+                onClearWalls={handleClearWalls}
                 onAlgorithmChange={setAlgorithm}
                 onSpeedChange={setSpeed}
                 onNodeSizeChange={handleNodeSizeChange}

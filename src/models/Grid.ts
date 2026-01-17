@@ -144,6 +144,26 @@ export default class GridGraph implements IGraph {
         }
     }
 
+    resetAlgorithmState(): void {
+        for (let r = 0; r < this.rows; r++) {
+            for (let c = 0; c < this.cols; c++) {
+                const node = this.grid[r][c];
+                this.resetNodePathFindingState(node);
+            }
+        }
+    }
+
+    clearWalls(): void {
+        for (let r = 0; r < this.rows; r++) {
+            for (let c = 0; c < this.cols; c++) {
+                const node = this.grid[r][c];
+                if (!node.isStart && !node.isEnd) {
+                    node.isWalkable = true;
+                }
+            }
+        }
+    }
+
     // For UI: iterate all nodes
     *nodes(): Generator<GridNode> {
         for (let r = 0; r < this.rows; r++) {

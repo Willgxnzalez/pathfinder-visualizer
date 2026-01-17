@@ -24,7 +24,9 @@ export interface ToolBarProps {
     nodeMax: number;
     nodeStep: number;
     onRun: () => void;
-    onReset: () => void;
+    onResetAll: () => void;
+    onResetAlgorithmState: () => void;
+    onClearWalls?: () => void;
     onAlgorithmChange: (algo: pathFindingAlgorithm) => void;
     onMazeGenChange?: (algo: MazeGenAlgo) => void;
     onSpeedChange: (s: Speed) => void;
@@ -53,7 +55,9 @@ export default function ToolBar({
     nodeMax,
     nodeStep,
     onRun,
-    onReset,
+    onResetAll,
+    onResetAlgorithmState,
+    onClearWalls,
     onAlgorithmChange,
     onMazeGenChange,
     onSpeedChange,
@@ -152,17 +156,43 @@ export default function ToolBar({
                     />
                 </LabelControl>
                 <button
-                    onClick={onReset}
+                    onClick={onResetAll}
                     disabled={isAnimating}
                     className={clsx(
-                        'px-4 py-2 rounded-lg font-medium text-text-muted cursor-pointer',
+                        'px-4 py-2 rounded-lg font-medium text-text-muted cursor-pointer text-sm',
                         isAnimating
                             ? 'opacity-50 cursor-not-allowed'
                             : 'border border-bdr hover:text-text-main hover:bg-surface-highlight'
                     )}
                 >
-                    Reset
+                    Reset All
                 </button>
+                <button
+                    onClick={onResetAlgorithmState}
+                    disabled={isAnimating}
+                    className={clsx(
+                        'px-4 py-2 rounded-lg font-medium text-text-muted cursor-pointer text-sm',
+                        isAnimating
+                            ? 'opacity-50 cursor-not-allowed'
+                            : 'border border-bdr hover:text-text-main hover:bg-surface-highlight'
+                    )}
+                >
+                    Reset Algo
+                </button>
+                {onClearWalls && (
+                    <button
+                        onClick={onClearWalls}
+                        disabled={isAnimating}
+                        className={clsx(
+                            'px-4 py-2 rounded-lg font-medium text-text-muted cursor-pointer text-sm',
+                            isAnimating
+                                ? 'opacity-50 cursor-not-allowed'
+                                : 'border border-bdr hover:text-text-main hover:bg-surface-highlight'
+                        )}
+                    >
+                        Clear Walls
+                    </button>
+                )}
             </div>
         </div>
     );

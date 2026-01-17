@@ -122,13 +122,28 @@ export default function useGrid(
         }, [nodeMin, nodeMax]
     );
 
-    const handleReset = useCallback(() => {
+    const handleResetAll = useCallback(() => {
         if (!grid || !rendererRef.current) return;
 
         grid.resetGrid(true);
         rendererRef.current.updateAllNodes();
         setResult('');
     }, [grid, setResult]);
+
+    const handleResetAlgorithmState = useCallback(() => {
+        if (!grid || !rendererRef.current) return;
+
+        grid.resetAlgorithmState();
+        rendererRef.current.updateAllNodes();
+        setResult('');
+    }, [grid, setResult]);
+
+    const handleClearWalls = useCallback(() => {
+        if (!grid || !rendererRef.current) return;
+
+        grid.clearWalls();
+        rendererRef.current.updateAllNodes();
+    }, [grid]);
 
     const handleAnimationStep = useCallback(
         async (step: AnimationStep): Promise<void> => {
@@ -150,7 +165,9 @@ export default function useGrid(
         nodeMax,
         nodeStep,
         handleNodeSizeChange,
-        handleReset,
+        handleResetAll,
+        handleResetAlgorithmState,
+        handleClearWalls,
         handleAnimationStep,
     };
 }
