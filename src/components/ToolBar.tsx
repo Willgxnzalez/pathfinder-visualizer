@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import clsx from 'clsx';
 import Dropdown from './Dropdown';
 import LabelControl from './LabelControl';
+import SettingsSidebar from './SettingsSidebar';
 import { pathFindingAlgorithm, AnimationState, Speed } from '../types';
+import { ChevronDownIcon } from '@heroicons/react/24/solid';
 
 const MAZE_GEN_ALGOS = [
     'random',
@@ -45,6 +47,12 @@ const ALGORITHM_OPTIONS: pathFindingAlgorithm[] = [
 const SPEED_OPTIONS: Speed[] = ['slow', 'medium', 'fast'];
 const SPEED_SYMBOLS = ['>', '>>', '>>>'];
 
+const HamburgerIcon = ({ className }: { className?: string }) => (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+);
+
 export default function ToolBar({
     animationState,
     selectedAlgorithm,
@@ -65,138 +73,374 @@ export default function ToolBar({
     isDrawing = false,
 }: ToolBarProps) {
     const isAnimating = animationState !== 'idle';
+    const [mobileControlsOpen, setMobileControlsOpen] = useState(false);
+    const [settingsOpen, setSettingsOpen] = useState(false);
 
     return (
-        <div
-            className={clsx(
-                'w-full px-4 py-3 z-20 transition-opacity',
-                'grid grid-cols-1 gap-4',
-                'xs:grid-cols-3 xs:items-center',
-                isDrawing ? 'opacity-60' : 'opacity-100'
-            )}
-        >
-            {/* Left controls */}
+        <>
             <div
                 className={clsx(
-                    'flex flex-1 items-center gap-3 flex-col',
-                    'sm:flex-row sm:items-start sm:justify-start'
+                    'w-full transition-opacity relative',
+                    'bg-surface border-b border-bdr',
+                    isDrawing ? 'opacity-60' : 'opacity-100'
                 )}
             >
-                <LabelControl label="Algorithm" className="w-full">
-                    <Dropdown
-                        options={ALGORITHM_OPTIONS}
-                        value={selectedAlgorithm}
-                        onChange={onAlgorithmChange}
+                {/* Mobile View Toolbar (< 640px) */}
+                <div className="sm:hidden w-full px-4 py-3 flex items-center relative">
+                    {/* Hamburger Menu (Left) */}
+                    <button
+                        onClick={() => setSettingsOpen(!settingsOpen)}
                         disabled={isAnimating}
-                    />
-                </LabelControl>
-                <LabelControl label="Maze Generation" className="w-full">
-                    <Dropdown
-                        options={MAZE_GEN_ALGOS}
-                        value={selectedMazeGen || 'random'}
-                        onChange={v => onMazeGenChange?.(v)}
-                        disabled={isAnimating}
-                    />
-                </LabelControl>
-            </div>
+                        className={clsx(
+                            'p-2 rounded-lg border border-bdr bg-surface-light hover:bg-surface-highlight transition-all',
+                            isAnimating && 'opacity-60 cursor-not-allowed'
+                        )}
+                    >
+                        <HamburgerIcon className="w-6 h-6 text-text-muted" />
+                    </button>
 
-            {/* Center - Run */}
-            <div className="flex justify-center items-center transition-all order-first xs:order-0">
-                <button
-                    onClick={onRun}
-                    disabled={isAnimating}
+                    {/* Visualize Button (Centered - using absolute positioning for true center) */}
+                    <button
+                        onClick={onRun}
+                        disabled={isAnimating}
+                        className={clsx(
+                            'absolute left-1/2 -translate-x-1/2 px-6 py-2 text-lg font-bold rounded-lg transition-all',
+                            isAnimating
+                                ? 'cursor-not-allowed opacity-50 text-text-muted'
+                                : 'cursor-pointer text-primary border-2 border-primary hover:bg-primary hover:text-text-invert'
+                        )}
+                    >
+                        VISUALIZE
+                    </button>
+                </div>
+
+                {/* Tablet View (640px - 1024px) */}
+                <div className="hidden sm:flex lg:hidden w-full px-4 py-3 items-end justify-between gap-4">
+                    {/* Left Side */}
+                    <div className="flex items-center gap-3">
+                        {/* Hamburger Menu */}
+                        <button
+                            onClick={() => setSettingsOpen(!settingsOpen)}
+                            disabled={isAnimating}
+                            className={clsx(
+                                'p-2 rounded-lg border border-bdr bg-surface-light hover:bg-surface-highlight transition-all',
+                                isAnimating && 'opacity-60 cursor-not-allowed'
+                            )}
+                        >
+                            <HamburgerIcon className="w-5 h-5 text-text-muted" />
+                        </button>
+
+                        {/* Left Controls (Stacked) */}
+                        <div className="flex flex-col gap-2 w-48">
+                            <LabelControl label="Algorithm">
+                                <Dropdown
+                                    options={ALGORITHM_OPTIONS}
+                                    value={selectedAlgorithm}
+                                    onChange={onAlgorithmChange}
+                                    disabled={isAnimating}
+                                />
+                            </LabelControl>
+                            <LabelControl label="Maze Generation">
+                                <Dropdown
+                                    options={MAZE_GEN_ALGOS}
+                                    value={selectedMazeGen || 'random'}
+                                    onChange={v => onMazeGenChange?.(v)}
+                                    disabled={isAnimating}
+                                />
+                            </LabelControl>
+                        </div>
+                    </div>
+
+                    {/* Center - Visualize (Absolute center) */}
+                    <button
+                        onClick={onRun}
+                        disabled={isAnimating}
+                        className={clsx(
+                            'absolute left-1/2 -translate-x-1/2 px-6 py-3 text-xl font-bold rounded-lg transition-all whitespace-nowrap',
+                            isAnimating
+                                ? 'cursor-not-allowed opacity-50 text-text-muted'
+                                : 'cursor-pointer text-primary border-2 border-primary hover:bg-primary hover:text-text-invert'
+                        )}
+                    >
+                        VISUALIZE
+                    </button>
+
+                    {/* Right Controls */}
+                    <div className="flex flex-col gap-2 items-end">
+                        <LabelControl label="Speed">
+                            <div className="flex gap-1 items-center rounded-lg border border-bdr-muted p-1">
+                                {SPEED_OPTIONS.map((s, i) => (
+                                    <button
+                                        key={s}
+                                        onClick={() => onSpeedChange(s)}
+                                        className={clsx(
+                                            'w-10 h-10 rounded-lg text-lg font-mono font-bold transition-all cursor-pointer',
+                                            speed === s
+                                                ? 'text-primary bg-surface-highlight shadow-lg scale-110'
+                                                : 'text-text-muted hover:text-text-main'
+                                        )}
+                                    >
+                                        {SPEED_SYMBOLS[i]}
+                                    </button>
+                                ))}
+                            </div>
+                        </LabelControl>
+                        <div className="flex rounded-lg border border-bdr overflow-hidden">
+                            <button
+                                onClick={onResetAll}
+                                disabled={isAnimating}
+                                className={clsx(
+                                    'px-3 py-2 text-sm text-text-muted hover:text-text-main hover:bg-surface-highlight border-r border-bdr whitespace-nowrap',
+                                    isAnimating && 'opacity-60 cursor-not-allowed'
+                                )}
+                            >
+                                Reset All
+                            </button>
+                            <button
+                                onClick={onResetAlgorithmState}
+                                disabled={isAnimating}
+                                className={clsx(
+                                    'px-3 py-2 text-sm text-text-muted hover:text-text-main hover:bg-surface-highlight border-r border-bdr whitespace-nowrap',
+                                    isAnimating && 'opacity-60 cursor-not-allowed'
+                                )}
+                            >
+                                Reset State
+                            </button>
+                            {onClearWalls && (
+                                <button
+                                    onClick={onClearWalls}
+                                    disabled={isAnimating}
+                                    className={clsx(
+                                        'px-3 py-2 text-sm text-text-muted hover:text-text-main hover:bg-surface-highlight whitespace-nowrap',
+                                        isAnimating && 'opacity-60 cursor-not-allowed'
+                                    )}
+                                >
+                                    Clear Walls
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Desktop View (>= 1024px) */}
+                <div className="hidden lg:flex w-full px-4 py-3 items-end justify-between gap-4 relative">
+                    {/* Left Side */}
+                    <div className="flex items-end gap-3">
+                        {/* Hamburger Menu */}
+                        <button
+                            onClick={() => setSettingsOpen(!settingsOpen)}
+                            disabled={isAnimating}
+                            className={clsx(
+                                'p-2 rounded-lg border border-bdr bg-surface-light hover:bg-surface-highlight transition-all',
+                                isAnimating && 'opacity-60 cursor-not-allowed'
+                            )}
+                        >
+                            <HamburgerIcon className="w-5 h-5 text-text-muted" />
+                        </button>
+
+                        {/* Left Controls (Horizontal) */}
+                        <div className="flex gap-3 items-end">
+                            <LabelControl label="Algorithm">
+                                <Dropdown
+                                    options={ALGORITHM_OPTIONS}
+                                    value={selectedAlgorithm}
+                                    onChange={onAlgorithmChange}
+                                    disabled={isAnimating}
+                                />
+                            </LabelControl>
+                            <LabelControl label="Maze Generation">
+                                <Dropdown
+                                    options={MAZE_GEN_ALGOS}
+                                    value={selectedMazeGen || 'random'}
+                                    onChange={v => onMazeGenChange?.(v)}
+                                    disabled={isAnimating}
+                                />
+                            </LabelControl>
+                        </div>
+                    </div>
+
+                    {/* Center - Visualize (Absolute center) */}
+                    <button
+                        onClick={onRun}
+                        disabled={isAnimating}
+                        className={clsx(
+                            'absolute left-1/2 -translate-x-1/2 px-6 py-3 text-xl font-bold rounded-lg transition-all whitespace-nowrap',
+                            isAnimating
+                                ? 'cursor-not-allowed opacity-50 text-text-muted'
+                                : 'cursor-pointer text-primary border-2 border-primary hover:bg-primary hover:text-text-invert'
+                        )}
+                    >
+                        VISUALIZE
+                    </button>
+
+                    {/* Right Controls */}
+                    <div className="flex gap-3 items-end">
+                        <LabelControl label="Speed">
+                            <div className="flex gap-1 items-center rounded-lg border border-bdr-muted p-1">
+                                {SPEED_OPTIONS.map((s, i) => (
+                                    <button
+                                        key={s}
+                                        onClick={() => onSpeedChange(s)}
+                                        className={clsx(
+                                            'w-10 h-10 rounded-lg text-lg font-mono font-bold transition-all cursor-pointer',
+                                            speed === s
+                                                ? 'text-primary bg-surface-highlight shadow-lg scale-110'
+                                                : 'text-text-muted hover:text-text-main'
+                                        )}
+                                    >
+                                        {SPEED_SYMBOLS[i]}
+                                    </button>
+                                ))}
+                            </div>
+                        </LabelControl>
+                        <div className="flex rounded-lg border border-bdr overflow-hidden">
+                            <button
+                                onClick={onResetAll}
+                                disabled={isAnimating}
+                                className={clsx(
+                                    'px-3 py-2 text-sm text-text-muted hover:text-text-main hover:bg-surface-highlight border-r border-bdr whitespace-nowrap',
+                                    isAnimating && 'opacity-60 cursor-not-allowed'
+                                )}
+                            >
+                                Reset All
+                            </button>
+                            <button
+                                onClick={onResetAlgorithmState}
+                                disabled={isAnimating}
+                                className={clsx(
+                                    'px-3 py-2 text-sm text-text-muted hover:text-text-main hover:bg-surface-highlight border-r border-bdr whitespace-nowrap',
+                                    isAnimating && 'opacity-60 cursor-not-allowed'
+                                )}
+                            >
+                                Reset State
+                            </button>
+                            {onClearWalls && (
+                                <button
+                                    onClick={onClearWalls}
+                                    disabled={isAnimating}
+                                    className={clsx(
+                                        'px-3 py-2 text-sm text-text-muted hover:text-text-main hover:bg-surface-highlight whitespace-nowrap',
+                                        isAnimating && 'opacity-60 cursor-not-allowed'
+                                    )}
+                                >
+                                    Clear Walls
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Mobile Controls Bar (Below toolbar, expandable, overlay) */}
+                <div
                     className={clsx(
-                        'w-3/5 min-w-fit max-w-3/5 font-bold rounded-lg transition-all py-2 text-lg',
-                        'xs:px-2 xs:py-4',
-                        'sm:text-xl',
-                        isAnimating
-                            ? 'cursor-not-allowed opacity-50 text-text-muted'
-                            : 'cursor-pointer text-primary border-2 border-primary hover:bg-secondary hover:border-secondary hover:scale-105'
+                        'sm:hidden absolute left-0 top-full w-full bg-surface border-t border-bdr shadow-lg',
+                        'overflow-hidden transition-all duration-300 z-30 pointer-events-auto',
+                        mobileControlsOpen ? 'max-h-[70vh]' : 'max-h-0'
                     )}
                 >
-                    VISUALIZE
+                    <div className="p-4 flex flex-col gap-4">
+                        <LabelControl label="Algorithm">
+                            <Dropdown
+                                options={ALGORITHM_OPTIONS}
+                                value={selectedAlgorithm}
+                                onChange={onAlgorithmChange}
+                                disabled={isAnimating}
+                            />
+                        </LabelControl>
+                        <LabelControl label="Maze Generation">
+                            <Dropdown
+                                options={MAZE_GEN_ALGOS}
+                                value={selectedMazeGen || 'random'}
+                                onChange={v => onMazeGenChange?.(v)}
+                                disabled={isAnimating}
+                            />
+                        </LabelControl>
+                        <LabelControl label="Speed">
+                            <div className="flex gap-1 items-center rounded-lg border border-bdr-muted p-1">
+                                {SPEED_OPTIONS.map((s, i) => (
+                                    <button
+                                        key={s}
+                                        onClick={() => onSpeedChange(s)}
+                                        className={clsx(
+                                            'w-10 h-10 rounded-lg text-lg font-mono font-bold transition-all cursor-pointer',
+                                            speed === s
+                                                ? 'text-primary bg-surface-highlight shadow-lg scale-110'
+                                                : 'text-text-muted hover:text-text-main'
+                                        )}
+                                    >
+                                        {SPEED_SYMBOLS[i]}
+                                    </button>
+                                ))}
+                            </div>
+                        </LabelControl>
+                        <div className="flex rounded-lg border border-bdr overflow-hidden">
+                            <button
+                                onClick={onResetAll}
+                                disabled={isAnimating}
+                                className={clsx(
+                                    'flex-1 px-3 py-2 text-sm text-text-muted hover:text-text-main hover:bg-surface-highlight border-r border-bdr',
+                                    isAnimating && 'opacity-60 cursor-not-allowed'
+                                )}
+                            >
+                                Reset All
+                            </button>
+                            <button
+                                onClick={onResetAlgorithmState}
+                                disabled={isAnimating}
+                                className={clsx(
+                                    'flex-1 px-3 py-2 text-sm text-text-muted hover:text-text-main hover:bg-surface-highlight border-r border-bdr',
+                                    isAnimating && 'opacity-60 cursor-not-allowed'
+                                )}
+                            >
+                                Reset State
+                            </button>
+                            {onClearWalls && (
+                                <button
+                                    onClick={onClearWalls}
+                                    disabled={isAnimating}
+                                    className={clsx(
+                                        'flex-1 px-3 py-2 text-sm text-text-muted hover:text-text-main hover:bg-surface-highlight',
+                                        isAnimating && 'opacity-60 cursor-not-allowed'
+                                    )}
+                                >
+                                    Clear Walls
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Mobile Controls Toggle Button*/}
+                <button
+                    onClick={() => setMobileControlsOpen(!mobileControlsOpen)}
+                    disabled={isAnimating}
+                    className={clsx(
+                        'sm:hidden w-full py-2 flex items-center justify-center gap-2',
+                        'bg-surface border-t border-bdr hover:bg-surface-highlight transition-all',
+                        'text-sm font-medium text-text-muted',
+                        isAnimating && 'opacity-60 cursor-not-allowed'
+                    )}
+                >
+                    <span>Controls</span>
+                    <ChevronDownIcon
+                        className={clsx(
+                            'w-4 h-4 transition-transform duration-300',
+                            mobileControlsOpen && 'rotate-180'
+                        )}
+                    />
                 </button>
             </div>
 
-            {/* Right controls */}
-            <div
-                className={clsx(
-                    'flex flex-1 items-center gap-3 flex-col',
-                    'sm:flex-row sm:items-start sm:justify-end'
-                )}
-            >
-                <LabelControl label="Speed">
-                    <div className="w-full max-w-[170px] flex gap-1 items-center rounded-lg border border-bdr-muted">
-                        {SPEED_OPTIONS.map((s, i) => (
-                            <button
-                                key={s}
-                                onClick={() => onSpeedChange(s)}
-                                className={clsx(
-                                    'w-10 h-10 rounded-lg text-lg font-mono font-bold cursor-pointer transition-all',
-                                    speed === s
-                                        ? 'text-primary bg-surface-highlight shadow-lg scale-120'
-                                        : 'text-text-muted hover:text-text-main'
-                                )}
-                            >
-                                {SPEED_SYMBOLS[i]}
-                            </button>
-                        ))}
-                    </div>
-                </LabelControl>
-                <LabelControl label={`Node Size: ${nodeSize}px`}>
-                    <input
-                        type="range"
-                        min={nodeMin}
-                        max={nodeMax}
-                        step={nodeStep}
-                        value={nodeSize}
-                        onChange={e => onNodeSizeChange(Number(e.target.value))}
-                        disabled={isAnimating}
-                        className="w-full accent-primary cursor-pointer"
-                    />
-                </LabelControl>
-                <div className="flex rounded-lg border border-bdr-muted overflow-hidden">
-                    <button
-                        onClick={onResetAll}
-                        disabled={isAnimating}
-                        className={clsx(
-                            'px-4 py-2 font-medium text-text-muted cursor-pointer text-sm transition-all border-r border-bdr-muted',
-                            isAnimating
-                                ? 'opacity-50 cursor-not-allowed'
-                                : 'hover:text-text-main hover:bg-surface-highlight'
-                        )}
-                    >
-                        Reset All
-                    </button>
-                    <button
-                        onClick={onResetAlgorithmState}
-                        disabled={isAnimating}
-                        className={clsx(
-                            'px-4 py-2 font-medium text-text-muted cursor-pointer text-sm transition-all',
-                            isAnimating
-                                ? 'opacity-50 cursor-not-allowed'
-                                : 'hover:text-text-main hover:bg-surface-highlight',
-                            onClearWalls && 'border-r border-bdr-muted'
-                        )}
-                    >
-                        Reset State
-                    </button>
-                    {onClearWalls && (
-                        <button
-                            onClick={onClearWalls}
-                            disabled={isAnimating}
-                            className={clsx(
-                                'px-4 py-2 font-medium text-text-muted cursor-pointer text-sm transition-all',
-                                isAnimating
-                                    ? 'opacity-50 cursor-not-allowed'
-                                    : 'hover:text-text-main hover:bg-surface-highlight'
-                            )}
-                        >
-                            Clear Walls
-                        </button>
-                    )}
-                </div>
-            </div>
-        </div>
+            {/* Settings Sidebar (Left Slide-in) */}
+            <SettingsSidebar
+                isOpen={settingsOpen}
+                onClose={() => setSettingsOpen(false)}
+                nodeSize={nodeSize}
+                nodeMin={nodeMin}
+                nodeMax={nodeMax}
+                nodeStep={nodeStep}
+                onNodeSizeChange={onNodeSizeChange}
+            />
+        </>
     );
 }
