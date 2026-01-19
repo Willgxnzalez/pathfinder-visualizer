@@ -53,7 +53,7 @@ export default function GridView({ gridViewRef, renderer, onDrawingChange }: Gri
     return (
         <div
             ref={gridViewRef}
-            className='absolute select-none overflow-hidden m-0 p-0 border-none'
+            className='absolute select-none overflow-hidden m-0 p-0 border-none touch-none'
             onMouseDown={e => {
                 handleMouseDown(e);
                 if (gridViewRef.current) gridViewRef.current.classList.add('cursor-crosshair');
