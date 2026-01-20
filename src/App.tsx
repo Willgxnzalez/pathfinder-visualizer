@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import GridView from './components/GridView';
 import Header from './components/Header';
+import Footer from './components/Footer';
 import usePathfinding from './hooks/usePathfinding';
 import useGrid from './hooks/useGrid';
-import type { pathFindingAlgorithm, Speed, AnimationState } from './types';
+import type { PathAlgorithm, Speed, AnimationState } from './types';
 
 export default function App() {
     const gridContainerRef = useRef<HTMLElement>(null);
@@ -11,7 +12,7 @@ export default function App() {
 
     const [speed, setSpeed] = useState<Speed>('medium');
     const speedRef = useRef<Speed>(speed); // Reference since speed can change during animation
-    const [algorithm, setAlgorithm] = useState<pathFindingAlgorithm>('A*');
+    const [algorithm, setAlgorithm] = useState<PathAlgorithm>('A*');
     const [isDrawing, setIsDrawing] = useState(false);
     const [animationState, setAnimationState] = useState<AnimationState>('idle');
     const [result, setResult] = useState(''); 
@@ -39,6 +40,10 @@ export default function App() {
         handleResetAlgorithmState
     );
 
+    const mapToggle = () => {
+        console.log("hi");
+    }
+
     return (
         <div className='w-screen h-screen bg-surface-dark flex flex-col text-text-main overflow-hidden'>
             <Header
@@ -59,51 +64,64 @@ export default function App() {
                 isDrawing={isDrawing}
                 mapMode={false}
                 onDarkModeToggle={() => {}}
-                onMapModeToggle={() => {}}
+                onMapModeToggle={mapToggle}
             />
 
-            <main ref={gridContainerRef} className='flex-1 relative flex justify-center items-center'>
+            <main ref={gridContainerRef} className='h-full relative flex justify-center items-center'>
                 <GridView
                     gridViewRef={gridViewRef}
                     renderer={gridRenderer}
                     onDrawingChange={setIsDrawing}
                 />
-            </main>
-            
-            {/* Playback controls */}
-            {animationState !== 'idle' && (
-                <div className="fixed z-50 bottom-4 left-1/2 -translate-x-1/2 flex gap-4 px-8 py-4 rounded-2xl glass shadow-highlight border border-bdr-glass">
-                    <button
-                        onClick={pathfinding.handleStop}
-                        className="px-7 py-3 rounded-xl font-bold transition border border-bdr-glass shadow-highlight
-                            bg-surface-light-glass hover:bg-surface-highlight-glass text-text-muted hover:text-text-main"
-                    >
-                        STOP
-                    </button>
-                    <button
-                        onClick={pathfinding.handlePlayPause}
-                        className="px-7 py-3 rounded-xl font-bold transition border border-bdr-glass shadow-highlight 
-                            bg-surface-light-glass hover:bg-surface-highlight-glass text-text-muted hover:text-text-main"
-                    >
-                        PLAY/PAUSE
-                    </button>
-                    <button
-                        onClick={pathfinding.handleStep}
-                        className="px-7 py-3 rounded-xl font-bold transition border border-bdr-glass shadow-highlight
-                            bg-surface-light-glass hover:bg-surface-highlight-glass text-text-muted hover:text-text-main"
-                    >
-                        STEP
-                    </button>
-                </div>
-            )}
-            
 
-            {/* Result display */}
-            {result && (
-                <div className='fixed z-50 bottom-24 left-1/2 -translate-x-1/2 px-8 py-4 rounded-2xl glass shadow-highlight border border-bdr-glass text-lg font-semibold text-text-main text-center'>
-                    {result}
-                </div>
-            )}
+                {/* Playback controls */}
+                {animationState !== 'idle' && (
+                    <div className="absolute z-40 bottom-4 left-1/2 -translate-x-1/2 flex gap-4 px-8 py-4 rounded-2xl glass shadow-highlight border border-bdr-glass">
+                        <button
+                            onClick={pathfinding.handleStop}
+                            className="px-7 py-3 rounded-xl font-bold transition border border-bdr-glass shadow-highlight
+                                bg-surface-light-glass hover:bg-surface-highlight-glass text-text-muted hover:text-text-main"
+                        >
+                            STOP
+                        </button>
+                        <button
+                            onClick={pathfinding.handlePlayPause}
+                            className="px-7 py-3 rounded-xl font-bold transition border border-bdr-glass shadow-highlight 
+                                bg-surface-light-glass hover:bg-surface-highlight-glass text-text-muted hover:text-text-main"
+                        >
+                            PLAY/PAUSE
+                        </button>
+                        <button
+                            onClick={pathfinding.handleStep}
+                            className="px-7 py-3 rounded-xl font-bold transition border border-bdr-glass shadow-highlight
+                                bg-surface-light-glass hover:bg-surface-highlight-glass text-text-muted hover:text-text-main"
+                        >
+                            STEP
+                        </button>
+                    </div>
+                )}
+
+                {/* Result display */}
+                {result && (
+                    <div className='fixed z-50 bottom-24 left-1/2 -translate-x-1/2 px-8 py-4 rounded-2xl glass shadow-highlight border border-bdr-glass text-lg font-semibold text-text-main text-center'>
+                        {result}
+                    </div>
+                )}
+            </main>
+            <Footer
+                animationState={animationState}
+                selectedAlgorithm={algorithm}
+                speed={speed}
+                onAlgorithmChange={setAlgorithm}
+                onSpeedChange={setSpeed}
+                onRun={pathfinding.animate}
+                onResetAll={handleResetAll}
+                onResetAlgorithmState={handleResetAlgorithmState}
+                onClearWalls={handleClearWalls}
+                isDrawing={isDrawing}
+                mapMode={false}
+            />
+            
         </div>
     );
 }
