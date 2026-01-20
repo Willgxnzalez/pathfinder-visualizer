@@ -41,7 +41,7 @@ export default function App() {
     );
 
     const mapToggle = () => {
-        console.log("hi");
+        console.log("map mode");
     }
 
     return (
