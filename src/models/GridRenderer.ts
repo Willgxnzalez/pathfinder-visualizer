@@ -32,7 +32,6 @@ export default class GridRenderer {
     private updateContainerSize(): void {
         if (!this.container || !this.grid) return;
         const { rows, cols } = this.grid.getDimensions();
-        console.log(rows, cols);
         this.container.style.width = `${cols * this.nodeSize}px`;
         this.container.style.height = `${rows * this.nodeSize}px`;
     }
