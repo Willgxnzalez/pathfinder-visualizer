@@ -33,8 +33,8 @@ export default function SettingsSidebar({
             />
             <div
                 className={clsx(
-                    'fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-surface border-r border-bdr z-50 overflow-y-auto transition-transform duration-300',
-                    isOpen ? 'translate-x-0' : '-translate-x-full'
+                    'fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-surface border-r border-bdr z-50 overflow-y-auto transition-transform duration-300',
+                    isOpen ? 'translate-x-0' : 'translate-x-full'
                 )}
             >
                 <div className="p-4 flex flex-col gap-4">
