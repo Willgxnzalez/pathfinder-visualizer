@@ -1,9 +1,9 @@
-export type PathAlgorithm = 'BFS' | 'DFS' | 'A*' | 'GBFS' | 'Dijkstra';
-export type MazeAlgorithm = 'RecursiveBacktracking' | 'Prim' | 'Kruskal' | 'DFS';
-export type Speed = 'slow' | 'medium' | 'fast';
-export type AnimationState = 'idle' | 'running' | 'paused' | 'stepping';
 export type ViewMode = 'grid' | 'map';
 export type DrawMode = 'draw' | 'erase';
+export type Speed = 'slow' | 'medium' | 'fast';
+export type AnimationState = 'idle' | 'running' | 'paused' | 'stepping';
+export type PathAlgorithm = 'BFS' | 'DFS' | 'A*' | 'GBFS' | 'Dijkstra';
+export type MazeAlgorithm = 'RecursiveBacktracking' | 'Prim' | 'Kruskal' | 'DFS';
 
 export interface INode {
     id: string;
