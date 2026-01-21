@@ -28,6 +28,8 @@ export interface FooterProps {
     onResetAll: () => void;
     onResetAlgorithmState: () => void;
     onClearWalls?: () => void;
+    
+    onHeightChange: (h: number) => void;
 }
 
 const ALGORITHM_OPTIONS: PathAlgorithm[] = ['BFS', 'DFS', 'A*', 'GBFS', 'Dijkstra'];
@@ -36,7 +38,8 @@ const SPEED_OPTIONS: Speed[] = ['slow', 'medium', 'fast'];
 const SPEED_SYMBOLS = ['>', '>>', '>>>'];
 
 const SWIPE_THRESHOLD = 50; // px
-const EXPANDED_HEIGHT_VH = 80; // as vh of viewport
+const EXPANDED_RATIO = 0.8;
+const COLLAPSED_RATIO = 0.2;
 
 export default function Footer({
     mapMode,
@@ -52,27 +55,27 @@ export default function Footer({
     onResetAll,
     onResetAlgorithmState,
     onClearWalls,
+    onHeightChange
 }: FooterProps) {
     const isAnimating = animationState !== 'idle';
 
     const [expanded, setExpanded] = useState(false);
     const [dragStartY, setDragStartY] = useState<number | null>(null);
-    const [currentHeight, setCurrentHeight] = useState<number>(100);
-    const [collapsedHeight, setCollapsedHeight] = useState<number>(100);
-    const footerRef = useRef<HTMLDivElement>(null);
+    const [height, setHeight] = useState<number>(0);
+    const [heights, setHeights] = useState<{ collapsed: number; expanded: number }>({ collapsed: 100, expanded: 100 });
 
     // Save collapsed height on mount or resize
     useEffect(() => {
-        const updateCollapsedHeight = () => {
-            if (footerRef.current) {
-                const height = footerRef.current.getBoundingClientRect().height;
-                setCollapsedHeight(height);
-                if (!expanded) setCurrentHeight(height);
-            }
+        const updateHeights = () => {
+            const collapsedHeight = (window.visualViewport?.height ?? window.innerHeight) * COLLAPSED_RATIO;
+            const expandedHeight = (window.visualViewport?.height ?? window.innerHeight) * EXPANDED_RATIO;
+            setHeights({collapsed: collapsedHeight, expanded: expandedHeight});
+            onHeightChange(collapsedHeight);
         };
-        updateCollapsedHeight();
-        window.addEventListener('resize', updateCollapsedHeight);
-        return () => window.removeEventListener('resize', updateCollapsedHeight);
+
+        updateHeights();
+        window.addEventListener('resize', updateHeights);
+        return () => window.removeEventListener('resize', updateHeights);
     }, [expanded]);
 
     const handleSwipeStart = (clientY: number) => {
@@ -83,17 +86,12 @@ export default function Footer({
         if (dragStartY === null) return;
 
         const deltaY = dragStartY - clientY;
-        const viewportHeight = window.innerHeight;
-        const expandedHeightPx = (viewportHeight * EXPANDED_HEIGHT_VH) / 100;
-
         if (deltaY > SWIPE_THRESHOLD) { // swipe up => expand
             setExpanded(true);
-            setCurrentHeight(expandedHeightPx);
         } else if (deltaY < -SWIPE_THRESHOLD) { // swipe down => collapse
             setExpanded(false);
-            setCurrentHeight(collapsedHeight);
         } else { // Snap back
-            setCurrentHeight(expanded ? expandedHeightPx : collapsedHeight);
+            setHeight(expanded ? heights.expanded : heights.collapsed);
         }
         setDragStartY(null);
     }
@@ -111,26 +109,24 @@ export default function Footer({
     
         document.addEventListener('mouseup', handleMouseUp);
         return () => document.removeEventListener('mouseup', handleMouseUp);
-    }, [dragStartY, collapsedHeight, expanded]);
+    }, [dragStartY, expanded]);
     
     useEffect(() => {
-        const viewportHeight = window.innerHeight;
-        const expandedHeightPx = (viewportHeight * EXPANDED_HEIGHT_VH) / 100;
-        setCurrentHeight(expanded ? expandedHeightPx : collapsedHeight);
-    }, [expanded, collapsedHeight]);
+        setHeight(expanded ? heights.expanded : heights.collapsed);
+    }, [expanded, heights]);
 
     return (
         <>
             {/* Scrim */}
             {expanded && (
                 <div
-                    className="fixed inset-0 bg-black/30 z-20 transition-opacity duration-300"
+                    className="fixed inset-0 bg-black/30 z-20 transition-opacity duration-200"
                     onClick={() => setExpanded(false)}
                 />
             )}
 
-            {/* Invisible layout spacer*/}
-            <div className="sm:hidden h-1/5" ref={footerRef} />
+            {/* Invisible layout spacer
+            <div className="sm:hidden h-1/5" ref={footerRef} /> */}
 
             {/* Expandable footer */}
             <footer
@@ -142,7 +138,7 @@ export default function Footer({
                     "bg-surface border-t border-bdr flex flex-col",
                     "transition-[height] duration-300"
                 )}
-                style={{ height: `${currentHeight}px` }}
+                style={{ height: `${height}px` }}
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
                 onMouseDown={handleMouseDown}
@@ -151,7 +147,7 @@ export default function Footer({
                 {/* Drag Handle */}
                 <div
                     className="w-full flex justify-center items-center p-3 cursor-grab active:cursor-grabbing"
-                    onClick={() => setExpanded(prev => !prev)}
+                    onClick={() => {setExpanded(prev => !prev), console.log(expanded)}}
                 >
                     <div className="w-1/7 h-1 bg-surface-light rounded-full" />
                 </div>
@@ -161,7 +157,7 @@ export default function Footer({
                     {/* Collapsed Controls */}
                     <div
                         className={clsx(
-                            'flex items-center gap-3 transition-all duration-200',
+                            'flex items-center gap-3 transition-all duration-100',
                             expanded
                                 ? 'opacity-0 -translate-y-2 pointer-events-none'
                                 : 'opacity-100 translate-y-0 pointer-events-auto'

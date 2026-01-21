@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import GridView from './components/GridView';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -11,17 +11,31 @@ export default function App() {
     const gridViewRef = useRef<HTMLDivElement>(null);
 
     const [speed, setSpeed] = useState<Speed>('medium');
-    const speedRef = useRef<Speed>(speed); // Reference since speed can change during animation
+    const speedRef = useRef(speed);
     const [algorithm, setAlgorithm] = useState<PathAlgorithm>('A*');
-    const [isDrawing, setIsDrawing] = useState(false);
     const [animationState, setAnimationState] = useState<AnimationState>('idle');
-    const [result, setResult] = useState(''); 
+    const [isDrawing, setIsDrawing] = useState(false);
+    const [result, setResult] = useState('');
+
+    const [footerHeight, setFooterHeight] = useState(0);
 
     useEffect(() => {
         speedRef.current = speed;
     }, [speed]);
 
-    const { grid, gridRenderer, nodeSize, nodeMin, nodeMax, nodeStep, handleNodeSizeChange, handleResetAll, handleResetAlgorithmState, handleClearWalls, handleAnimationStep } = useGrid( // called every rerender
+    const {
+        grid,
+        gridRenderer,
+        nodeSize,
+        nodeMin,
+        nodeMax,
+        nodeStep,
+        handleNodeSizeChange,
+        handleResetAll,
+        handleResetAlgorithmState,
+        handleClearWalls,
+        handleAnimationStep,
+    } = useGrid(
         gridContainerRef,
         gridViewRef,
         animationState,
@@ -40,12 +54,8 @@ export default function App() {
         handleResetAlgorithmState
     );
 
-    const mapToggle = () => {
-        console.log("map mode");
-    }
-
     return (
-        <div className='w-screen h-screen bg-surface-dark flex flex-col text-text-main overflow-hidden'>
+        <div className="w-screen h-dvh flex flex-col bg-surface-dark overflow-hidden">
             <Header
                 animationState={animationState}
                 selectedAlgorithm={algorithm}
@@ -64,10 +74,14 @@ export default function App() {
                 isDrawing={isDrawing}
                 mapMode={false}
                 onDarkModeToggle={() => {}}
-                onMapModeToggle={mapToggle}
+                onMapModeToggle={() => {}}
             />
 
-            <main ref={gridContainerRef} className='h-full relative flex justify-center items-center'>
+            <main
+                ref={gridContainerRef}
+                className="flex-1 min-h-0 relative flex justify-center items-center"
+                style={{ marginBottom: footerHeight }}
+            >
                 <GridView
                     gridViewRef={gridViewRef}
                     renderer={gridRenderer}
@@ -101,13 +115,13 @@ export default function App() {
                     </div>
                 )}
 
-                {/* Result display */}
                 {result && (
-                    <div className='fixed z-50 bottom-24 left-1/2 -translate-x-1/2 px-8 py-4 rounded-2xl glass shadow-highlight border border-bdr-glass text-lg font-semibold text-text-main text-center'>
+                    <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-xl glass">
                         {result}
                     </div>
                 )}
             </main>
+
             <Footer
                 animationState={animationState}
                 selectedAlgorithm={algorithm}
@@ -120,8 +134,8 @@ export default function App() {
                 onClearWalls={handleClearWalls}
                 isDrawing={isDrawing}
                 mapMode={false}
+                onHeightChange={setFooterHeight}
             />
-            
         </div>
     );
 }
