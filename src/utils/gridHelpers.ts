@@ -14,18 +14,20 @@ export function computeNodeSizeBounds(container: HTMLElement): { min: number; ma
     const width = rect?.width ?? window.innerWidth;
     const height = rect?.height ?? window.innerHeight;
 
-    const minRows = 14;
-    const maxRows = 28;
-    const minCols = width < 640 ? 10 : 16;
-    const maxCols = width < 640 ? 22 : 42;
+    // Updated min/max row and col constraints for grid reset logic 
+    const minRows = 10;
+    const maxRows = 40;
+    const minCols = width < 640 ? 5 : 10;
+    const maxCols = width < 640 ? 30 : 60;
 
     const sizeForMaxDensity = Math.min(Math.floor(width / maxCols), Math.floor(height / maxRows));
     const sizeForMinDensity = Math.min(Math.floor(width / minCols), Math.floor(height / minRows));
 
     const min = snapTo(NODE_SIZE_STEP, Math.max(12, Math.min(80, sizeForMaxDensity)));
     const max = snapTo(NODE_SIZE_STEP, Math.max(min + NODE_SIZE_STEP, Math.min(220, sizeForMinDensity)));
-    const midpoint = Math.floor((min + max) / 2);
-    return { min, max, step: NODE_SIZE_STEP, initial: midpoint };
+    const initial = Math.floor((min + max) / 3);
+
+    return { min, max, step: NODE_SIZE_STEP, initial };
 }
 
 export function getMajorGridInterval(nodeSize: number) {
