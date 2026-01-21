@@ -1,5 +1,6 @@
 export const NODE_SIZE_STEP = 5;
 const MAJOR_GRID_PIXEL_INTERVAL = 150;
+const INITIAL_NODE_SIZE_RATIO = 0.4;
 const START_ROW_POSITION = 0.5;
 const START_COL_POSITION = 0.2;
 const END_ROW_POSITION = 0.5;
@@ -44,7 +45,7 @@ export function computeNodeSizeBounds(container: HTMLElement): { min: number; ma
 
     const min = snapTo(NODE_SIZE_STEP, Math.max(12, Math.min(80, sizeForMaxDensity)));
     const max = snapTo(NODE_SIZE_STEP, Math.max(min + NODE_SIZE_STEP, Math.min(220, sizeForMinDensity)));
-    const initial = Math.floor((min + max) * 0.4); // midpoint
+    const initial = Math.floor((min + max) * INITIAL_NODE_SIZE_RATIO);
 
     return { min, max, step: NODE_SIZE_STEP, initial };
 }

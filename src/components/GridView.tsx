@@ -57,7 +57,7 @@ export default function GridView({
     return (
         <div
             ref={gridViewRef}
-            className="absolute inset-0 select-none overflow-hidden touch-none"
+            className="relative select-none overflow-hidden touch-none"
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
