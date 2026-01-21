@@ -36,7 +36,7 @@ const SPEED_OPTIONS: Speed[] = ['slow', 'medium', 'fast'];
 const SPEED_SYMBOLS = ['>', '>>', '>>>'];
 
 const SWIPE_THRESHOLD = 50; // px
-const EXPANDED_HEIGHT_VH = 70; // as vh of viewport
+const EXPANDED_HEIGHT_VH = 80; // as vh of viewport
 
 export default function Footer({
     mapMode,
@@ -130,11 +130,18 @@ export default function Footer({
             )}
 
             {/* Invisible layout spacer*/}
-            <div className="sm:hidden h-1/6" ref={footerRef} />
+            <div className="sm:hidden h-1/5" ref={footerRef} />
 
             {/* Expandable footer */}
-            <div
-                className="sm:hidden fixed z-40 bottom-0 left-0 right-0 px-4 pb-3 touch-none select-none bg-surface flex flex-col transition-[height] duration-300"
+            <footer
+                className={clsx(
+                    "sm:hidden",
+                    "fixed z-40 bottom-0 left-0 right-0",
+                    "rounded-t-2xl px-4 pb-3",
+                    "touch-none select-none",
+                    "bg-surface border-t border-bdr flex flex-col",
+                    "transition-[height] duration-300"
+                )}
                 style={{ height: `${currentHeight}px` }}
                 onTouchStart={handleTouchStart}
                 onTouchEnd={handleTouchEnd}
@@ -162,9 +169,9 @@ export default function Footer({
                     >
                         <button
                             onClick={() => setExpanded(true)}
-                            className="px-3 py-2 rounded-lg bg-surface-light flex gap-2 items-center"
+                            className="px-3 py-2 rounded-lg bg-surface-light flex gap-2 items-center border border-bdr text-text-main hover:bg-surface-highlight transition-all"
                         >
-                            <span className="text-xs text-gray-400">Algo:</span>
+                            <span className="text-xs text-text-muted">Algo:</span>
                             <span>{selectedAlgorithm}</span>
                         </button>
 
@@ -173,8 +180,8 @@ export default function Footer({
                             disabled={isAnimating}
                             className={clsx(
                                 'px-3 py-2 rounded-lg text-sm font-medium',
-                                'bg-gray-700 border border-gray-600 text-gray-300',
-                                isAnimating && 'opacity-50 cursor-not-allowed'
+                                'bg-surface-light border border-bdr text-text-muted hover:bg-surface-highlight hover:text-text-main transition-all',
+                                isAnimating && 'opacity-60 cursor-not-allowed'
                             )}
                         >
                             Reset
@@ -184,10 +191,10 @@ export default function Footer({
                             onClick={onRun}
                             disabled={isAnimating}
                             className={clsx(
-                                'px-2 py-1 text-lg font-bold rounded-lg border-2',
+                                'px-2 py-1 text-lg font-bold rounded-lg border-2 transition-all',
                                 isAnimating
-                                    ? 'opacity-50 cursor-not-allowed text-text-muted'
-                                    : 'border-primary text-primary hover:bg-primary hover:text-text-invert'
+                                    ? 'opacity-60 cursor-not-allowed text-text-muted border-bdr'
+                                    : 'border-primary text-primary hover:bg-primary hover:text-text-invert shadow-highlight'
                             )}
                         >
                             GO
@@ -197,7 +204,7 @@ export default function Footer({
                     {/* Expanded Controls */}
                     <div
                         className={clsx(
-                            'absolute inset-0 transition-all duration-100',
+                            'absolute inset-0 transition-all duration-100 flex flex-col gap-4',
                             expanded
                                 ? 'opacity-100 translate-y-0 pointer-events-auto'
                                 : 'opacity-0 translate-y-2 pointer-events-none'
@@ -220,8 +227,7 @@ export default function Footer({
                             />
                         </LabelControl>
                         {/* Speed Selection */}
-                        <div className="space-y-2">
-                            <label className="text-sm text-gray-400">Speed</label>
+                        <LabelControl label="Speed">
                             <div className="flex gap-2">
                                 {SPEED_OPTIONS.map((s, i) => (
                                     <button
@@ -229,23 +235,23 @@ export default function Footer({
                                         onClick={() => onSpeedChange(s)}
                                         disabled={isAnimating}
                                         className={clsx(
-                                            'flex-1 py-4 rounded-lg font-bold transition-all border flex flex-col items-center gap-1',
+                                            'flex-1 py-1 rounded-md font-semibold transition-all border flex flex-col items-center gap-0.5 min-w-0',
+                                            'text-xs',
                                             isAnimating && 'opacity-50 cursor-not-allowed',
                                             speed === s
-                                                ? 'bg-cyan-400 text-gray-900 border-cyan-400 shadow-lg'
-                                                : 'bg-gray-700 text-white border-gray-600 hover:bg-gray-600'
+                                                ? 'bg-primary text-text-invert border-primary shadow-highlight'
+                                                : 'bg-surface-light text-text-main border-bdr hover:bg-surface-highlight'
                                         )}
+                                        style={{ minWidth: 0 }}
                                     >
-                                        <span className="text-2xl font-mono">{SPEED_SYMBOLS[i]}</span>
-                                        <span className="text-xs capitalize">{s}</span>
+                                        <span className="text-lg font-mono leading-none">{SPEED_SYMBOLS[i]}</span>
+                                        <span className="text-[0.72rem] capitalize leading-none">{s}</span>
                                     </button>
                                 ))}
                             </div>
-                        </div>
+                        </LabelControl>
 
-                        {/* Reset Actions */}
-                        <div className="space-y-2">
-                            <label className="text-sm text-gray-400">Reset Options</label>
+                        <LabelControl label="Reset Options" className="text-sm text-text-muted">
                             <div className="grid grid-cols-2 gap-2">
                                 <button
                                     onClick={() => {
@@ -254,9 +260,9 @@ export default function Footer({
                                     }}
                                     disabled={isAnimating}
                                     className={clsx(
-                                        'px-4 py-3 rounded-lg font-medium transition-all',
-                                        'bg-gray-700 border border-gray-600 text-gray-300',
-                                        'hover:text-white hover:bg-gray-600',
+                                        'px-2 py-1 rounded-md font-medium transition-all text-sm',
+                                        'bg-surface-light border border-bdr text-text-main',
+                                        'hover:text-text-main hover:bg-surface-highlight',
                                         isAnimating && 'opacity-50 cursor-not-allowed'
                                     )}
                                 >
@@ -269,9 +275,9 @@ export default function Footer({
                                     }}
                                     disabled={isAnimating}
                                     className={clsx(
-                                        'px-4 py-3 rounded-lg font-medium transition-all',
-                                        'bg-gray-700 border border-gray-600 text-gray-300',
-                                        'hover:text-white hover:bg-gray-600',
+                                        'px-2 py-1 rounded-md font-medium transition-all text-sm',
+                                        'bg-surface-light border border-bdr text-text-main',
+                                        'hover:text-text-main hover:bg-surface-highlight',
                                         isAnimating && 'opacity-50 cursor-not-allowed'
                                     )}
                                 >
@@ -285,9 +291,9 @@ export default function Footer({
                                         }}
                                         disabled={isAnimating}
                                         className={clsx(
-                                            'px-4 py-3 rounded-lg font-medium transition-all col-span-2',
-                                            'bg-gray-700 border border-gray-600 text-gray-300',
-                                            'hover:text-white hover:bg-gray-600',
+                                            'px-2 py-1 rounded-md font-medium transition-all col-span-2 text-sm',
+                                            'bg-surface-light border border-bdr text-text-main',
+                                            'hover:text-text-main hover:bg-surface-highlight',
                                             isAnimating && 'opacity-50 cursor-not-allowed'
                                         )}
                                     >
@@ -295,10 +301,10 @@ export default function Footer({
                                     </button>
                                 )}
                             </div>
-                        </div>
+                        </LabelControl>
                     </div>
                 </div>
-            </div>
+            </footer>
         </>
     );
 }
