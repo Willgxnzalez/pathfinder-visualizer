@@ -14,18 +14,37 @@ export function computeNodeSizeBounds(container: HTMLElement): { min: number; ma
     const width = rect?.width ?? window.innerWidth;
     const height = rect?.height ?? window.innerHeight;
 
-    // Updated min/max row and col constraints for grid reset logic 
-    const minRows = 10;
-    const maxRows = 40;
-    const minCols = width < 640 ? 5 : 10;
-    const maxCols = width < 640 ? 30 : 60;
+    const isMobile = width <= 640;
+    const isLargeDesktop = width >= 1440;
+
+    let minRows: number;
+    let maxRows: number;
+    let minCols: number;
+    let maxCols: number;
+
+    if (isMobile) {
+        minRows = 5;
+        maxRows = 20;
+        minCols = 6;
+        maxCols = 25;
+    } else if (isLargeDesktop) {
+        minRows = 10;
+        maxRows = 50;
+        minCols = 20;
+        maxCols = 100;
+    } else { // Tablet / normal desktop
+        minRows = 8;
+        maxRows = 35;
+        minCols = 16;
+        maxCols = 75;
+    }
 
     const sizeForMaxDensity = Math.min(Math.floor(width / maxCols), Math.floor(height / maxRows));
     const sizeForMinDensity = Math.min(Math.floor(width / minCols), Math.floor(height / minRows));
 
     const min = snapTo(NODE_SIZE_STEP, Math.max(12, Math.min(80, sizeForMaxDensity)));
     const max = snapTo(NODE_SIZE_STEP, Math.max(min + NODE_SIZE_STEP, Math.min(220, sizeForMinDensity)));
-    const initial = Math.floor((min + max) / 3);
+    const initial = Math.floor((min + max) * 0.4); // midpoint
 
     return { min, max, step: NODE_SIZE_STEP, initial };
 }
