@@ -38,7 +38,6 @@ export interface HeaderProps {
     onMapModeToggle: () => void;
 }
 
-
 const MAZE_GEN_ALGOS = [
     'Random',
     'Recursive-division',
@@ -161,36 +160,33 @@ export default function Header(props: HeaderProps) {
                 )}
             >
                 {/* Tablet View (640px - 1024px) */}
-                <div className="hidden sm:flex lg:hidden w-full px-4 py-2 items-end justify-between gap-4">
-                    {/* Left Side */}
-                    <div className="flex items-center gap-3">
-                        {/* Left Controls (Stacked) */}
-                        <div className="flex flex-col gap-2 w-48">
-                            <LabelControl label="Algorithm">
-                                <Dropdown
-                                    options={ALGORITHM_OPTIONS}
-                                    value={selectedAlgorithm}
-                                    onChange={onAlgorithmChange}
-                                    disabled={isAnimating}
-                                />
-                            </LabelControl>
-                            <LabelControl label="Maze Generation">
-                                <Dropdown
-                                    options={MAZE_GEN_ALGOS}
-                                    value={selectedMazeGen || 'Random'}
-                                    onChange={v => onMazeGenChange?.(v)}
-                                    disabled={isAnimating}
-                                />
-                            </LabelControl>
-                        </div>
+                <div className="hidden sm:flex lg:hidden w-full px-4 py-2 items-center gap-4">
+                    {/* Left Controls (Stacked) */}
+                    <div className="flex flex-1 flex-col gap-2">
+                        <LabelControl label="Algorithm" className="w-3/4">
+                            <Dropdown
+                                options={ALGORITHM_OPTIONS}
+                                value={selectedAlgorithm}
+                                onChange={onAlgorithmChange}
+                                disabled={isAnimating}
+                            />
+                        </LabelControl>
+                        <LabelControl label="Maze Generation" className="w-3/4">
+                            <Dropdown
+                                options={MAZE_GEN_ALGOS}
+                                value={selectedMazeGen || 'Random'}
+                                onChange={v => onMazeGenChange?.(v)}
+                                disabled={isAnimating}
+                            />
+                        </LabelControl>
                     </div>
 
-                    {/* Center - Visualize (Absolute center) */}
+                    {/* Visualize*/}
                     <button
                         onClick={onRun}
                         disabled={isAnimating}
                         className={clsx(
-                            'absolute left-1/2 -translate-x-1/2 px-6 py-3 text-xl font-bold rounded-lg transition-all whitespace-nowrap',
+                            'min-w-fit shrink-0 w-1/8 px-5 py-3 text-xl font-bold rounded-lg transition-all whitespace-nowrap',
                             isAnimating
                                 ? 'cursor-not-allowed opacity-50 text-text-muted'
                                 : 'cursor-pointer text-primary border-2 border-primary hover:bg-primary hover:text-text-invert'
@@ -200,59 +196,60 @@ export default function Header(props: HeaderProps) {
                     </button>
 
                     {/* Right Controls */}
-                    <div className="flex flex-col gap-2 items-end">
+                    <div className="h-full flex flex-1 flex-col justify-between items-center gap-3">
                         <LabelControl label="Speed">
-                            <div className="flex gap-1 items-center rounded-lg border border-bdr-muted p-1">
+                            <div className="flex items-center rounded-lg border border-bdr overflow-hidden">
                                 {SPEED_OPTIONS.map((s, i) => (
                                     <button
                                         key={s}
                                         onClick={() => onSpeedChange(s)}
                                         className={clsx(
-                                            'w-10 h-10 rounded-lg text-lg font-mono font-bold transition-all cursor-pointer',
+                                            'w-10 flex-1 rounded-none first:rounded-l-lg last:rounded-r-lg p-2 font-medium text-center transition-all cursor-pointer',
                                             speed === s
-                                                ? 'text-primary bg-surface-highlight shadow-lg scale-110'
+                                                ? 'text-text-main bg-surface-light'
                                                 : 'text-text-muted hover:text-text-main'
                                         )}
+                                        style={{ minWidth: "5rem" }}
                                     >
                                         {SPEED_OPTIONS[i]}
                                     </button>
                                 ))}
                             </div>
                         </LabelControl>
-                        <div className="flex rounded-lg border border-bdr overflow-hidden">
-                            <button
-                                onClick={onResetAll}
-                                disabled={isAnimating}
-                                className={clsx(
-                                    'px-3 py-2 text-sm text-text-muted hover:text-text-main hover:bg-surface-highlight border-r border-bdr whitespace-nowrap',
-                                    isAnimating && 'opacity-60 cursor-not-allowed'
-                                )}
-                            >
-                                Reset All
-                            </button>
-                            <button
-                                onClick={onResetAlgorithmState}
-                                disabled={isAnimating}
-                                className={clsx(
-                                    'px-3 py-2 text-sm text-text-muted hover:text-text-main hover:bg-surface-highlight border-r border-bdr whitespace-nowrap',
-                                    isAnimating && 'opacity-60 cursor-not-allowed'
-                                )}
-                            >
-                                Reset State
-                            </button>
-                            {onClearWalls && (
+                        <LabelControl label="Reset">
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={onResetAll}
+                                    disabled={isAnimating}
+                                    className={clsx(
+                                        'px-3 py-2 text-sm font-medium bg-surface-light text-red-800 hover:text-main hover:bg-surface-highlight rounded-lg border border-bdr whitespace-nowrap cursor-pointer',
+                                        isAnimating && 'opacity-60 cursor-not-allowed'
+                                    )}
+                                >
+                                    All
+                                </button>
+                                <button
+                                    onClick={onResetAlgorithmState}
+                                    disabled={isAnimating}
+                                    className={clsx(
+                                        'px-3 py-2 text-sm font-medium bg-surface-light text-text-muted hover:text-main hover:bg-surface-highlight rounded-lg border border-bdr whitespace-nowrap cursor-pointer',
+                                        isAnimating && 'opacity-60 cursor-not-allowed'
+                                    )}
+                                >
+                                    State
+                                </button>
                                 <button
                                     onClick={onClearWalls}
                                     disabled={isAnimating}
                                     className={clsx(
-                                        'px-3 py-2 text-sm text-text-muted hover:text-text-main hover:bg-surface-highlight whitespace-nowrap',
+                                        'px-3 py-2 text-sm font-medium bg-surface-light text-text-muted hover:text-main hover:bg-surface-highlight rounded-lg border border-bdr whitespace-nowrap cursor-pointer',
                                         isAnimating && 'opacity-60 cursor-not-allowed'
                                     )}
                                 >
-                                    Clear Walls
+                                    Walls
                                 </button>
-                            )}
-                        </div>
+                            </div>
+                        </LabelControl>
                     </div>
                 </div>
 
@@ -283,7 +280,7 @@ export default function Header(props: HeaderProps) {
                         onClick={onRun}
                         disabled={isAnimating}
                         className={clsx(
-                            'shrink-0 w-1/8 px-5 py-3 text-xl font-bold rounded-lg transition-all whitespace-nowrap',
+                            'min-w-fit shrink-0 w-1/8 px-5 py-3 text-xl font-bold rounded-lg transition-all whitespace-nowrap',
                             isAnimating
                                 ? 'cursor-not-allowed opacity-50 text-text-muted'
                                 : 'cursor-pointer text-primary border-2 border-primary hover:bg-primary hover:text-text-invert'
@@ -303,7 +300,7 @@ export default function Header(props: HeaderProps) {
                                         className={clsx(
                                             'w-10 flex-1 rounded-none first:rounded-l-lg last:rounded-r-lg p-2 font-medium text-center transition-all cursor-pointer',
                                             speed === s
-                                                ? 'text-primary bg-surface-highlight'
+                                                ? 'text-text-main bg-surface-light'
                                                 : 'text-text-muted hover:text-text-main'
                                         )}
                                         style={{ minWidth: "5rem" }}
@@ -313,40 +310,40 @@ export default function Header(props: HeaderProps) {
                                 ))}
                             </div>
                         </LabelControl>
-                        <div className="flex rounded-lg border border-bdr overflow-hidden">
-                            <button
-                                onClick={onResetAll}
-                                disabled={isAnimating}
-                                className={clsx(
-                                    'px-3 py-2 text-sm text-text-muted hover:text-text-main hover:bg-surface-highlight border-r border-bdr whitespace-nowrap',
-                                    isAnimating && 'opacity-60 cursor-not-allowed'
-                                )}
-                            >
-                                Reset All
-                            </button>
-                            <button
-                                onClick={onResetAlgorithmState}
-                                disabled={isAnimating}
-                                className={clsx(
-                                    'px-3 py-2 text-sm text-text-muted hover:text-text-main hover:bg-surface-highlight border-r border-bdr whitespace-nowrap',
-                                    isAnimating && 'opacity-60 cursor-not-allowed'
-                                )}
-                            >
-                                Reset State
-                            </button>
-                            {onClearWalls && (
+                        <LabelControl label="Reset">
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={onResetAll}
+                                    disabled={isAnimating}
+                                    className={clsx(
+                                        'px-3 py-2 text-sm font-medium bg-surface-light text-red-800 hover:text-main hover:bg-surface-highlight rounded-lg border border-bdr whitespace-nowrap cursor-pointer',
+                                        isAnimating && 'opacity-60 cursor-not-allowed'
+                                    )}
+                                >
+                                    All
+                                </button>
+                                <button
+                                    onClick={onResetAlgorithmState}
+                                    disabled={isAnimating}
+                                    className={clsx(
+                                        'px-3 py-2 text-sm font-medium bg-surface-light text-text-muted hover:text-main hover:bg-surface-highlight rounded-lg border border-bdr whitespace-nowrap cursor-pointer',
+                                        isAnimating && 'opacity-60 cursor-not-allowed'
+                                    )}
+                                >
+                                    State
+                                </button>
                                 <button
                                     onClick={onClearWalls}
                                     disabled={isAnimating}
                                     className={clsx(
-                                        'px-3 py-2 text-sm text-text-muted hover:text-text-main hover:bg-surface-highlight whitespace-nowrap',
+                                        'px-3 py-2 text-sm font-medium bg-surface-light text-text-muted hover:text-main hover:bg-surface-highlight rounded-lg border border-bdr whitespace-nowrap cursor-pointer',
                                         isAnimating && 'opacity-60 cursor-not-allowed'
                                     )}
                                 >
-                                    Clear Walls
+                                    Walls
                                 </button>
-                            )}
-                        </div>
+                            </div>
+                        </LabelControl>
                     </div>
                 </div>
             </div>
