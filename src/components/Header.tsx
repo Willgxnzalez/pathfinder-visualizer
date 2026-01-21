@@ -236,7 +236,7 @@ export default function Header(props: HeaderProps) {
                                         isAnimating && 'opacity-60 cursor-not-allowed'
                                     )}
                                 >
-                                    State
+                                    Path
                                 </button>
                                 <button
                                     onClick={onClearWalls}
@@ -330,7 +330,7 @@ export default function Header(props: HeaderProps) {
                                         isAnimating && 'opacity-60 cursor-not-allowed'
                                     )}
                                 >
-                                    State
+                                    Path
                                 </button>
                                 <button
                                     onClick={onClearWalls}
