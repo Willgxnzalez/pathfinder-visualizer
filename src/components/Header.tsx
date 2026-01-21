@@ -40,11 +40,11 @@ export interface HeaderProps {
 
 
 const MAZE_GEN_ALGOS = [
-    'random',
-    'recursive-division',
-    'prim',
-    'eller',
-    'kruskal',
+    'Random',
+    'Recursive-division',
+    'Prim',
+    'Eller',
+    'Kruskal',
 ] as const;
 
 type MazeGenAlgo = (typeof MAZE_GEN_ALGOS)[number];
@@ -115,7 +115,6 @@ export default function Header(props: HeaderProps) {
 
     const isAnimating = animationState !== 'idle';
 
-    const [mobileControlsOpen, setMobileControlsOpen] = useState(false);
     const [settingsOpen, setSettingsOpen] = useState(false);
 
     return (
@@ -162,7 +161,7 @@ export default function Header(props: HeaderProps) {
                 )}
             >
                 {/* Tablet View (640px - 1024px) */}
-                <div className="hidden sm:flex lg:hidden w-full px-4 py-3 items-end justify-between gap-4">
+                <div className="hidden sm:flex lg:hidden w-full px-4 py-2 items-end justify-between gap-4">
                     {/* Left Side */}
                     <div className="flex items-center gap-3">
                         {/* Left Controls (Stacked) */}
@@ -178,7 +177,7 @@ export default function Header(props: HeaderProps) {
                             <LabelControl label="Maze Generation">
                                 <Dropdown
                                     options={MAZE_GEN_ALGOS}
-                                    value={selectedMazeGen || 'random'}
+                                    value={selectedMazeGen || 'Random'}
                                     onChange={v => onMazeGenChange?.(v)}
                                     disabled={isAnimating}
                                 />
@@ -258,35 +257,33 @@ export default function Header(props: HeaderProps) {
                 </div>
 
                 {/* Desktop View (>= 1024px) */}
-                <div className="hidden lg:flex w-full px-4 py-3 items-end justify-between gap-4 relative">
-                    {/* Left Side */}
-                    <div className="flex items-end gap-3">
-                        <div className="flex gap-3 items-end">
-                            <LabelControl label="Algorithm">
-                                <Dropdown
-                                    options={ALGORITHM_OPTIONS}
-                                    value={selectedAlgorithm}
-                                    onChange={onAlgorithmChange}
-                                    disabled={isAnimating}
-                                />
-                            </LabelControl>
-                            <LabelControl label="Maze Generation">
-                                <Dropdown
-                                    options={MAZE_GEN_ALGOS}
-                                    value={selectedMazeGen || 'random'}
-                                    onChange={v => onMazeGenChange?.(v)}
-                                    disabled={isAnimating}
-                                />
-                            </LabelControl>
-                        </div>
+                <div className="hidden lg:flex w-full px-8 py-2 items-center justify-between gap-4 relative">
+                    {/* Left Controls */}
+                    <div className="flex flex-1 justify-start items-center gap-8">
+                        <LabelControl label="Algorithm" className="flex-1 max-w-1/3">
+                            <Dropdown
+                                options={ALGORITHM_OPTIONS}
+                                value={selectedAlgorithm}
+                                onChange={onAlgorithmChange}
+                                disabled={isAnimating}
+                            />
+                        </LabelControl>
+                        <LabelControl label="Maze Generation" className="flex-1 max-w-1/3">
+                            <Dropdown
+                                options={MAZE_GEN_ALGOS}
+                                value={selectedMazeGen || 'Random'}
+                                onChange={v => onMazeGenChange?.(v)}
+                                disabled={isAnimating}
+                            />
+                        </LabelControl>
                     </div>
 
-                    {/* Center - Visualize (Absolute center) */}
+                    {/* Visualize*/}
                     <button
                         onClick={onRun}
                         disabled={isAnimating}
                         className={clsx(
-                            'absolute left-1/2 -translate-x-1/2 px-6 py-3 text-xl font-bold rounded-lg transition-all whitespace-nowrap',
+                            'shrink-0 w-1/8 px-5 py-3 text-xl font-bold rounded-lg transition-all whitespace-nowrap',
                             isAnimating
                                 ? 'cursor-not-allowed opacity-50 text-text-muted'
                                 : 'cursor-pointer text-primary border-2 border-primary hover:bg-primary hover:text-text-invert'
@@ -296,19 +293,20 @@ export default function Header(props: HeaderProps) {
                     </button>
 
                     {/* Right Controls */}
-                    <div className="flex gap-3 items-end">
+                    <div className="flex flex-1 justify-end items-center gap-8">
                         <LabelControl label="Speed">
-                            <div className="flex gap-1 items-center rounded-lg border border-bdr-muted p-1">
+                            <div className="flex items-center rounded-lg border border-bdr overflow-hidden">
                                 {SPEED_OPTIONS.map((s, i) => (
                                     <button
                                         key={s}
                                         onClick={() => onSpeedChange(s)}
                                         className={clsx(
-                                            'w-10 h-10 rounded-lg text-lg font-mono font-bold transition-all cursor-pointer',
+                                            'w-10 flex-1 rounded-none first:rounded-l-lg last:rounded-r-lg p-2 font-medium text-center transition-all cursor-pointer',
                                             speed === s
-                                                ? 'text-primary bg-surface-highlight shadow-lg scale-110'
+                                                ? 'text-primary bg-surface-highlight'
                                                 : 'text-text-muted hover:text-text-main'
                                         )}
+                                        style={{ minWidth: "5rem" }}
                                     >
                                         {SPEED_OPTIONS[i]}
                                     </button>
