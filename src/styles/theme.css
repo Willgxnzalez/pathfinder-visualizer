@@ -3,7 +3,7 @@
   --color-surface-dark: oklch(0.1 0.02 270);
   --color-surface: oklch(0.2 0.02 270);
   --color-surface-light: oklch(0.3 0.02 270);
-  --color-surface-highlight: oklch(0.35 0.02 270);
+  --color-surface-highlight: oklch(0.4 0.02 270);
 
   --color-surface-glass: color-mix(in oklch, var(--color-surface) 50%, transparent);
   --color-surface-light-glass: color-mix(in oklch, var(--color-surface-light) 50%, transparent);
