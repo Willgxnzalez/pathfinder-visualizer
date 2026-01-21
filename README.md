@@ -42,9 +42,10 @@ npm run dev
 - [x] Brighter HUD (improved contrast/UI visibility)
 - [ ] Visualization on real maps (OpenStreetMap or other APIs)
 - [ ] Light mode/dark mode toggle
-- [ ] Speed slider (for continuous animation rate adjustment)
+- [x] Speed slider (for continuous animation rate adjustment)
 - [x] Improved initial placement for start/end nodes
-- [ ] Sidebar for advanced controls (heuristic selection, options, etc.)
+- [x] Sidebar for advanced controls (heuristic selection, options, etc.)
+    - [x] Node Size
     - [ ] Heuristic switch (Manhattan ↔ Euclidean)
     - [ ] Toggle diagonal movement
     - [ ] Weighted mode for Dijkstra's and similar algorithms
