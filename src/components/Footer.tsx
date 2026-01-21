@@ -28,8 +28,6 @@ export interface FooterProps {
     onResetAll: () => void;
     onResetAlgorithmState: () => void;
     onClearWalls?: () => void;
-    
-    onHeightChange: (h: number) => void;
 }
 
 const ALGORITHM_OPTIONS: PathAlgorithm[] = ['BFS', 'DFS', 'A*', 'GBFS', 'Dijkstra'];
@@ -55,7 +53,6 @@ export default function Footer({
     onResetAll,
     onResetAlgorithmState,
     onClearWalls,
-    onHeightChange
 }: FooterProps) {
     const isAnimating = animationState !== 'idle';
 
@@ -70,7 +67,6 @@ export default function Footer({
             const collapsedHeight = (window.visualViewport?.height ?? window.innerHeight) * COLLAPSED_RATIO;
             const expandedHeight = (window.visualViewport?.height ?? window.innerHeight) * EXPANDED_RATIO;
             setHeights({collapsed: collapsedHeight, expanded: expandedHeight});
-            onHeightChange(collapsedHeight);
         };
 
         updateHeights();
@@ -125,8 +121,10 @@ export default function Footer({
                 />
             )}
 
-            {/* Invisible layout spacer
-            <div className="sm:hidden h-1/5" ref={footerRef} /> */}
+            {/* Invisible layout spacer */}
+            <div className="sm:hidden"
+                style={{ height: `${heights.collapsed}px` }}
+            />
 
             {/* Expandable footer */}
             <footer

@@ -17,8 +17,6 @@ export default function App() {
     const [isDrawing, setIsDrawing] = useState(false);
     const [result, setResult] = useState('');
 
-    const [footerHeight, setFooterHeight] = useState(0);
-
     useEffect(() => {
         speedRef.current = speed;
     }, [speed]);
@@ -80,7 +78,6 @@ export default function App() {
             <main
                 ref={gridContainerRef}
                 className="flex-1 min-h-0 relative flex justify-center items-center"
-                style={{ marginBottom: footerHeight }}
             >
                 <GridView
                     gridViewRef={gridViewRef}
@@ -134,7 +131,6 @@ export default function App() {
                 onClearWalls={handleClearWalls}
                 isDrawing={isDrawing}
                 mapMode={false}
-                onHeightChange={setFooterHeight}
             />
         </div>
     );
