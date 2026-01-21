@@ -38,8 +38,6 @@ export default function useGrid(
         setNodeMax(max);
         setNodeStep(step);
         setNodeSize(initial);
-
-        console.log("compute node size bounds");
     }, []);
 
     // Mount renderer to GridView div
@@ -47,11 +45,8 @@ export default function useGrid(
         if (!gridViewRef.current) return;
 
         const renderer = new GridRenderer();
-        console.log(gridViewRef.current)
         renderer.mount(gridViewRef.current);
         rendererRef.current = renderer;
-
-        console.log("mount renderer")
 
         return () => {
             renderer.destroy();
@@ -69,8 +64,7 @@ export default function useGrid(
     // Create grid when nodeSize changes 
     useLayoutEffect(() => {
         if (!gridContainerRef.current) return;
-        console.log("run")
-
+        
         const rect = gridContainerRef.current.getBoundingClientRect();
         if (rect.width < 5 || rect.height < 5) return;
 
