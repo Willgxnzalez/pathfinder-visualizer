@@ -113,7 +113,7 @@ export default function App() {
                 )}
 
                 {result && (
-                    <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-xl glass">
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-xl glass">
                         {result}
                     </div>
                 )}
