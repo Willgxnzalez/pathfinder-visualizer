@@ -123,7 +123,7 @@ export default function Footer({
 
             {/* Invisible layout spacer */}
             <div className="sm:hidden"
-                style={{ height: `${heights.collapsed}px` }}
+                style={{ height: `${heights.collapsed + 8}px` }} // account for bottom-2
             />
 
             {/* Expandable footer */}
