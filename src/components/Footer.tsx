@@ -153,7 +153,7 @@ export default function Footer({
                 {/* Collapsed Controls */}
                 <div
                     className={clsx(
-                        'h-full flex justify-center items-center gap-3 transition-all duration-100',
+                        'h-full flex justify-center items-start gap-3 transition-all duration-100',
                         expanded
                             ? 'opacity-0 -translate-y-2 pointer-events-none'
                             : 'opacity-100 translate-y-0 pointer-events-auto'
@@ -163,29 +163,18 @@ export default function Footer({
                         onClick={() => setExpanded(true)}
                         className="h-full flex-1 flex flex-col gap-2 items-center"
                     >
-                        <div className="flex-1 w-full px-3 py-1 rounded-lg bg-surface-light border border-bdr flex flex-col items-center justify-center">
+                        <div className="w-full p-1 rounded-lg bg-surface-light border border-bdr flex flex-col items-center justify-center">
                             <div className="text-2xl font-bold text-text-main text-center">{selectedAlgorithm}</div>
                             <span className="text-xs text-text-muted mt-1 text-center">Path Algorithm</span>
                         </div>
-                        <div className="flex-1 w-full px-3 py-1  rounded-lg bg-surface-light border border-bdr flex flex-col items-center justify-center">
-                            <div className="text-2xl font-bold text-text-main text-center">{selectedMazeGen || 'Random'}</div>
+                        <div className="w-full p-1  rounded-lg bg-surface-light border border-bdr flex flex-col items-center justify-center">
+                            <div className="text-2xl font-bold text-text-main text-center">{selectedMazeGen || 'Recursive '}</div>
                             <span className="text-xs text-text-muted mt-1 text-center">Maze Generation</span>
                         </div>
                     </button>
 
-                    <button
-                        onClick={onRun}
-                        disabled={isAnimating}
-                        className={clsx(
-                            'px-3 py-4 text-3xl font-bold rounded-lg border-2 transition-all',
-                            isAnimating
-                                ? 'opacity-60 cursor-not-allowed text-text-muted border-bdr'
-                                : 'border-primary text-primary hover:bg-primary hover:text-text-invert shadow-highlight'
-                        )}
-                    >
-                        GO
-                    </button>
-                    <div className="flex-1 flex justify-center">
+                    
+                    <div className="h-full flex-1 flex justify-center items-start">
                         <button
                             onClick={onResetAlgorithmState}
                             disabled={isAnimating}
@@ -198,8 +187,18 @@ export default function Footer({
                             Reset
                         </button>
                     </div>
-                    
-
+                    <button
+                        onClick={onRun}
+                        disabled={isAnimating}
+                        className={clsx(
+                            'flex-1 max-w-1/4 py-3 text-3xl font-bold rounded-lg border-2 transition-all',
+                            isAnimating
+                                ? 'opacity-60 cursor-not-allowed text-text-muted border-bdr'
+                                : 'border-primary text-primary hover:bg-primary hover:text-text-invert shadow-highlight'
+                        )}
+                    >
+                        GO
+                    </button>
                 </div>
 
                 {/* Expanded Controls */}
