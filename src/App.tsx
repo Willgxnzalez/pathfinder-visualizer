@@ -110,9 +110,9 @@ export default function App() {
                             aria-label={animationState === 'paused' ? 'Pause' : 'Play'}
                         >
                             {animationState === 'paused' ? (
-                                <PauseIcon className="w-12 h-12 sm:w-14 sm:h-14"/>
-                            ) : (
                                 <PlayIcon className="w-12 h-12 sm:w-14 sm:h-14"/>
+                            ) : (
+                                <PauseIcon className="w-12 h-12 sm:w-14 sm:h-14"/>
                             )}
                         </button>
                         <button
