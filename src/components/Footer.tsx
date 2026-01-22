@@ -130,8 +130,8 @@ export default function Footer({
             <footer
                 className={clsx(
                     "sm:hidden",
-                    "fixed z-40 bottom-0 left-0 right-0",
-                    "rounded-t-2xl px-4 pb-3",
+                    "fixed z-40 bottom-2 left-4 right-4",
+                    "rounded-2xl px-4 pb-3",
                     "touch-none select-none",
                     "bg-surface border-t border-bdr flex flex-col",
                     "transition-[height] duration-300"
@@ -151,11 +151,11 @@ export default function Footer({
                 </div>
 
 
-                <div className="relative">
+                <div className="flex relative">
                     {/* Collapsed Controls */}
                     <div
                         className={clsx(
-                            'flex items-center gap-3 transition-all duration-100',
+                            'flex justify-center items-center gap-3 transition-all duration-100',
                             expanded
                                 ? 'opacity-0 -translate-y-2 pointer-events-none'
                                 : 'opacity-100 translate-y-0 pointer-events-auto'
@@ -163,29 +163,17 @@ export default function Footer({
                     >
                         <button
                             onClick={() => setExpanded(true)}
-                            className="px-3 py-2 rounded-lg bg-surface-light flex gap-2 items-center border border-bdr text-text-main hover:bg-surface-highlight transition-all"
+                            className="flex-1 px-3 py-2 rounded-lg bg-surface-light flex gap-2 items-center border border-bdr text-text-main hover:bg-surface-highlight transition-all"
                         >
                             <span className="text-xs text-text-muted">Algo:</span>
                             <span>{selectedAlgorithm}</span>
                         </button>
 
                         <button
-                            onClick={onResetAlgorithmState}
-                            disabled={isAnimating}
-                            className={clsx(
-                                'px-3 py-2 rounded-lg text-sm font-medium',
-                                'bg-surface-light border border-bdr text-text-muted hover:bg-surface-highlight hover:text-text-main transition-all',
-                                isAnimating && 'opacity-60 cursor-not-allowed'
-                            )}
-                        >
-                            Reset
-                        </button>
-
-                        <button
                             onClick={onRun}
                             disabled={isAnimating}
                             className={clsx(
-                                'px-2 py-1 text-lg font-bold rounded-lg border-2 transition-all',
+                                'p-3 text-lg font-bold rounded-lg border-2 transition-all',
                                 isAnimating
                                     ? 'opacity-60 cursor-not-allowed text-text-muted border-bdr'
                                     : 'border-primary text-primary hover:bg-primary hover:text-text-invert shadow-highlight'
@@ -193,6 +181,18 @@ export default function Footer({
                         >
                             GO
                         </button>
+                        <button
+                            onClick={onResetAlgorithmState}
+                            disabled={isAnimating}
+                            className={clsx(
+                                'flex-1 px-3 py-2 rounded-lg text-sm font-medium',
+                                'bg-surface-light border border-bdr text-text-muted hover:bg-surface-highlight hover:text-text-main transition-all',
+                                isAnimating && 'opacity-60 cursor-not-allowed'
+                            )}
+                        >
+                            Reset
+                        </button>
+
                     </div>
 
                     {/* Expanded Controls */}
