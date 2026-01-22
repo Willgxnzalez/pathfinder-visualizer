@@ -19,7 +19,7 @@ export default function App() {
     const [result, setResult] = useState('');
 
     const CONTROL_BTN =
-        "w-12 h-12 sm:w-14 sm:h-14 p-1 flex items-center justify-center " +
+        "flex items-center justify-center " +
         "rounded-lg font-bold transition border border-bdr-glass " +
         "shadow-highlight bg-surface-light-glass " +
         "hover:bg-surface-highlight-glass " +
@@ -102,7 +102,7 @@ export default function App() {
                             className={CONTROL_BTN}
                             aria-label="Stop"
                         >
-                            <StopIcon/>
+                            <StopIcon className="w-12 h-12 sm:w-14 sm:h-14"/>
                         </button>
                         <button
                             onClick={pathfinding.handlePlayPause}
@@ -110,9 +110,9 @@ export default function App() {
                             aria-label={animationState === 'paused' ? 'Pause' : 'Play'}
                         >
                             {animationState === 'paused' ? (
-                                <PauseIcon/>
+                                <PauseIcon className="w-12 h-12 sm:w-14 sm:h-14"/>
                             ) : (
-                                <PlayIcon/>
+                                <PlayIcon className="w-12 h-12 sm:w-14 sm:h-14"/>
                             )}
                         </button>
                         <button
@@ -120,7 +120,7 @@ export default function App() {
                             className={CONTROL_BTN}
                             aria-label="Step"
                         >
-                            <ChevronDoubleRightIcon/>
+                            <ChevronDoubleRightIcon className="w-12 h-12 sm:w-14 sm:h-14"/>
                         </button>
                     </div>
                 )}
