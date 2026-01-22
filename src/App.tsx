@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import usePathfinding from './hooks/usePathfinding';
 import useGrid from './hooks/useGrid';
 import type { PathAlgorithm, Speed, AnimationState } from './types';
+import { StopIcon, PlayIcon, PauseIcon, ChevronDoubleRightIcon } from '@heroicons/react/24/solid';
 
 export default function App() {
     const gridContainerRef = useRef<HTMLElement>(null);
@@ -16,6 +17,14 @@ export default function App() {
     const [animationState, setAnimationState] = useState<AnimationState>('idle');
     const [isDrawing, setIsDrawing] = useState(false);
     const [result, setResult] = useState('');
+
+    const CONTROL_BTN =
+        "w-12 h-12 sm:w-14 sm:h-14 p-1 flex items-center justify-center " +
+        "rounded-lg font-bold transition border border-bdr-glass " +
+        "shadow-highlight bg-surface-light-glass " +
+        "hover:bg-surface-highlight-glass " +
+        "text-text-muted hover:text-text-main";
+
 
     useEffect(() => {
         speedRef.current = speed;
@@ -87,27 +96,31 @@ export default function App() {
 
                 {/* Playback controls */}
                 {animationState !== 'idle' && (
-                    <div className="absolute z-40 bottom-4 left-1/2 -translate-x-1/2 flex gap-4 px-8 py-4 rounded-2xl glass shadow-highlight border border-bdr-glass">
+                    <div className="absolute z-40 bottom-4 left-1/2 -translate-x-1/2 flex gap-4 px-4 sm:px-8 py-4 rounded-2xl glass shadow-highlight border border-bdr-glass min-w-fit">
                         <button
                             onClick={pathfinding.handleStop}
-                            className="px-7 py-3 rounded-xl font-bold transition border border-bdr-glass shadow-highlight
-                                bg-surface-light-glass hover:bg-surface-highlight-glass text-text-muted hover:text-text-main"
+                            className={CONTROL_BTN}
+                            aria-label="Stop"
                         >
-                            STOP
+                            <StopIcon/>
                         </button>
                         <button
                             onClick={pathfinding.handlePlayPause}
-                            className="px-7 py-3 rounded-xl font-bold transition border border-bdr-glass shadow-highlight 
-                                bg-surface-light-glass hover:bg-surface-highlight-glass text-text-muted hover:text-text-main"
+                            className={CONTROL_BTN}
+                            aria-label={animationState === 'paused' ? 'Pause' : 'Play'}
                         >
-                            PLAY/PAUSE
+                            {animationState === 'paused' ? (
+                                <PauseIcon/>
+                            ) : (
+                                <PlayIcon/>
+                            )}
                         </button>
                         <button
                             onClick={pathfinding.handleStep}
-                            className="px-7 py-3 rounded-xl font-bold transition border border-bdr-glass shadow-highlight
-                                bg-surface-light-glass hover:bg-surface-highlight-glass text-text-muted hover:text-text-main"
+                            className={CONTROL_BTN}
+                            aria-label="Step"
                         >
-                            STEP
+                            <ChevronDoubleRightIcon/>
                         </button>
                     </div>
                 )}
