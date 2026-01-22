@@ -1,23 +1,23 @@
 @theme {
   /* === Background Layers === */
-  --color-surface-dark: oklch(0.12 0.0 255);
-  --color-surface: oklch(0.2 0.0115 255);
-  --color-surface-light: oklch(0.28 0.0115 255);
-  --color-surface-highlight: oklch(0.36 0.015 255);
+  --color-surface-dark: oklch(0.14 0 0);
+  --color-surface: oklch(0.22 0 0);
+  --color-surface-light: oklch(0.3 0 0);
+  --color-surface-highlight: oklch(0.38 0 0);
 
   --color-surface-glass: color-mix(in oklch, var(--color-surface) 50%, transparent);
   --color-surface-light-glass: color-mix(in oklch, var(--color-surface-light) 50%, transparent);
   --color-surface-highlight-glass: color-mix(in oklch, var(--color-surface-highlight) 70%, transparent);
 
   /* === Borders === */
-  --color-bdr: oklch(0.33 0.0115 255);
-  --color-bdr-muted: oklch(0.25 0.0115 255);
+  --color-bdr: oklch(0.35 0 0);
+  --color-bdr-muted: oklch(0.3 0 0);
   --color-bdr-glass: color-mix(in oklch, var(--color-bdr) 60%, transparent);
   --color-bdr-light-glass: color-mix(in oklch, var(--color-bdr) 30%, transparent);
 
   /* === Grid Lines === */
-  --color-grid-minor: color-mix(in oklch, var(--color-bdr) 35%, transparent);
-  --color-grid-major: color-mix(in oklch, var(--color-bdr) 70%, transparent);
+  --color-grid-minor: color-mix(in oklch, var(--color-bdr) 20%, transparent);
+  --color-grid-major: color-mix(in oklch, var(--color-bdr) 40%, transparent);
   
 
 
