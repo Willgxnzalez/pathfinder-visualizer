@@ -131,7 +131,7 @@ export default function Footer({
                 className={clsx(
                     "sm:hidden",
                     "fixed z-40 bottom-2 left-4 right-4",
-                    "rounded-2xl px-4 pb-3",
+                    "rounded-2xl px-4 pb-4",
                     "touch-none select-none",
                     "bg-surface border-t border-bdr flex flex-col",
                     "transition-[height] duration-300"
@@ -150,153 +150,159 @@ export default function Footer({
                     <div className="w-1/7 h-1 bg-surface-light rounded-full" />
                 </div>
 
+                {/* Collapsed Controls */}
+                <div
+                    className={clsx(
+                        'h-full flex justify-center items-center gap-3 transition-all duration-100',
+                        expanded
+                            ? 'opacity-0 -translate-y-2 pointer-events-none'
+                            : 'opacity-100 translate-y-0 pointer-events-auto'
+                    )}
+                >
+                    <button
+                        onClick={() => setExpanded(true)}
+                        className="h-full flex-1 flex flex-col gap-2 items-center"
+                    >
+                        <div className="flex-1 w-full px-3 py-1 rounded-lg bg-surface-light border border-bdr flex flex-col items-center justify-center">
+                            <div className="text-2xl font-bold text-text-main text-center">{selectedAlgorithm}</div>
+                            <span className="text-xs text-text-muted mt-1 text-center">Path Algorithm</span>
+                        </div>
+                        <div className="flex-1 w-full px-3 py-1  rounded-lg bg-surface-light border border-bdr flex flex-col items-center justify-center">
+                            <div className="text-2xl font-bold text-text-main text-center">{selectedMazeGen || 'Random'}</div>
+                            <span className="text-xs text-text-muted mt-1 text-center">Maze Generation</span>
+                        </div>
+                    </button>
 
-                <div className="flex relative">
-                    {/* Collapsed Controls */}
-                    <div
+                    <button
+                        onClick={onRun}
+                        disabled={isAnimating}
                         className={clsx(
-                            'flex justify-center items-center gap-3 transition-all duration-100',
-                            expanded
-                                ? 'opacity-0 -translate-y-2 pointer-events-none'
-                                : 'opacity-100 translate-y-0 pointer-events-auto'
+                            'px-3 py-4 text-3xl font-bold rounded-lg border-2 transition-all',
+                            isAnimating
+                                ? 'opacity-60 cursor-not-allowed text-text-muted border-bdr'
+                                : 'border-primary text-primary hover:bg-primary hover:text-text-invert shadow-highlight'
                         )}
                     >
-                        <button
-                            onClick={() => setExpanded(true)}
-                            className="flex-1 px-3 py-2 rounded-lg bg-surface-light flex gap-2 items-center border border-bdr text-text-main hover:bg-surface-highlight transition-all"
-                        >
-                            <span className="text-xs text-text-muted">Algo:</span>
-                            <span>{selectedAlgorithm}</span>
-                        </button>
-
-                        <button
-                            onClick={onRun}
-                            disabled={isAnimating}
-                            className={clsx(
-                                'p-3 text-lg font-bold rounded-lg border-2 transition-all',
-                                isAnimating
-                                    ? 'opacity-60 cursor-not-allowed text-text-muted border-bdr'
-                                    : 'border-primary text-primary hover:bg-primary hover:text-text-invert shadow-highlight'
-                            )}
-                        >
-                            GO
-                        </button>
+                        GO
+                    </button>
+                    <div className="flex-1 flex justify-center">
                         <button
                             onClick={onResetAlgorithmState}
                             disabled={isAnimating}
                             className={clsx(
-                                'flex-1 px-3 py-2 rounded-lg text-sm font-medium',
+                                'px-3 py-2 rounded-lg text-lg font-medium',
                                 'bg-surface-light border border-bdr text-text-muted hover:bg-surface-highlight hover:text-text-main transition-all',
                                 isAnimating && 'opacity-60 cursor-not-allowed'
                             )}
                         >
                             Reset
                         </button>
-
                     </div>
+                    
 
-                    {/* Expanded Controls */}
-                    <div
-                        className={clsx(
-                            'absolute inset-0 transition-all duration-100 flex flex-col gap-4',
-                            expanded
-                                ? 'opacity-100 translate-y-0 pointer-events-auto'
-                                : 'opacity-0 translate-y-2 pointer-events-none'
-                        )}
-                    >
-                        <LabelControl label="Algorithm">
-                            <Dropdown
-                                options={ALGORITHM_OPTIONS}
-                                value={selectedAlgorithm}
-                                onChange={onAlgorithmChange}
-                                disabled={isAnimating}
-                            />
-                        </LabelControl>
-                        <LabelControl label="Maze Generation">
-                            <Dropdown
-                                options={MAZE_GEN_ALGOS}
-                                value={selectedMazeGen || 'random'}
-                                onChange={v => onMazeGenChange?.(v)}
-                                disabled={isAnimating}
-                            />
-                        </LabelControl>
-                        {/* Speed Selection */}
-                        <LabelControl label="Speed">
-                            <div className="flex gap-2">
-                                {SPEED_OPTIONS.map((s, i) => (
-                                    <button
-                                        key={s}
-                                        onClick={() => onSpeedChange(s)}
-                                        disabled={isAnimating}
-                                        className={clsx(
-                                            'flex-1 py-1 rounded-md font-semibold transition-all border flex flex-col items-center gap-0.5 min-w-0',
-                                            'text-xs',
-                                            isAnimating && 'opacity-50 cursor-not-allowed',
-                                            speed === s
-                                                ? 'bg-primary text-text-invert border-primary shadow-highlight'
-                                                : 'bg-surface-light text-text-main border-bdr hover:bg-surface-highlight'
-                                        )}
-                                        style={{ minWidth: 0 }}
-                                    >
-                                        <span className="text-lg font-mono leading-none">{SPEED_SYMBOLS[i]}</span>
-                                        <span className="text-[0.72rem] capitalize leading-none">{s}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </LabelControl>
+                </div>
 
-                        <LabelControl label="Reset Options" className="text-sm text-text-muted">
-                            <div className="grid grid-cols-2 gap-2">
+                {/* Expanded Controls */}
+                <div
+                    className={clsx(
+                        'absolute inset-4 transition-all duration-100 flex flex-col gap-4',
+                        expanded
+                            ? 'opacity-100 translate-y-0 pointer-events-auto'
+                            : 'opacity-0 translate-y-2 pointer-events-none'
+                    )}
+                >
+                    <LabelControl label="Algorithm">
+                        <Dropdown
+                            options={ALGORITHM_OPTIONS}
+                            value={selectedAlgorithm}
+                            onChange={onAlgorithmChange}
+                            disabled={isAnimating}
+                        />
+                    </LabelControl>
+                    <LabelControl label="Maze Generation">
+                        <Dropdown
+                            options={MAZE_GEN_ALGOS}
+                            value={selectedMazeGen || 'random'}
+                            onChange={v => onMazeGenChange?.(v)}
+                            disabled={isAnimating}
+                        />
+                    </LabelControl>
+                    {/* Speed Selection */}
+                    <LabelControl label="Speed">
+                        <div className="flex gap-2">
+                            {SPEED_OPTIONS.map((s, i) => (
                                 <button
-                                    onClick={() => {
-                                        onResetAll();
-                                        setExpanded(false);
-                                    }}
+                                    key={s}
+                                    onClick={() => onSpeedChange(s)}
                                     disabled={isAnimating}
                                     className={clsx(
-                                        'px-2 py-1 rounded-md font-medium transition-all text-sm',
-                                        'bg-surface-light border border-bdr text-text-main',
-                                        'hover:text-text-main hover:bg-surface-highlight',
-                                        isAnimating && 'opacity-50 cursor-not-allowed'
+                                        'flex-1 py-1 rounded-md font-semibold transition-all border flex flex-col items-center gap-0.5 min-w-0',
+                                        'text-xs',
+                                        isAnimating && 'opacity-50 cursor-not-allowed',
+                                        speed === s
+                                            ? 'bg-primary text-text-invert border-primary shadow-highlight'
+                                            : 'bg-surface-light text-text-main border-bdr hover:bg-surface-highlight'
                                     )}
+                                    style={{ minWidth: 0 }}
                                 >
-                                    Reset All
+                                    <span className="text-lg font-mono leading-none">{SPEED_SYMBOLS[i]}</span>
+                                    <span className="text-[0.72rem] capitalize leading-none">{s}</span>
                                 </button>
-                                <button
-                                    onClick={() => {
-                                        onResetAlgorithmState();
-                                        setExpanded(false);
-                                    }}
-                                    disabled={isAnimating}
-                                    className={clsx(
-                                        'px-2 py-1 rounded-md font-medium transition-all text-sm',
-                                        'bg-surface-light border border-bdr text-text-main',
-                                        'hover:text-text-main hover:bg-surface-highlight',
-                                        isAnimating && 'opacity-50 cursor-not-allowed'
-                                    )}
-                                >
-                                    Reset State
-                                </button>
-                                {onClearWalls && (
-                                    <button
-                                        onClick={() => {
-                                            onClearWalls();
-                                            setExpanded(false);
-                                        }}
-                                        disabled={isAnimating}
-                                        className={clsx(
-                                            'px-2 py-1 rounded-md font-medium transition-all col-span-2 text-sm',
-                                            'bg-surface-light border border-bdr text-text-main',
-                                            'hover:text-text-main hover:bg-surface-highlight',
-                                            isAnimating && 'opacity-50 cursor-not-allowed'
-                                        )}
-                                    >
-                                        Clear Walls
-                                    </button>
+                            ))}
+                        </div>
+                    </LabelControl>
+
+                    <LabelControl label="Reset Options" className="text-sm text-text-muted">
+                        <div className="grid grid-cols-2 gap-2">
+                            <button
+                                onClick={() => {
+                                    onResetAll();
+                                    setExpanded(false);
+                                }}
+                                disabled={isAnimating}
+                                className={clsx(
+                                    'px-2 py-1 rounded-md font-medium transition-all text-sm',
+                                    'bg-surface-light border border-bdr text-text-main',
+                                    'hover:text-text-main hover:bg-surface-highlight',
+                                    isAnimating && 'opacity-50 cursor-not-allowed'
                                 )}
-                            </div>
-                        </LabelControl>
-                    </div>
+                            >
+                                Reset All
+                            </button>
+                            <button
+                                onClick={() => {
+                                    onResetAlgorithmState();
+                                    setExpanded(false);
+                                }}
+                                disabled={isAnimating}
+                                className={clsx(
+                                    'px-2 py-1 rounded-md font-medium transition-all text-sm',
+                                    'bg-surface-light border border-bdr text-text-main',
+                                    'hover:text-text-main hover:bg-surface-highlight',
+                                    isAnimating && 'opacity-50 cursor-not-allowed'
+                                )}
+                            >
+                                Reset State
+                            </button>
+                            {onClearWalls && (
+                                <button
+                                    onClick={() => {
+                                        onClearWalls();
+                                        setExpanded(false);
+                                    }}
+                                    disabled={isAnimating}
+                                    className={clsx(
+                                        'px-2 py-1 rounded-md font-medium transition-all col-span-2 text-sm',
+                                        'bg-surface-light border border-bdr text-text-main',
+                                        'hover:text-text-main hover:bg-surface-highlight',
+                                        isAnimating && 'opacity-50 cursor-not-allowed'
+                                    )}
+                                >
+                                    Clear Walls
+                                </button>
+                            )}
+                        </div>
+                    </LabelControl>
                 </div>
             </footer>
         </>
